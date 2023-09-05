@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">hersphere</string>
+
+    <string name="facebook_app_id">225922099798073</string>
+    <string name="fb_login_protocol_scheme">fb1234</string>
+    <string name="facebook_client_token">22110eed0cc16c94b0d46961529d8c57</string>
+
+</resources>
