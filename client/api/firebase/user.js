@@ -2,10 +2,9 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
-import {doc, setDoc} from 'firebase/firestore';
+import {collection, doc, getDoc, setDoc} from 'firebase/firestore';
 import {auth, db} from '../../firebase';
 import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import firebase from 'react-native-firebase';
 
 export const createAccount = async ({auth, email, username, password}) => {
   try {
@@ -14,6 +13,7 @@ export const createAccount = async ({auth, email, username, password}) => {
     await setDoc(doc(db, 'Users', res.user.uid), {
       username,
       email,
+      profileCompleted: false,
     });
     return res.user;
   } catch (err) {
@@ -24,7 +24,8 @@ export const createAccount = async ({auth, email, username, password}) => {
 export const login = async ({email, password}) => {
   try {
     const res = await signInWithEmailAndPassword(auth, email, password);
-    return res.user;
+    const user = await getDoc(doc(collection(db, 'Users'), res.user.uid));
+    return user.data();
   } catch (err) {
     throw err;
   }
@@ -40,16 +41,26 @@ export const loginWithGoogle = async () => {
 
     const userInfo = await GoogleSignin.signIn();
 
-    const credential = firebase.auth.GoogleAuthProvider.credential(
-      userInfo.idToken,
-    );
+    // const credential = firebase.auth.GoogleAuthProvider.credential(
+    //   userInfo.idToken,
+    // );
 
-    await setDoc(doc(db, 'Users', userInfo.user.id), {
-      username: userInfo.user.name,
-      email: userInfo.user.email,
-    });
+    const user = await getDoc(doc(collection(db, 'Users'), userInfo.user.id));
 
-    return firebase.auth().signInWithCredential(credential);
+    if (user.exists()) {
+      return user.data();
+    } else {
+      await setDoc(doc(db, 'Users', userInfo.user.id), {
+        username: userInfo.user.name,
+        email: userInfo.user.email,
+      });
+      return {
+        username: userInfo.user.name,
+        email: userInfo.user.email,
+      };
+    }
+
+    // return firebase.auth().signInWithCredential(credential);
   } catch (error) {
     throw error;
   }

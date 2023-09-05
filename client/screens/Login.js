@@ -12,10 +12,12 @@ import {Card, TextInput, Button, Text} from 'react-native-paper';
 import {IconButton} from 'react-native-paper';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {loginWithGoogle} from '../api/firebase/user';
+import {login, loginWithGoogle} from '../api/firebase/user';
 
 const LoginScreen = () => {
   const [apiCalled, setapiCalled] = useState(false);
+  const [email, setemail] = useState('');
+  const [password, setpassword] = useState('');
 
   const navigation = useNavigation();
 
@@ -23,11 +25,28 @@ const LoginScreen = () => {
     navigation.navigate('signup');
   };
 
-  const handleLogin = () => {};
+  const handleLogin = () => {
+    if (email && password)
+      login({email, password})
+        .then(res => {
+          if (res.profileCompleted) {
+            navigation.navigate('dashboard');
+          } else {
+            navigation.navigate('profileSetup');
+          }
+        })
+        .catch(err => {});
+  };
 
   const handleGoogleLogin = () => {
     loginWithGoogle()
-      .then(res => {})
+      .then(res => {
+        if (res.profileCompleted) {
+          navigation.navigate('dashboard');
+        } else {
+          navigation.navigate('profileSetup');
+        }
+      })
       .catch(err => {});
   };
 
@@ -48,6 +67,8 @@ const LoginScreen = () => {
           mode="outlined"
           style={styles.input}
           keyboardType="email-address"
+          value={email}
+          onChangeText={setemail}
         />
         <TextInput
           label="Password"
@@ -55,8 +76,14 @@ const LoginScreen = () => {
           secureTextEntry
           style={styles.input}
           right={<TextInput.Icon icon="eye" />}
+          value={password}
+          onChangeText={setpassword}
         />
-        <Button mode="elevated" style={styles.button} disabled={apiCalled}>
+        <Button
+          mode="elevated"
+          style={styles.button}
+          disabled={apiCalled}
+          onPress={handleLogin}>
           <Text style={{color: 'black', fontSize: 20}}>Login</Text>
         </Button>
         <View

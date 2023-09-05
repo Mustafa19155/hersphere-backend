@@ -4,6 +4,9 @@ import {Button, Text} from 'react-native-paper';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
+import {db, storage} from '../../firebase';
+import {doc} from 'firebase/firestore';
 
 const AddPhoto = ({isValidStep, setisValidStep}) => {
   const [imageUri, setImageUri] = useState(null);
@@ -18,6 +21,32 @@ const AddPhoto = ({isValidStep, setisValidStep}) => {
       setImageUri(result.assets[0].uri);
     }
   };
+
+  const handleUpload = async () => {
+    if (imageUri) {
+      const res = await fetch(imageUri);
+      const blob = res.blob();
+      // const imageRef = ref(storage, `profiles/userId`);
+      const filename = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+      const ref = firebase.storage().ref().child(filename).put(blob);
+      try {
+        await ref;
+      } catch (e) {
+        console.log(e);
+      }
+
+      // console.log(filename)
+      // await uploadBytes(imageRef, filename);
+      // const downloadimg = await getDownloadURL(imageRef);
+      // const updatedocument = doc(db, 'Users', userData.id);
+      // await updateDoc(updatedocument, {
+      //   picture: downloadimg,
+      // });
+    }
+  };
+
+  //called when continue is clicked
+  useEffect(() => () => handleUpload(), []);
 
   return (
     <View style={styles.container}>
