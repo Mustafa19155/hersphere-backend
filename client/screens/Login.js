@@ -16,8 +16,8 @@ import {login, loginWithGoogle} from '../api/firebase/user';
 
 const LoginScreen = () => {
   const [apiCalled, setapiCalled] = useState(false);
-  const [email, setemail] = useState('');
-  const [password, setpassword] = useState('');
+  const [email, setemail] = useState('asd@a.com');
+  const [password, setpassword] = useState('123456');
 
   const navigation = useNavigation();
 

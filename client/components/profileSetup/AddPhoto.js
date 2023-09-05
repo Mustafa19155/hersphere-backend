@@ -12,7 +12,12 @@ const AddPhoto = ({isValidStep, setisValidStep}) => {
   const [imageUri, setImageUri] = useState(null);
 
   useEffect(() => {
-    imageUri ? setisValidStep(true) : setisValidStep(false);
+    if (imageUri) {
+      handleUpload();
+      setisValidStep(true);
+    } else {
+      setisValidStep(false);
+    }
   }, [imageUri]);
 
   const selectImage = async () => {
@@ -23,30 +28,42 @@ const AddPhoto = ({isValidStep, setisValidStep}) => {
   };
 
   const handleUpload = async () => {
-    if (imageUri) {
-      const res = await fetch(imageUri);
-      const blob = res.blob();
-      // const imageRef = ref(storage, `profiles/userId`);
-      const filename = imageUri.substring(imageUri.lastIndexOf('/') + 1);
-      const ref = firebase.storage().ref().child(filename).put(blob);
-      try {
-        await ref;
-      } catch (e) {
-        console.log(e);
-      }
+    try {
+      console.log(imageUri);
+      if (imageUri) {
+        const res = await fetch(imageUri);
+        console.log(res);
+        const blob = res.blob();
+        // const imageRef = ref(storage, `profiles/userId`);
+        const filename = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+        console.log(filename);
+        const ref = firebase.storage().ref().child(filename).put(blob);
+        try {
+          await ref;
+        } catch (e) {
+          console.log(e);
+        }
 
-      // console.log(filename)
-      // await uploadBytes(imageRef, filename);
-      // const downloadimg = await getDownloadURL(imageRef);
-      // const updatedocument = doc(db, 'Users', userData.id);
-      // await updateDoc(updatedocument, {
-      //   picture: downloadimg,
-      // });
+        // console.log(filename)
+        // await uploadBytes(imageRef, filename);
+        // const downloadimg = await getDownloadURL(imageRef);
+        // const updatedocument = doc(db, 'Users', userData.id);
+        // await updateDoc(updatedocument, {
+        //   picture: downloadimg,
+        // });
+      }
+    } catch (err) {
+      console.log(err);
     }
   };
 
   //called when continue is clicked
-  useEffect(() => () => handleUpload(), []);
+  // useEffect(
+  //   () => () => {
+  //     handleUpload();
+  //   },
+  //   [],
+  // );
 
   return (
     <View style={styles.container}>
