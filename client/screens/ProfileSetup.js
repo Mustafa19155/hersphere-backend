@@ -1,8 +1,8 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, Dimensions} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import {Button} from 'react-native-paper';
+import {ScrollView} from 'react-native';
 import AddPhoto from '../components/profileSetup/AddPhoto';
 import UserType from '../components/profileSetup/UserType';
 import BusinessDetails from '../components/profileSetup/BusinessDetails';
@@ -34,45 +34,53 @@ export default function ProfileSetup() {
   }, [currentStep]);
 
   return (
-    <View style={styles.container}>
-      {currentStep > 1 && (
-        <View style={styles.topWrapper}>
-          <Icon
-            onPress={handlePrevioustep}
-            name="arrow-back"
-            size={30}
-            color="#000"
-          />
-        </View>
-      )}
-      <View>
-        {currentStep == 1 ? (
-          <AddPhoto isValidStep={isValidStep} setisValidStep={setisValidStep} />
-        ) : currentStep == 2 ? (
-          <UserType
-            isValidStep={isValidStep}
-            setisValidStep={setisValidStep}
-            setuserType={setuserType}
-          />
-        ) : currentStep == 3 ? (
-          <BusinessDetails
-            isValidStep={isValidStep}
-            setisValidStep={setisValidStep}
-          />
-        ) : (
-          <SocialConnect
-            isValidStep={isValidStep}
-            setisValidStep={setisValidStep}
-          />
-        )}
-      </View>
+    <ScrollView style={styles.container}>
       <View
         style={{
-          flex: 1,
-          flexDirection: 'row',
-          alignItems: 'flex-end',
-          marginBottom: 10,
+          minHeight: Dimensions.get('screen').height - 30,
         }}>
+        {currentStep > 1 && (
+          <View style={styles.topWrapper}>
+            <Icon
+              onPress={handlePrevioustep}
+              name="arrow-back"
+              size={30}
+              color="#000"
+            />
+          </View>
+        )}
+        <View>
+          {currentStep == 1 ? (
+            <AddPhoto
+              isValidStep={isValidStep}
+              setisValidStep={setisValidStep}
+            />
+          ) : currentStep == 2 ? (
+            <UserType
+              isValidStep={isValidStep}
+              setisValidStep={setisValidStep}
+              setuserType={setuserType}
+            />
+          ) : currentStep == 3 ? (
+            <SocialConnect
+              isValidStep={isValidStep}
+              setisValidStep={setisValidStep}
+            />
+          ) : (
+            <BusinessDetails
+              isValidStep={isValidStep}
+              setisValidStep={setisValidStep}
+              userType={userType}
+            />
+          )}
+        </View>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: 'row',
+            alignItems: 'flex-end',
+            marginBottom: 10,
+          }}></View>
         <Button
           disabled={!isValidStep}
           style={isValidStep ? styles.continueButton : styles.disabledBtn}
@@ -80,7 +88,7 @@ export default function ProfileSetup() {
           <Text style={styles.btnText}>Continue</Text>
         </Button>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -99,7 +107,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    width: '95%',
+    width: '90%',
     alignSelf: 'center',
   },
   topWrapper: {

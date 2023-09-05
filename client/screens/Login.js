@@ -12,6 +12,7 @@ import {Card, TextInput, Button, Text} from 'react-native-paper';
 import {IconButton} from 'react-native-paper';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {loginWithGoogle} from '../api/firebase/user';
 
 const LoginScreen = () => {
   const [apiCalled, setapiCalled] = useState(false);
@@ -23,6 +24,12 @@ const LoginScreen = () => {
   };
 
   const handleLogin = () => {};
+
+  const handleGoogleLogin = () => {
+    loginWithGoogle()
+      .then(res => {})
+      .catch(err => {});
+  };
 
   return (
     <View style={styles.container}>
@@ -75,27 +82,30 @@ const LoginScreen = () => {
               borderColor: 'gray',
             }}></View>
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderWidth: 1,
-            width: '80%',
-            borderColor: 'gray',
-            alignSelf: 'center',
-            borderRadius: 8,
-            marginTop: 20,
-            gap: 10,
-            paddingVertical: 10,
-          }}>
-          <Image
-            source={require('../assets/icons/google.png')}
-            style={{width: 30, height: 30}}
-          />
-          <Text style={{fontSize: 18}} disabled={!apiCalled}>
-            Continue with Google
-          </Text>
+        <View>
+          <TouchableOpacity
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderWidth: 1,
+              width: '80%',
+              borderColor: 'gray',
+              alignSelf: 'center',
+              borderRadius: 8,
+              marginTop: 20,
+              gap: 10,
+              paddingVertical: 10,
+            }}
+            onPress={handleGoogleLogin}>
+            <Image
+              source={require('../assets/icons/google.png')}
+              style={{width: 30, height: 30}}
+            />
+            <Text style={{fontSize: 18}} disabled={!apiCalled}>
+              Continue with Google
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 

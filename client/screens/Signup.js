@@ -1,4 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
+import {createUserWithEmailAndPassword} from 'firebase/auth';
 import React, {useState} from 'react';
 import {
   View,
@@ -12,18 +13,35 @@ import {Card, TextInput, Button, Text} from 'react-native-paper';
 import {IconButton} from 'react-native-paper';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import {createAccount} from '../api/firebase/user';
+import {auth, db} from '../firebase';
+import {setDoc} from 'firebase/firestore';
 const SignupScreen = () => {
   const navigation = useNavigation();
 
-  const [apiCalled, setapiCalled] = useState(false);
+  const [email, setemail] = useState('');
+  const [password, setpassword] = useState('');
+  const [username, setusername] = useState('');
+  const [confirmPassword, setconfirmPassword] = useState('');
 
   const handleLoginNavigate = () => {
     navigation.navigate('login');
   };
 
   const handleRegister = () => {
-    navigation.navigate('profileSetup');
+    if (
+      email &&
+      username &&
+      password &&
+      confirmPassword &&
+      password == confirmPassword
+    ) {
+      createAccount({auth, email, password, username})
+        .then(res => {
+          navigation.navigate('profileSetup');
+        })
+        .catch(err => {});
+    }
   };
 
   return (
@@ -38,12 +56,20 @@ const SignupScreen = () => {
       </ImageBackground>
 
       <View style={styles.inputsWrapper}>
-        <TextInput label="Full Name" mode="outlined" style={styles.input} />
+        <TextInput
+          label="Full Name"
+          mode="outlined"
+          style={styles.input}
+          value={username}
+          onChangeText={setusername}
+        />
         <TextInput
           label="Email"
           mode="outlined"
           style={styles.input}
           keyboardType="email-address"
+          value={email}
+          onChangeText={setemail}
         />
         <TextInput
           label="Password"
@@ -51,6 +77,8 @@ const SignupScreen = () => {
           secureTextEntry
           style={styles.input}
           right={<TextInput.Icon icon="eye" />}
+          value={password}
+          onChangeText={setpassword}
         />
         <TextInput
           label="Confirm Password"
@@ -58,6 +86,8 @@ const SignupScreen = () => {
           secureTextEntry
           style={styles.input}
           right={<TextInput.Icon icon="eye" />}
+          value={confirmPassword}
+          onChangeText={setconfirmPassword}
         />
         <Button mode="elevated" style={styles.button} onPress={handleRegister}>
           <Text style={{color: 'black', fontSize: 20}}>Signup</Text>

@@ -4,10 +4,6 @@ const authMiddleware = require("../middlewares/auth");
 
 var router = express.Router();
 
-router.get("/admin", authMiddleware.verifyJWT, authController.getUser);
-router.put("/single", authMiddleware.verifyJWT, authController.updateUser);
-router.post("/login", authController.login, authMiddleware.createJWT);
-router.post("/logout", authMiddleware.verifyJWT, authController.logout);
-router.get("/isLoggedIn", authMiddleware.verifyJWT, authController.isLoggedIn);
-
+router.get("/facebook-pages", authController.getFacebookPages);
+router.get("/youtube-details", authController.getYoutubeDetails);
 module.exports = router;

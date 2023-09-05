@@ -54,12 +54,12 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
     color: 'white',
     alignSelf: 'center',
-    fontSize: 24,
+    fontSize: 20,
   },
   inactiveText: {
     textTransform: 'capitalize',
     alignSelf: 'center',
-    fontSize: 24,
+    fontSize: 20,
     color: '#000',
   },
   typesWrapper: {
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   activeButton: {
     textAlign: 'center',
-    backgroundColor: '#0C7324',
+    backgroundColor: '#0C7320',
     borderRadius: 20,
     color: 'white',
     paddingVertical: 10,
