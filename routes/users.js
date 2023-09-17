@@ -5,5 +5,6 @@ const authMiddleware = require("../middlewares/auth");
 var router = express.Router();
 
 router.get("/facebook-pages", authController.getFacebookPages);
+router.get("/instagram-pages", authController.getInstagramPages);
 router.get("/youtube-details", authController.getYoutubeDetails);
 module.exports = router;

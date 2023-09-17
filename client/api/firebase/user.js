@@ -11,11 +11,17 @@ export const createAccount = async ({auth, email, username, password}) => {
     const res = await createUserWithEmailAndPassword(auth, email, password);
 
     await setDoc(doc(db, 'Users', res.user.uid), {
+      id: res.user.uid,
       username,
       email,
       profileCompleted: false,
     });
-    return res.user;
+    return {
+      id: res.user.uid,
+      username,
+      email,
+      profileCompleted: false,
+    };
   } catch (err) {
     throw err;
   }
@@ -25,7 +31,11 @@ export const login = async ({email, password}) => {
   try {
     const res = await signInWithEmailAndPassword(auth, email, password);
     const user = await getDoc(doc(collection(db, 'Users'), res.user.uid));
-    return user.data();
+    if (user.data()) {
+      return user.data();
+    } else {
+      throw err;
+    }
   } catch (err) {
     throw err;
   }
@@ -51,11 +61,14 @@ export const loginWithGoogle = async () => {
       return user.data();
     } else {
       await setDoc(doc(db, 'Users', userInfo.user.id), {
+        googleId: userInfo.user.id,
+        id: userInfo.user.id,
         username: userInfo.user.name,
         email: userInfo.user.email,
         profileCompleted: false,
       });
       return {
+        id: userInfo.user.id,
         username: userInfo.user.name,
         email: userInfo.user.email,
         profileCompleted: false,
@@ -64,13 +77,14 @@ export const loginWithGoogle = async () => {
 
     // return firebase.auth().signInWithCredential(credential);
   } catch (error) {
+    console.log(error);
     throw error;
   }
 };
 
-export const udpateUser = async data => {
+export const udpateUser = async (userId, data) => {
   try {
-    await updateDoc(doc(db, 'Users', '110312011204047655082'), data);
+    await updateDoc(doc(db, 'Users', userId), data);
     return;
   } catch (err) {
     throw err;

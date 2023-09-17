@@ -8,6 +8,7 @@ import UserType from '../components/profileSetup/UserType';
 import BusinessDetails from '../components/profileSetup/BusinessDetails';
 import SocialConnect from '../components/profileSetup/SocialConnect';
 import {StackActions, useNavigation} from '@react-navigation/native';
+import ContinueButton from '../components/profileSetup/ContinueButton';
 
 export default function ProfileSetup() {
   const navigation = useNavigation();
@@ -29,10 +30,6 @@ export default function ProfileSetup() {
     if (currentStep > 1) setcurrentStep(currentStep - 1);
   };
 
-  useEffect(() => {
-    setisValidStep(false);
-  }, [currentStep]);
-
   return (
     <ScrollView style={styles.container}>
       <View
@@ -52,22 +49,26 @@ export default function ProfileSetup() {
         <View>
           {currentStep == 1 ? (
             <AddPhoto
+              setcurrentStep={setcurrentStep}
               isValidStep={isValidStep}
               setisValidStep={setisValidStep}
             />
           ) : currentStep == 2 ? (
             <UserType
+              setcurrentStep={setcurrentStep}
               isValidStep={isValidStep}
               setisValidStep={setisValidStep}
               setuserType={setuserType}
             />
           ) : currentStep == 3 ? (
             <SocialConnect
+              setcurrentStep={setcurrentStep}
               isValidStep={isValidStep}
               setisValidStep={setisValidStep}
             />
           ) : (
             <BusinessDetails
+              setcurrentStep={setcurrentStep}
               isValidStep={isValidStep}
               setisValidStep={setisValidStep}
               userType={userType}
@@ -81,30 +82,18 @@ export default function ProfileSetup() {
             alignItems: 'flex-end',
             marginBottom: 10,
           }}></View>
-        <Button
-          disabled={!isValidStep}
-          style={isValidStep ? styles.continueButton : styles.disabledBtn}
-          onPress={handleNextStep}>
-          <Text style={styles.btnText}>Continue</Text>
-        </Button>
+        {currentStep != 4 && (
+          <ContinueButton
+            isValidStep={isValidStep}
+            clickHandler={handleNextStep}
+          />
+        )}
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  disabledBtn: {
-    opacity: 0.7,
-    backgroundColor: 'gray',
-    width: '100%',
-  },
-  btnText: {
-    color: 'white',
-  },
-  continueButton: {
-    backgroundColor: '#2A52C1',
-    width: '100%',
-  },
   container: {
     flex: 1,
     width: '90%',

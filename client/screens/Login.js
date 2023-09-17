@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   View,
   StyleSheet,
@@ -13,13 +13,16 @@ import {IconButton} from 'react-native-paper';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {login, loginWithGoogle} from '../api/firebase/user';
+import {AuthContext} from '../contexts/userContext';
 
 const LoginScreen = () => {
   const [apiCalled, setapiCalled] = useState(false);
-  const [email, setemail] = useState('asd@a.com');
+  const [email, setemail] = useState('as@a.com');
   const [password, setpassword] = useState('123456');
 
   const navigation = useNavigation();
+
+  const {user, setuser} = useContext(AuthContext);
 
   const handleRegisterNavigate = () => {
     navigation.navigate('signup');
@@ -29,6 +32,7 @@ const LoginScreen = () => {
     if (email && password)
       login({email, password})
         .then(res => {
+          setuser(res);
           if (res.profileCompleted) {
             navigation.navigate('dashboard');
           } else {
@@ -41,13 +45,17 @@ const LoginScreen = () => {
   const handleGoogleLogin = () => {
     loginWithGoogle()
       .then(res => {
+        setuser(res);
+
         if (res.profileCompleted) {
           navigation.navigate('dashboard');
         } else {
           navigation.navigate('profileSetup');
         }
       })
-      .catch(err => {});
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   return (

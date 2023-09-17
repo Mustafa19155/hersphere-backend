@@ -1,23 +1,43 @@
 import {View, Text, StyleSheet} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {Button} from 'react-native-paper';
 import {TouchableOpacity} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {udpateUser} from '../../api/firebase/user';
+import {AuthContext} from '../../contexts/userContext';
 
-export default function UserType({isValidStep, setisValidStep, setuserType}) {
+export default function UserType({
+  isValidStep,
+  setisValidStep,
+  setuserType,
+  setcurrentStep,
+}) {
   const userTypes = [{name: 'startup'}, {name: 'influencer'}];
   const [activeType, setactiveType] = useState('');
+
+  const {user, setuser} = useContext(AuthContext);
 
   const handleActiveType = async index => {
     setuserType(userTypes[index].name);
     setactiveType(userTypes[index].name);
-    await udpateUser({userType: userTypes[index].name});
+    setuser({...user, userType: userTypes[index].name});
+    await udpateUser(user.id, {userType: userTypes[index].name});
   };
 
   useEffect(() => {
     activeType ? setisValidStep(true) : setisValidStep(false);
   }, [activeType]);
+
+  useEffect(() => {
+    if (user?.userType) {
+      setuserType(user.userType);
+      setactiveType(user?.userType);
+      setisValidStep(true);
+      setcurrentStep(prev => prev + 1);
+    } else {
+      setisValidStep(false);
+    }
+  }, []);
 
   return (
     <View>

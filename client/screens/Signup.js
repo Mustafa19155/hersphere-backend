@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   View,
   StyleSheet,
@@ -16,8 +16,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {createAccount} from '../api/firebase/user';
 import {auth, db} from '../firebase';
 import {setDoc} from 'firebase/firestore';
+import {AuthContext} from '../contexts/userContext';
+
 const SignupScreen = () => {
   const navigation = useNavigation();
+
+  const {setuser} = useContext(AuthContext);
 
   const [email, setemail] = useState('');
   const [password, setpassword] = useState('');
@@ -38,9 +42,12 @@ const SignupScreen = () => {
     ) {
       createAccount({auth, email, password, username})
         .then(res => {
+          setuser(res);
           navigation.navigate('profileSetup');
         })
-        .catch(err => {});
+        .catch(err => {
+          console.log(err);
+        });
     }
   };
 

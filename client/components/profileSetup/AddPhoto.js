@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import {View, Image, StyleSheet} from 'react-native';
 import {Button, Text} from 'react-native-paper';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
@@ -8,9 +8,12 @@ import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
 import {db, storage} from '../../firebase';
 import {doc} from 'firebase/firestore';
 import {udpateUser} from '../../api/firebase/user';
+import {AuthContext} from '../../contexts/userContext';
 
-const AddPhoto = ({isValidStep, setisValidStep}) => {
+const AddPhoto = ({isValidStep, setisValidStep, setcurrentStep}) => {
   const [imageUri, setImageUri] = useState(null);
+
+  const {user, setuser} = useContext(AuthContext);
 
   useEffect(() => {
     if (imageUri) {
@@ -42,12 +45,21 @@ const AddPhoto = ({isValidStep, setisValidStep}) => {
 
         const downloadimg = await getDownloadURL(mainRef);
 
-        await udpateUser({profileImage: downloadimg});
+        setuser({...user, profileImage: downloadimg});
+
+        await udpateUser(user.id, {profileImage: downloadimg});
       }
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
+
+  useEffect(() => {
+    if (user.profileImage) {
+      setcurrentStep(prev => prev + 1);
+      setisValidStep(true);
+    } else {
+      setisValidStep(false);
+    }
+  }, []);
 
   //called when continue is clicked
   // useEffect(

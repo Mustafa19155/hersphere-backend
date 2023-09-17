@@ -8,8 +8,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 
-const TagInput = () => {
-  const [tags, setTags] = useState([]);
+const TagInput = ({tags, setTags}) => {
   const [text, setText] = useState('');
 
   const addTag = () => {

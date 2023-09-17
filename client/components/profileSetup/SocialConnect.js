@@ -1,5 +1,5 @@
 import {View, Text, StyleSheet} from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {Button} from 'react-native-paper';
 import {TouchableOpacity} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
@@ -11,12 +11,23 @@ import {
 } from '@react-native-google-signin/google-signin';
 import axios from 'axios';
 import {axiosClient} from '../../api/axios';
+import {getFacebookPages, getInstagramPages} from '../../api/socialConnect';
+import {AuthContext} from '../../contexts/userContext';
+import SocialPageChooseModal from '../modals/SocialPageChooseModal';
+import {udpateUser} from '../../api/firebase/user';
+import {collection, doc, getDoc} from 'firebase/firestore';
+import {db} from '../../firebase';
 
 export default function SocialConnect({
   isValidStep,
   setisValidStep,
   setuserType,
 }) {
+  const {user, setuser} = useContext(AuthContext);
+  const [socialModalOpen, setsocialModalOpen] = useState(false);
+  const [pages, setpages] = useState([]);
+  const [activeType, setactiveType] = useState('');
+
   const handleGoogleSignin = async index => {
     try {
       await GoogleSignin.hasPlayServices();
@@ -29,40 +40,29 @@ export default function SocialConnect({
           'https://www.googleapis.com/auth/youtube.upload',
         ],
       });
-
-      const userInfo = await GoogleSignin.signIn();
       const tokens = await GoogleSignin.getTokens();
 
       axiosClient
         .get(`/user/youtube-details?access_token=${tokens.accessToken}`)
         .then(res => {
-          console.log(res);
+          handleChoosePage(res.data, 'youtube');
+          // setaccountTypes(
+          //   accountTypes.map((type, ind) => {
+          //     if (ind == index) {
+          //       return {
+          //         ...type,
+          //         connected: true,
+          //       };
+          //     }
+          //     return type;
+          //   }),
+          // );
         })
         .catch(err => {
-          console.log(err);
+          // console.log(err);
         });
-      setaccountTypes(
-        accountTypes.map((type, ind) => {
-          if (ind == index) {
-            return {
-              ...type,
-              connected: true,
-            };
-          }
-          return type;
-        }),
-      );
     } catch (error) {
       console.log(error);
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        // play services not available or outdated
-      } else {
-        // some other error happened
-      }
     }
   };
 
@@ -72,7 +72,7 @@ export default function SocialConnect({
       'instagram_content_publish',
       'instagram_manage_comments',
       'instagram_manage_insights',
-      // 'pages_show_list',
+      'pages_show_list',
       'pages_read_engagement',
     ]).then(
       function (result) {
@@ -80,25 +80,33 @@ export default function SocialConnect({
           console.log('Login cancelled');
         } else {
           AccessToken.getCurrentAccessToken().then(data => {
-            axios
-              .get('http://192.168.18.60:3001/api/user/facebook-pages')
+            getInstagramPages({
+              token: data.accessToken,
+              userType: user.userType,
+            })
               .then(res => {
-                console.log(res);
+                setpages(res);
+                if (res.length > 1) {
+                  setactiveType('instagram');
+                  setsocialModalOpen(true);
+                } else {
+                  handleChoosePage(res[0], 'instagram');
+                }
+                // setaccountTypes(
+                //   accountTypes.map((type, ind) => {
+                //     if (ind == index) {
+                //       return {
+                //         ...type,
+                //         connected: true,
+                //       };
+                //     }
+                //     return type;
+                //   }),
+                // );
               })
               .catch(err => {
                 console.log(err);
               });
-            setaccountTypes(
-              accountTypes.map((type, ind) => {
-                if (ind == index) {
-                  return {
-                    ...type,
-                    connected: true,
-                  };
-                }
-                return type;
-              }),
-            );
           });
         }
       },
@@ -120,25 +128,30 @@ export default function SocialConnect({
           console.log('Login cancelled');
         } else {
           AccessToken.getCurrentAccessToken().then(data => {
-            axios
-              .get('http://192.168.18.60:3001/api/user/facebook-pages')
+            getFacebookPages({token: data.accessToken, userType: user.userType})
               .then(res => {
-                console.log(res);
+                setpages(res);
+                if (res.length > 1) {
+                  setactiveType('facebook');
+                  setsocialModalOpen(true);
+                } else {
+                  handleChoosePage(res[0], 'facebook');
+                }
+                // setaccountTypes(
+                //   accountTypes.map((type, ind) => {
+                //     if (ind == index) {
+                //       return {
+                //         ...type,
+                //         connected: true,
+                //       };
+                //     }
+                //     return type;
+                //   }),
+                // );
               })
               .catch(err => {
-                console.log(err);
+                // console.log(err);
               });
-            setaccountTypes(
-              accountTypes.map((type, ind) => {
-                if (ind == index) {
-                  return {
-                    ...type,
-                    connected: true,
-                  };
-                }
-                return type;
-              }),
-            );
           });
         }
       },
@@ -146,6 +159,22 @@ export default function SocialConnect({
         console.log('Login fail with error: ' + error);
       },
     );
+  };
+
+  const handleChoosePage = async (page, type) => {
+    const dbUser = (await getDoc(doc(db, 'Users', user.id))).data();
+
+    if (type == 'facebook') {
+      setuser({...dbUser, facebookPage: page});
+      await udpateUser(user.id, {facebookPage: page});
+    } else if (type == 'instagram') {
+      setuser({...dbUser, instagramPage: page});
+      await udpateUser(user.id, {instagramPage: page});
+    } else {
+      setuser({...dbUser, youtubeChannel: page});
+      await udpateUser(user.id, {youtubeChannel: page});
+    }
+    setsocialModalOpen(false);
   };
 
   const [accountTypes, setaccountTypes] = useState([
@@ -173,15 +202,49 @@ export default function SocialConnect({
   ]);
 
   useEffect(() => {
+    let valid = false;
     accountTypes.map(type => {
       if (type.connected) {
-        setisValidStep(true);
+        valid = true;
       }
     });
+    setisValidStep(valid);
   }, [accountTypes]);
+
+  useEffect(() => {
+    setaccountTypes(
+      accountTypes.map(type => {
+        if (type.name == 'youtube') {
+          return {
+            ...type,
+            connected: user?.youtubeChannel ? true : false,
+          };
+        } else if (type.name == 'facebook') {
+          return {
+            ...type,
+            connected: user?.facebookPage ? true : false,
+          };
+        } else {
+          return {
+            ...type,
+            connected: user?.instagramPage ? true : false,
+          };
+        }
+      }),
+    );
+  }, [user]);
 
   return (
     <View>
+      {socialModalOpen && (
+        <SocialPageChooseModal
+          open={socialModalOpen}
+          onconfirm={handleChoosePage}
+          data={pages}
+          setopen={setsocialModalOpen}
+          type={activeType}
+        />
+      )}
       <View style={styles.headingWrapper}>
         <Text style={styles.heading}>Social Accounts Connect</Text>
         <Text style={styles.subheading}>

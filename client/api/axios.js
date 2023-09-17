@@ -1,8 +1,10 @@
 import axios from 'axios';
+import {baseURL} from '../variables';
 
 export const axiosClient = axios.create();
 
-axiosClient.defaults.baseURL = process.env.REACT_APP_BASE_URL + '/api';
+axiosClient.defaults.baseURL = baseURL + '/api';
+
 axiosClient.defaults.headers = {
   'Content-Type': 'application/json',
   Accept: 'application/json',
