@@ -17,6 +17,7 @@ import SocialPageChooseModal from '../modals/SocialPageChooseModal';
 import {udpateUser} from '../../api/firebase/user';
 import {collection, doc, getDoc} from 'firebase/firestore';
 import {db} from '../../firebase';
+import global from '../../assets/styles/global';
 
 export default function SocialConnect({
   isValidStep,
@@ -246,16 +247,15 @@ export default function SocialConnect({
         />
       )}
       <View style={styles.headingWrapper}>
-        <Text style={styles.heading}>Social Accounts Connect</Text>
-        <Text style={styles.subheading}>
-          Connect your social media accounts with our app.
+        <Text style={[styles.heading, global.textSmall]}>
+          Connect Social Accounts
         </Text>
       </View>
       <View style={styles.typesWrapper}>
         {accountTypes.map((type, index) => (
           <View key={index}>
             <TouchableWithoutFeedback
-              style={styles.button}
+              style={[global.whiteBtn, styles.button]}
               onPress={() =>
                 type.connected ? null : type.clickHandler(index)
               }>
@@ -297,11 +297,9 @@ const styles = StyleSheet.create({
     gap: 10,
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    borderWidth: 1,
     textAlign: 'center',
-    borderRadius: 20,
-    paddingVertical: 7,
-    borderColor: 'rgba(0,0,0,0.2)',
+    borderWidth: 0,
+    backgroundColor: '#EEEEEE',
   },
   headingWrapper: {
     flexDirection: 'column',

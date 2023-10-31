@@ -2,6 +2,8 @@ const express = require("express");
 const User = require("../models/user");
 const axios = require("axios");
 const { google } = require("googleapis");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 exports.getFacebookPages = async (req, res, next) => {
   try {
@@ -158,4 +160,97 @@ exports.getYoutubeDetails = (req, res, next) => {
       }
     }
   );
+};
+
+exports.register = async (req, res, next) => {
+  try {
+    const data = req.body;
+
+    const foundUser = await User.findOne({ email: data.email });
+
+    if (foundUser) {
+      return res.status(401).send("User already exists");
+    }
+
+    data["password"] = bcrypt.hashSync(data.password, 8);
+
+    const user = new User(req.body);
+
+    await user.save();
+
+    let token;
+    token = jwt.sign(
+      { userId: user._id, email: user.email },
+      process.env.TOKEN_SECRET,
+      { expiresIn: "7d" }
+    );
+    user.password = undefined;
+    user["token"] = token;
+    return res.send({ user });
+  } catch (err) {
+    next(err);
+  }
+};
+exports.login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    const foundUser = await User.findOne({ email });
+
+    if (!foundUser) {
+      return res.status(404).send("User not found");
+    }
+
+    const matchPass = bcrypt.compareSync(password, foundUser.password);
+
+    if (!matchPass) {
+      return res.status(401).send("Incorrect Password");
+    }
+
+    let token;
+    token = jwt.sign(
+      { userId: foundUser._id, email: foundUser.email },
+      process.env.TOKEN_SECRET,
+      { expiresIn: "7d" }
+    );
+    // res.cookie("jwt", token, {
+    //   maxAge: 7 * 24 * 60 * 60 * 1000,
+    //   httpOnly: true,
+    //   secure: false,
+    // });
+
+    const user = { ...foundUser._doc };
+    user["token"] = token;
+    user.password = undefined;
+    return res.send(user);
+  } catch (err) {
+    next(err);
+  }
+};
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const data = req.body;
+    await User.findByIdAndUpdate(data._id, data);
+    res.send("User updated");
+  } catch (err) {
+    next(err);
+  }
+};
+exports.loginWithGoogle = async (req, res, next) => {
+  try {
+    const data = req.body;
+    const foundUser = await User.findOne({ email: data.email });
+
+    if (foundUser) {
+      return res.send(foundUser);
+    } else {
+      const user = new User(data);
+
+      await user.save();
+
+      return res.send(user);
+    }
+  } catch (err) {
+    next(err);
+  }
 };

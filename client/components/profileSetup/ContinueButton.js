@@ -1,14 +1,18 @@
 import {StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import {Button} from 'react-native-paper';
+import global from '../../assets/styles/global';
 
-const ContinueButton = ({isValidStep, clickHandler}) => {
+const ContinueButton = ({isValidStep, clickHandler, text}) => {
   return (
     <Button
       disabled={!isValidStep}
-      style={isValidStep ? styles.continueButton : styles.disabledBtn}
+      style={[
+        isValidStep ? global.greenBtn : global.disabledBtn,
+        {width: '100%'},
+      ]}
       onPress={clickHandler}>
-      <Text style={styles.btnText}>Continue</Text>
+      <Text style={styles.btnText}>{text}</Text>
     </Button>
   );
 };
@@ -25,7 +29,7 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   continueButton: {
-    backgroundColor: '#2A52C1',
+    backgroundColor: '',
     width: '100%',
   },
 });

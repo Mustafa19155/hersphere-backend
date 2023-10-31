@@ -12,8 +12,10 @@ import {Card, TextInput, Button, Text} from 'react-native-paper';
 import {IconButton} from 'react-native-paper';
 // import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {login, loginWithGoogle} from '../api/firebase/user';
+import {login} from '../api/user';
 import {AuthContext} from '../contexts/userContext';
+import global from '../assets/styles/global';
+import {loginWithGoogle} from '../api/user';
 
 const LoginScreen = () => {
   const [apiCalled, setapiCalled] = useState(false);
@@ -29,9 +31,10 @@ const LoginScreen = () => {
   };
 
   const handleLogin = () => {
-    if (email && password)
+    if (email && password) {
       login({email, password})
         .then(res => {
+          console.log(res);
           setuser(res);
           if (res.profileCompleted) {
             navigation.navigate('dashboard');
@@ -40,59 +43,59 @@ const LoginScreen = () => {
           }
         })
         .catch(err => {});
+    }
   };
 
   const handleGoogleLogin = () => {
     loginWithGoogle()
       .then(res => {
+        console.log(res);
         setuser(res);
-
         if (res.profileCompleted) {
           navigation.navigate('dashboard');
         } else {
           navigation.navigate('profileSetup');
         }
       })
-      .catch(err => {
-        console.log(err);
-      });
+      .catch(err => {});
   };
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require('../assets/images/login-page.png')}
-        style={styles.backgroundImage}>
-        <View style={styles.overlay}>
-          <Text style={styles.logo}>Signin to your Account</Text>
-          <Text style={styles.headerText}>Login to your Account</Text>
-        </View>
-      </ImageBackground>
-
+      <Text
+        style={[
+          global.fontBold,
+          global.textExtraLarge,
+          {textAlign: 'center', marginBottom: 60},
+        ]}>
+        Welcome to {'\n'}HerSphere
+      </Text>
       <View style={styles.inputsWrapper}>
+        <Text style={[global.fontBold, global.textLarge]}>Sign In</Text>
         <TextInput
           label="Email"
-          mode="outlined"
-          style={styles.input}
+          mode="flat"
+          underlineColor="transparent"
+          style={[global.input]}
           keyboardType="email-address"
           value={email}
           onChangeText={setemail}
         />
         <TextInput
           label="Password"
-          mode="outlined"
+          mode="flat"
+          underlineColor="transparent"
           secureTextEntry
-          style={styles.input}
           right={<TextInput.Icon icon="eye" />}
           value={password}
           onChangeText={setpassword}
         />
         <Button
-          mode="elevated"
-          style={styles.button}
+          // mode="elevated"
+          style={[global.greenBtn]}
           disabled={apiCalled}
           onPress={handleLogin}>
-          <Text style={{color: 'black', fontSize: 20}}>Login</Text>
+          <Text style={[global.greenBtnText]}>Login</Text>
         </Button>
         <View
           style={{
@@ -107,72 +110,70 @@ const LoginScreen = () => {
               height: 2,
               width: 100,
               borderColor: 'gray',
+              opacity: 0.5,
             }}></View>
-          <Text style={{fontSize: 20}}>or</Text>
+          <Text style={{fontSize: 20, opacity: 0.5}}>or</Text>
           <View
             style={{
+              opacity: 0.5,
               borderWidth: 1,
               height: 2,
               width: 100,
               borderColor: 'gray',
             }}></View>
         </View>
-        <View>
-          <TouchableOpacity
-            style={{
+        <TouchableOpacity
+          style={[
+            global.whiteBtn,
+            {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              borderWidth: 1,
-              width: '80%',
-              borderColor: 'gray',
               alignSelf: 'center',
-              borderRadius: 8,
-              marginTop: 20,
               gap: 10,
-              paddingVertical: 10,
-            }}
-            onPress={handleGoogleLogin}>
-            <Image
-              source={require('../assets/icons/google.png')}
-              style={{width: 30, height: 30}}
-            />
-            <Text style={{fontSize: 18}} disabled={!apiCalled}>
-              Continue with Google
-            </Text>
+              width: '100%',
+            },
+          ]}
+          onPress={handleGoogleLogin}>
+          <Image
+            source={require('../assets/icons/google.png')}
+            style={{width: 30, height: 30}}
+          />
+          <Text style={[global.whiteBtnText]} disabled={!apiCalled}>
+            Continue with Google
+          </Text>
+        </TouchableOpacity>
+
+        <View style={styles.registerLink}>
+          <Text style={{fontSize: 20}}>Dont have an account? </Text>
+          <TouchableOpacity onPress={handleRegisterNavigate}>
+            <Text style={[global.greenColor, global.textNormal]}>Register</Text>
           </TouchableOpacity>
         </View>
-      </View>
-
-      <View style={styles.registerLink}>
-        <Text style={{fontSize: 20}}>Dont have an account? </Text>
-        <TouchableOpacity onPress={handleRegisterNavigate}>
-          <Text style={styles.registerLinkText}>Register</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  registerLinkText: {
-    fontSize: 20,
-    color: 'green',
-  },
   registerLink: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: '5%',
     fontSize: 20,
     alignSelf: 'center',
   },
   inputsWrapper: {
     width: '90%',
     alignSelf: 'center',
+    flexDirection: 'column',
+    gap: 20,
   },
   container: {
     backgroundColor: 'white',
     flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backgroundImage: {
     flex: 0.9,
@@ -197,9 +198,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginBottom: 20,
     opacity: 0.8,
-  },
-  input: {
-    marginTop: '3%',
   },
   button: {
     marginVertical: '3%',

@@ -37,12 +37,12 @@ const TagInput = ({tags, setTags}) => {
             </TouchableOpacity>
           </View>
         ))}
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           value={text}
           onChangeText={newText => setText(newText)}
           onSubmitEditing={addTag}
-        />
+        /> */}
       </View>
     </View>
   );

@@ -5,6 +5,7 @@ import {TouchableOpacity} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import {udpateUser} from '../../api/firebase/user';
 import {AuthContext} from '../../contexts/userContext';
+import global from '../../assets/styles/global';
 
 export default function UserType({
   isValidStep,
@@ -21,7 +22,7 @@ export default function UserType({
     setuserType(userTypes[index].name);
     setactiveType(userTypes[index].name);
     setuser({...user, userType: userTypes[index].name});
-    await udpateUser(user.id, {userType: userTypes[index].name});
+    // await udpateUser(user.id, {userType: userTypes[index].name});
   };
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function UserType({
       setuserType(user.userType);
       setactiveType(user?.userType);
       setisValidStep(true);
-      setcurrentStep(prev => prev + 1);
+      // setcurrentStep(prev => prev + 1);
     } else {
       setisValidStep(false);
     }
@@ -42,28 +43,30 @@ export default function UserType({
   return (
     <View>
       <View style={styles.headingWrapper}>
-        <Text style={styles.heading}>How do you want to join our app as?</Text>
-        <Text style={styles.subheading}>
+        <Text style={[styles.heading, global.textSmall]}>
+          How do you want to join our app as?
+        </Text>
+        <Text style={[styles.subheading, global.textSmall]}>
           We need this information to verify your identity.
         </Text>
       </View>
       <View style={styles.typesWrapper}>
         {userTypes.map((type, index) => (
-          <View key={index}>
-            <TouchableWithoutFeedback
+          <View key={index} style={{width: '80%', alignSelf: 'center'}}>
+            <Button
               style={
-                activeType == type.name ? styles.activeButton : styles.button
+                activeType == type.name ? global.greenBtn : global.whiteBtn
               }
               onPress={() => handleActiveType(index)}>
               <Text
                 style={
                   activeType == type.name
-                    ? styles.activeText
-                    : styles.inactiveText
+                    ? global.greenBtnText
+                    : global.whiteBtnText
                 }>
                 {type.name}
               </Text>
-            </TouchableWithoutFeedback>
+            </Button>
           </View>
         ))}
       </View>

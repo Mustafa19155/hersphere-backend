@@ -6,9 +6,9 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
 import {db, storage} from '../../firebase';
-import {doc} from 'firebase/firestore';
-import {udpateUser} from '../../api/firebase/user';
+import {updateProfile} from '../../api/user';
 import {AuthContext} from '../../contexts/userContext';
+import global from '../../assets/styles/global';
 
 const AddPhoto = ({isValidStep, setisValidStep, setcurrentStep}) => {
   const [imageUri, setImageUri] = useState(null);
@@ -46,37 +46,29 @@ const AddPhoto = ({isValidStep, setisValidStep, setcurrentStep}) => {
         const downloadimg = await getDownloadURL(mainRef);
 
         setuser({...user, profileImage: downloadimg});
-
-        await udpateUser(user.id, {profileImage: downloadimg});
+        // await updateProfile({data: {profileImage: downloadimg}});
       }
     } catch (err) {}
   };
 
   useEffect(() => {
     if (user.profileImage) {
-      setcurrentStep(prev => prev + 1);
+      setImageUri(user.profileImage);
+      // setcurrentStep(prev => prev + 1);
       setisValidStep(true);
     } else {
       setisValidStep(false);
     }
   }, []);
 
-  //called when continue is clicked
-  // useEffect(
-  //   () => () => {
-  //     handleUpload();
-  //   },
-  //   [],
-  // );
-
   return (
     <View style={styles.container}>
       <View style={styles.headingWrapper}>
         <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-          <Text style={styles.heading}>Add a photo</Text>
-          <Icon name="camera" size={35} color="#000" />
+          <Text style={[styles.heading, global.textSmall]}>Add a photo</Text>
+          <Icon name="camera" size={22} color="#000" />
         </View>
-        <Text style={styles.subheading}>
+        <Text style={[global.textSmall, styles.subheading]}>
           Add your photo to be recognised in the app
         </Text>
       </View>
@@ -87,7 +79,7 @@ const AddPhoto = ({isValidStep, setisValidStep, setcurrentStep}) => {
         </TouchableOpacity>
       ) : (
         <View style={styles.imgPlaceholder}>
-          <Icon name="user" onPress={selectImage} size={170} />
+          <Icon name="user" onPress={selectImage} size={124} />
         </View>
       )}
     </View>
@@ -105,7 +97,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   subheading: {
-    fontSize: 18,
     color: 'gray',
   },
   imgPlaceholder: {
@@ -119,8 +110,8 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   image: {
-    width: 200,
-    height: 200,
+    width: 124,
+    height: 124,
     resizeMode: 'cover',
     borderRadius: 100,
     alignSelf: 'center',

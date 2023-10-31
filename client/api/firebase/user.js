@@ -51,10 +51,6 @@ export const loginWithGoogle = async () => {
 
     const userInfo = await GoogleSignin.signIn();
 
-    // const credential = firebase.auth.GoogleAuthProvider.credential(
-    //   userInfo.idToken,
-    // );
-
     const user = await getDoc(doc(collection(db, 'Users'), userInfo.user.id));
 
     if (user.exists()) {
@@ -74,10 +70,7 @@ export const loginWithGoogle = async () => {
         profileCompleted: false,
       };
     }
-
-    // return firebase.auth().signInWithCredential(credential);
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };

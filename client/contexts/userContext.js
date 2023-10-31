@@ -4,7 +4,7 @@ import {useAsyncStorage} from '../hooks/useAsyncStorage.js';
 export const AuthContext = React.createContext();
 
 function AuthProvider({children}) {
-  const [user, setuser] = useState(null);
+  const [user, setuser] = useAsyncStorage('user', null);
 
   const value = {
     user,
