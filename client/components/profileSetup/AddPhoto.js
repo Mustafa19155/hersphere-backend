@@ -46,13 +46,12 @@ const AddPhoto = ({isValidStep, setisValidStep, setcurrentStep}) => {
         const downloadimg = await getDownloadURL(mainRef);
 
         setuser({...user, profileImage: downloadimg});
-        // await updateProfile({data: {profileImage: downloadimg}});
       }
     } catch (err) {}
   };
 
   useEffect(() => {
-    if (user.profileImage) {
+    if (user && user.profileImage) {
       setImageUri(user.profileImage);
       // setcurrentStep(prev => prev + 1);
       setisValidStep(true);

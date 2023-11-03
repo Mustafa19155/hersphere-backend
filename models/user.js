@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const ProductSchema = new Schema({
+  facebookPage: {},
+  instagramPage: {},
+  youtubeChannel: {},
   profileImage: String,
   userType: String,
   username: String,
@@ -13,6 +16,14 @@ const ProductSchema = new Schema({
   },
   email: String,
   password: String,
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
   businessDetails: {},
 });
 

@@ -65,9 +65,8 @@ export default function BusinessDetails({
     // navigation.dispatch(StackActions.replace('Main'));
     setuser({
       ...user,
-      businessDetails: {
-        obj,
-      },
+      businessDetails: obj,
+
       profileCompleted: false,
     });
     await updateProfile({
@@ -77,6 +76,10 @@ export default function BusinessDetails({
   };
 
   useEffect(() => {
+    setcategory(user?.businessDetails?.category);
+    settitle(user?.businessDetails?.title);
+    settargetAudience(user?.businessDetails?.targetAudience?.map(tar => tar));
+    setdescription(user?.businessDetails?.description);
     setisValidStep(true);
   }, []);
 

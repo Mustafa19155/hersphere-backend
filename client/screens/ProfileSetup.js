@@ -1,5 +1,5 @@
 import {StyleSheet, Text, View, Dimensions} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Button} from 'react-native-paper';
 import {ScrollView} from 'react-native';
@@ -11,9 +11,12 @@ import {StackActions, useNavigation} from '@react-navigation/native';
 import ContinueButton from '../components/profileSetup/ContinueButton';
 import global from '../assets/styles/global';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {AuthContext} from '../contexts/userContext';
 
 export default function ProfileSetup() {
   const navigation = useNavigation();
+
+  const {user} = useContext(AuthContext);
 
   const maxSteps = 4;
   const [currentStep, setcurrentStep] = useState(1);
@@ -31,6 +34,16 @@ export default function ProfileSetup() {
   const handlePrevioustep = () => {
     if (currentStep > 1) setcurrentStep(currentStep - 1);
   };
+
+  useEffect(() => {
+    if (user.businessDetails) {
+      setcurrentStep(4);
+    } else if (user.userType) {
+      setcurrentStep(3);
+    } else if (user.profileImage) {
+      setcurrentStep(2);
+    }
+  }, []);
 
   return (
     <KeyboardAwareScrollView>
@@ -163,7 +176,7 @@ export default function ProfileSetup() {
               </View>
             </View>
           </View>
-          {currentStep != 3 && (
+          {currentStep != 3 && currentStep != 4 && (
             <ContinueButton
               text={'Continue'}
               isValidStep={isValidStep}

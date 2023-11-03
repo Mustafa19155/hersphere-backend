@@ -115,7 +115,6 @@ exports.getYoutubeDetails = (req, res, next) => {
     },
     (err, response) => {
       if (err) {
-        console.error(err);
       } else {
         const stats = response.data.items[0].statistics;
 
@@ -152,14 +151,25 @@ exports.getYoutubeDetails = (req, res, next) => {
             const data = response.data.items[0];
             res.json({ id: data.id, stats: data.statistics });
           })
-          .catch((err) => {
-            console.log(err);
-          });
-
-        // res.send(response.data.items[0]);
+          .catch((err) => {});
       }
     }
   );
+};
+
+exports.getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (user) {
+      user.password = undefined;
+      res.send(user);
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.register = async (req, res, next) => {
@@ -230,7 +240,8 @@ exports.login = async (req, res, next) => {
 exports.updateProfile = async (req, res, next) => {
   try {
     const data = req.body;
-    await User.findByIdAndUpdate(data._id, data);
+
+    await User.findByIdAndUpdate(req.userId, data);
     res.send("User updated");
   } catch (err) {
     next(err);
@@ -239,18 +250,50 @@ exports.updateProfile = async (req, res, next) => {
 exports.loginWithGoogle = async (req, res, next) => {
   try {
     const data = req.body;
+    data["isVerified"] = true;
     const foundUser = await User.findOne({ email: data.email });
 
+    let token;
+    token = jwt.sign(
+      { userId: foundUser._id, email: foundUser.email },
+      process.env.TOKEN_SECRET,
+      { expiresIn: "7d" }
+    );
+
     if (foundUser) {
-      return res.send(foundUser);
+      const user = { ...foundUser._doc };
+      user["token"] = token;
+      return res.send(user);
     } else {
       const user = new User(data);
 
       await user.save();
 
-      return res.send(user);
+      const userCopy = { ...user };
+
+      userCopy["token"] = token;
+
+      return res.send(userCopy);
     }
   } catch (err) {
     next(err);
+  }
+};
+exports.updatePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.userId);
+
+    if (bcrypt.compareSync(currentPassword, user.password)) {
+      user.password = bcrypt.hashSync(newPassword, 8);
+
+      await user.save();
+      return res.send("Password Updated");
+    } else {
+      return res.status(400).send("Incorrect Password");
+    }
+  } catch (error) {
+    next(error);
   }
 };

@@ -1,181 +1,43 @@
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Dimensions} from 'react-native';
 import React, {useEffect, useState, useContext} from 'react';
-import {Button} from 'react-native-paper';
-import {TouchableOpacity} from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {LoginButton, AccessToken, LoginManager} from 'react-native-fbsdk-next';
-import {
-  GoogleSignin,
-  statusCodes,
-} from '@react-native-google-signin/google-signin';
-import axios from 'axios';
-import {axiosClient} from '../../api/axios';
-import {getFacebookPages, getInstagramPages} from '../../api/socialConnect';
 import {AuthContext} from '../../contexts/userContext';
 import SocialPageChooseModal from '../modals/SocialPageChooseModal';
-import {udpateUser} from '../../api/firebase/user';
-import {collection, doc, getDoc} from 'firebase/firestore';
-import {db} from '../../firebase';
+import {
+  facebookSignin,
+  getUser,
+  instagramSignin,
+  updateProfile,
+  youtubeSignin,
+} from '../../api/user';
 import global from '../../assets/styles/global';
+import ContinueButton from './ContinueButton';
 
-export default function SocialConnect({
-  isValidStep,
-  setisValidStep,
-  setuserType,
-}) {
+export default function SocialConnect({setisValidStep}) {
   const {user, setuser} = useContext(AuthContext);
   const [socialModalOpen, setsocialModalOpen] = useState(false);
   const [pages, setpages] = useState([]);
   const [activeType, setactiveType] = useState('');
 
-  const handleGoogleSignin = async index => {
-    try {
-      await GoogleSignin.hasPlayServices();
-
-      await GoogleSignin.addScopes({
-        scopes: [
-          'profile',
-          'email',
-          'https://www.googleapis.com/auth/youtube',
-          'https://www.googleapis.com/auth/youtube.upload',
-        ],
-      });
-      const tokens = await GoogleSignin.getTokens();
-
-      axiosClient
-        .get(`/user/youtube-details?access_token=${tokens.accessToken}`)
-        .then(res => {
-          handleChoosePage(res.data, 'youtube');
-          // setaccountTypes(
-          //   accountTypes.map((type, ind) => {
-          //     if (ind == index) {
-          //       return {
-          //         ...type,
-          //         connected: true,
-          //       };
-          //     }
-          //     return type;
-          //   }),
-          // );
-        })
-        .catch(err => {
-          // console.log(err);
-        });
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleInstagramLogin = index => {
-    LoginManager.logInWithPermissions([
-      'instagram_basic',
-      'instagram_content_publish',
-      'instagram_manage_comments',
-      'instagram_manage_insights',
-      'pages_show_list',
-      'pages_read_engagement',
-    ]).then(
-      function (result) {
-        if (result.isCancelled) {
-          console.log('Login cancelled');
-        } else {
-          AccessToken.getCurrentAccessToken().then(data => {
-            getInstagramPages({
-              token: data.accessToken,
-              userType: user.userType,
-            })
-              .then(res => {
-                setpages(res);
-                if (res.length > 1) {
-                  setactiveType('instagram');
-                  setsocialModalOpen(true);
-                } else {
-                  handleChoosePage(res[0], 'instagram');
-                }
-                // setaccountTypes(
-                //   accountTypes.map((type, ind) => {
-                //     if (ind == index) {
-                //       return {
-                //         ...type,
-                //         connected: true,
-                //       };
-                //     }
-                //     return type;
-                //   }),
-                // );
-              })
-              .catch(err => {
-                console.log(err);
-              });
-          });
-        }
-      },
-      function (error) {
-        console.log('Login fail with error: ' + error);
-      },
-    );
-  };
-
-  const handleFacebookLogin = index => {
-    LoginManager.logInWithPermissions([
-      'user_friends',
-      'manage_pages',
-      'publish_to_groups',
-      'pages_manage_posts',
-    ]).then(
-      function (result) {
-        if (result.isCancelled) {
-          console.log('Login cancelled');
-        } else {
-          AccessToken.getCurrentAccessToken().then(data => {
-            getFacebookPages({token: data.accessToken, userType: user.userType})
-              .then(res => {
-                setpages(res);
-                if (res.length > 1) {
-                  setactiveType('facebook');
-                  setsocialModalOpen(true);
-                } else {
-                  handleChoosePage(res[0], 'facebook');
-                }
-                // setaccountTypes(
-                //   accountTypes.map((type, ind) => {
-                //     if (ind == index) {
-                //       return {
-                //         ...type,
-                //         connected: true,
-                //       };
-                //     }
-                //     return type;
-                //   }),
-                // );
-              })
-              .catch(err => {
-                // console.log(err);
-              });
-          });
-        }
-      },
-      function (error) {
-        console.log('Login fail with error: ' + error);
-      },
-    );
-  };
-
   const handleChoosePage = async (page, type) => {
-    const dbUser = (await getDoc(doc(db, 'Users', user.id))).data();
-
-    if (type == 'facebook') {
-      setuser({...dbUser, facebookPage: page});
-      await udpateUser(user.id, {facebookPage: page});
-    } else if (type == 'instagram') {
-      setuser({...dbUser, instagramPage: page});
-      await udpateUser(user.id, {instagramPage: page});
-    } else {
-      setuser({...dbUser, youtubeChannel: page});
-      await udpateUser(user.id, {youtubeChannel: page});
+    const userData = await getUser();
+    userData['token'] = user.token;
+    try {
+      if (type == 'facebook') {
+        setuser({...userData, facebookPage: page});
+        await updateProfile({data: {...userData, facebookPage: page}});
+      } else if (type == 'instagram') {
+        setuser({...userData, instagramPage: page});
+        await updateProfile({data: {...userData, instagramPage: page}});
+      } else {
+        setuser({...userData, youtubeChannel: page});
+        await updateProfile({data: {...userData, youtubeChannel: page}});
+      }
+      setsocialModalOpen(false);
+    } catch (err) {
+      console.log(err);
     }
-    setsocialModalOpen(false);
   };
 
   const [accountTypes, setaccountTypes] = useState([
@@ -184,24 +46,57 @@ export default function SocialConnect({
       icon: 'logo-youtube',
       color: '#FF0000',
       connected: false,
-      clickHandler: handleGoogleSignin,
+      clickHandler: () => {
+        youtubeSignin()
+          .then(res => {
+            handleChoosePage(res.data, 'youtube');
+          })
+          .catch(err => {});
+      },
     },
     {
       name: 'facebook',
       icon: 'logo-facebook',
       color: '#4267B2',
       connected: false,
-      clickHandler: handleFacebookLogin,
+      clickHandler: () => {
+        facebookSignin({userType: user.userType})
+          .then(res => {
+            setpages(res);
+            if (res.length > 1) {
+              setactiveType('facebook');
+              setsocialModalOpen(true);
+            } else {
+              handleChoosePage(res[0], 'facebook');
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      },
     },
     {
       name: 'instagram',
       icon: 'logo-instagram',
       color: '#bc2a8d',
       connected: false,
-      clickHandler: handleInstagramLogin,
+      clickHandler: () => {
+        instagramSignin({userType: user.userType})
+          .then(res => {
+            setpages(res);
+            if (res.length > 1) {
+              setactiveType('instagram');
+              setsocialModalOpen(true);
+            } else {
+              handleChoosePage(res[0], 'instagram');
+            }
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      },
     },
   ]);
-
   useEffect(() => {
     let valid = false;
     accountTypes.map(type => {
@@ -246,31 +141,52 @@ export default function SocialConnect({
           type={activeType}
         />
       )}
-      <View style={styles.headingWrapper}>
-        <Text style={[styles.heading, global.textSmall]}>
-          Connect Social Accounts
-        </Text>
+      <View style={{minHeight: Dimensions.get('window').height - 250}}>
+        <View style={styles.headingWrapper}>
+          <Text style={[styles.heading, global.textSmall]}>
+            Connect Social Accounts
+          </Text>
+        </View>
+        <View style={styles.typesWrapper}>
+          {accountTypes.map((type, index) => (
+            <View key={index}>
+              <TouchableWithoutFeedback
+                style={[global.whiteBtn, styles.button]}
+                onPress={() =>
+                  type.connected ? null : type.clickHandler(index)
+                }>
+                <View style={{marginTop: 7}}>
+                  <Icon name={type.icon} size={30} color={type.color} />
+                </View>
+                {type.connected ? (
+                  <Text style={styles.activeText}>Connected</Text>
+                ) : (
+                  <Text style={styles.inactiveText}>{type.name}</Text>
+                )}
+              </TouchableWithoutFeedback>
+            </View>
+          ))}
+        </View>
       </View>
-      <View style={styles.typesWrapper}>
-        {accountTypes.map((type, index) => (
-          <View key={index}>
-            <TouchableWithoutFeedback
-              style={[global.whiteBtn, styles.button]}
-              onPress={() =>
-                type.connected ? null : type.clickHandler(index)
-              }>
-              <View style={{marginTop: 7}}>
-                <Icon name={type.icon} size={30} color={type.color} />
-              </View>
-              {type.connected ? (
-                <Text style={styles.activeText}>Connected</Text>
-              ) : (
-                <Text style={styles.inactiveText}>{type.name}</Text>
-              )}
-            </TouchableWithoutFeedback>
-          </View>
-        ))}
-      </View>
+      {/* <View
+        style={{
+          flex: 0.5,
+          justifyContent: 'flex-end',
+          marginBottom: 10,
+          marginTop: 20,
+        }}> */}
+      <ContinueButton
+        text={'Continue'}
+        isValidStep={true}
+        clickHandler={async () => {
+          try {
+            setuser({...user, profileCompleted: true});
+            await updateProfile({data: {...user, profileCompleted: true}});
+            navigation.dispatch(StackActions.replace('Main'));
+          } catch (err) {}
+        }}
+      />
+      {/* </View> */}
     </View>
   );
 }

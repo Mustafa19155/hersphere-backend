@@ -19,7 +19,7 @@ axiosClient.interceptors.request.use(
     try {
       const user = await AsyncStorage.getItem('user');
       const token = JSON.parse(user).token;
-      axiosClient.defaults.headers.common['Cookie'] = `jwt=${token.value}`;
+      axiosClient.defaults.headers = {Authorization: `${token}`};
     } catch (err) {}
     return config;
   },

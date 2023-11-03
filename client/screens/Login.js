@@ -19,8 +19,8 @@ import {loginWithGoogle} from '../api/user';
 
 const LoginScreen = () => {
   const [apiCalled, setapiCalled] = useState(false);
-  const [email, setemail] = useState('as@a.com');
-  const [password, setpassword] = useState('123456');
+  const [email, setemail] = useState('mustafa@gmail.com');
+  const [password, setpassword] = useState('123');
 
   const navigation = useNavigation();
 
@@ -49,7 +49,6 @@ const LoginScreen = () => {
   const handleGoogleLogin = () => {
     loginWithGoogle()
       .then(res => {
-        console.log(res);
         setuser(res);
         if (res.profileCompleted) {
           navigation.navigate('dashboard');
