@@ -4,6 +4,9 @@ const axios = require("axios");
 const { google } = require("googleapis");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const tf = require("@tensorflow/tfjs-node");
+const sharp = require("sharp");
+const fs = require("fs").promises;
 
 exports.getFacebookPages = async (req, res, next) => {
   try {
@@ -254,13 +257,14 @@ exports.loginWithGoogle = async (req, res, next) => {
     const foundUser = await User.findOne({ email: data.email });
 
     let token;
-    token = jwt.sign(
-      { userId: foundUser._id, email: foundUser.email },
-      process.env.TOKEN_SECRET,
-      { expiresIn: "7d" }
-    );
 
     if (foundUser) {
+      token = jwt.sign(
+        { userId: foundUser._id, email: foundUser.email },
+        process.env.TOKEN_SECRET,
+        { expiresIn: "7d" }
+      );
+
       const user = { ...foundUser._doc };
       user["token"] = token;
       return res.send(user);
@@ -269,7 +273,13 @@ exports.loginWithGoogle = async (req, res, next) => {
 
       await user.save();
 
-      const userCopy = { ...user };
+      token = jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.TOKEN_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      const userCopy = { ...user._doc };
 
       userCopy["token"] = token;
 
@@ -295,5 +305,35 @@ exports.updatePassword = async (req, res, next) => {
     }
   } catch (error) {
     next(error);
+  }
+};
+exports.verifyGender = async (req, res, next) => {
+  try {
+    const model = await tf.loadLayersModel(
+      "file://trained-modals/gender_recognition/model.json"
+    );
+    // const imageBuffer = await fs.readFile(req.file.buffer);
+
+    const processedImageBuffer = await sharp(req.file.buffer)
+      .resize(250, 250)
+      .toBuffer();
+
+    const processedImage = tf.node.decodeImage(processedImageBuffer, 3);
+
+    const expandedImage = processedImage.expandDims();
+
+    const normalizedImage = expandedImage.div(255);
+
+    const predictions = model.predict(normalizedImage);
+
+    const genderProb = predictions.dataSync()[0];
+
+    const gender = genderProb >= 0.5 ? "Female" : "Male";
+
+    console.log(`Predicted Gender: ${gender}`);
+
+    res.json({ gender });
+  } catch (err) {
+    next(err);
   }
 };

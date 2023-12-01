@@ -6,7 +6,6 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
 import {db, storage} from '../../firebase';
-import {updateProfile} from '../../api/user';
 import {AuthContext} from '../../contexts/userContext';
 import global from '../../assets/styles/global';
 

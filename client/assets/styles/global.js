@@ -55,7 +55,7 @@ export default globalStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   textExtraSmall: {
-    fontSize: 10,
+    fontSize: 12,
   },
   textSmall: {
     fontSize: 16,
@@ -68,5 +68,11 @@ export default globalStyles = StyleSheet.create({
   },
   textExtraLarge: {
     fontSize: 36,
+  },
+  //headings
+  mainHeading: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: 'black',
   },
 });

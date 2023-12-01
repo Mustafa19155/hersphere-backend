@@ -37,7 +37,7 @@ const LoginScreen = () => {
           console.log(res);
           setuser(res);
           if (res.profileCompleted) {
-            navigation.navigate('dashboard');
+            navigation.navigate('Main');
           } else {
             navigation.navigate('profileSetup');
           }
@@ -51,7 +51,7 @@ const LoginScreen = () => {
       .then(res => {
         setuser(res);
         if (res.profileCompleted) {
-          navigation.navigate('dashboard');
+          navigation.navigate('Main');
         } else {
           navigation.navigate('profileSetup');
         }

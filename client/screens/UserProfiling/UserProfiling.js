@@ -35,7 +35,7 @@ const UserProfiling = () => {
           onPress={() => navigation.navigate('SocialAccounts')}>
           <Text style={styles.text}>Social Accounts</Text>
         </TouchableWithoutFeedback>
-        {user.source != 'google' && (
+        {user?.source != 'google' && (
           <TouchableWithoutFeedback
             style={styles.btnWrapper}
             onPress={() => navigation.navigate('Security')}>

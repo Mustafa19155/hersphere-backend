@@ -148,3 +148,22 @@ export const updatePassword = async ({currentPassword, newPassword}) => {
     throw err;
   }
 };
+
+export const verifyGender = async ({data}) => {
+  try {
+    axiosClient.defaults.headers = {
+      'Content-Type': 'multipart/form-data',
+    };
+
+    const res = await axiosClient.post('/user/verify-gender', data);
+
+    axiosClient.defaults.headers = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
+
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};
