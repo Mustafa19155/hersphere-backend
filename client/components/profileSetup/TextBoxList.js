@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import global from '../../assets/styles/global';
 
 const TagInput = ({tags, setTags}) => {
   const [text, setText] = useState('');
@@ -32,17 +33,11 @@ const TagInput = ({tags, setTags}) => {
             <TouchableOpacity
               onPress={() => removeTag(index)}
               style={styles.tagWrapper}>
-              <Text>{tag}</Text>
-              <Icon name="close" size={16} />
+              <Text style={{color: 'white'}}>{tag}</Text>
+              <Icon name="close" size={16} color="white" />
             </TouchableOpacity>
           </View>
         ))}
-        {/* <TextInput
-          style={styles.input}
-          value={text}
-          onChangeText={newText => setText(newText)}
-          onSubmitEditing={addTag}
-        /> */}
       </View>
     </View>
   );
@@ -53,32 +48,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
-  tagWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-  },
+  tagWrapper: [{flexDirection: 'row', alignItems: 'center', gap: 5}],
   inputsWrapper: {
-    paddingHorizontal: 10,
     flexDirection: 'row',
+    marginTop: 10,
+    marginBottom: 20,
     alignItems: 'center',
-    // minHeight: 60,
-    borderWidth: 1,
     width: '100%',
-    borderColor: '#a9a9a9',
     borderRadius: 10,
     flexWrap: 'wrap',
   },
-  tag: {
-    borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor: '#e0e0e0',
-    borderRadius: 20,
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    margin: 5,
-  },
+  tag: [
+    global.greenBack,
+    {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderRadius: 20,
+      paddingVertical: 8,
+      paddingHorizontal: 10,
+      margin: 5,
+    },
+  ],
   input: {
     flex: 1,
     height: '100%',

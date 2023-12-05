@@ -8,7 +8,10 @@ import {AuthContext} from './contexts/userContext';
 import {useContext, useEffect} from 'react';
 import {Image, View} from 'react-native';
 import VerifyGender from './screens/UserProfiling/VerifyGender';
-import UserProfilingStack from './navigation/StackNavigation';
+import UserProfilingStack, {
+  ChatStack,
+  InfluenceProfileStack,
+} from './navigation/StackNavigation';
 import DashboardDrawer from './navigation/DrawerNavigation';
 
 const Stack = createStackNavigator();
@@ -39,6 +42,11 @@ function App() {
       <Stack.Screen name="signup" component={SignupScreen} />
       <Stack.Screen name="profileSetup" component={ProfileSetup} />
       <Stack.Screen name="Main" component={DashboardDrawer} />
+      <Stack.Screen
+        name="InfluencerProfile"
+        component={InfluenceProfileStack}
+      />
+      <Stack.Screen name="Chats" component={ChatStack} />
     </Stack.Navigator>
   );
 }

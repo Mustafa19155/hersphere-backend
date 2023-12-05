@@ -10,6 +10,8 @@ import {GoogleSignin} from '@react-native-google-signin/google-signin';
 import {PaperProvider, DefaultTheme} from 'react-native-paper';
 import AuthProvider from './contexts/userContext';
 import {NavigationContainer} from '@react-navigation/native';
+import SearchProvider from './contexts/searchContext';
+import RequestProvider from './contexts/requestContext';
 
 Settings.initializeSDK();
 
@@ -18,13 +20,25 @@ GoogleSignin.configure({
   //     '417688593234-8m330cnb15cqh4cks8lpnun441hsuf9e.apps.googleusercontent.com',
 });
 
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: 'white',
+  },
+};
+
 export default function Main() {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={MyTheme}>
       <AuthProvider>
-        <PaperProvider>
-          <App />
-        </PaperProvider>
+        <SearchProvider>
+          <RequestProvider>
+            <PaperProvider>
+              <App />
+            </PaperProvider>
+          </RequestProvider>
+        </SearchProvider>
       </AuthProvider>
     </NavigationContainer>
   );

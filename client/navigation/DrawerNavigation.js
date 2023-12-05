@@ -9,6 +9,7 @@ import AnalyticsOptions from '../screens/Analytics/AnalyticsOptions';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
+import {Image, TouchableWithoutFeedback, View} from 'react-native';
 
 const Drawer = createDrawerNavigator();
 
@@ -32,6 +33,19 @@ function CustomDrawerContent(props) {
 export default function DashboardDrawer() {
   return (
     <Drawer.Navigator
+      screenOptions={({navigation, route}) => ({
+        headerShown: route.state?.routes.some(r => r.name === 'UserProfile'),
+        drawerStyle: {backgroundColor: 'white'},
+        headerStyle: {elevation: 0},
+        headerLeft: props => (
+          <TouchableWithoutFeedback onPress={navigation.toggleDrawer}>
+            <Image
+              source={require('../assets/icons/drawer.png')}
+              style={{margin: 20}}
+            />
+          </TouchableWithoutFeedback>
+        ),
+      })}
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen
         name="Dashboard"
