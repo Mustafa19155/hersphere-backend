@@ -28,18 +28,18 @@ axiosClient.interceptors.request.use(
   },
 );
 
-axiosClient.interceptors.response.use(
-  function (response) {
-    //Dispatch any action on success
-    return response;
-  },
+// axiosClient.interceptors.response.use(
+//   function (response) {
+//     //Dispatch any action on success
+//     return response;
+//   },
 
-  function (error) {
-    if (error.response.status === 401) {
-      if (error.response.config.url != '/user/login') {
-        window.location.href = '/user';
-      }
-    }
-    return Promise.reject(error);
-  },
-);
+//   function (error) {
+//     if (error.response.status === 401) {
+//       if (error.response.config.url != '/user/login') {
+//         window.location.href = '/user';
+//       }
+//     }
+//     return Promise.reject(error);
+//   },
+// );

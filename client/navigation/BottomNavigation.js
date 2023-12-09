@@ -1,7 +1,11 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React from 'react';
 import Dashboard from '../screens/Dashboard';
-import UserProfilingStack, {ChatStack, SearchStack} from './StackNavigation';
+import UserProfilingStack, {
+  ChatStack,
+  RequetsStack,
+  SearchStack,
+} from './StackNavigation';
 import Icon from 'react-native-vector-icons/Feather';
 import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
@@ -69,20 +73,20 @@ const BottomHomeNavigation = () => {
         }}
       />
       <Tab.Screen
-        name="Notifications"
-        component={UserProfilingStack}
+        name="RequestsStack"
+        component={RequetsStack}
         options={{
           headerShown: false,
           tabBarLabel: ({focused}) => {
             return (
               <Text style={focused ? global.greenColor : global.blackColor}>
-                Notifications
+                Requests
               </Text>
             );
           },
           tabBarIcon: ({focused}) => (
             <Icon
-              name="notifications"
+              name="request"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
             />
@@ -94,13 +98,13 @@ const BottomHomeNavigation = () => {
         component={ChatStack}
         options={{
           headerShown: false,
-          tabBarLabel: ({focused}) => {
-            return (
-              <Text style={focused ? global.greenColor : global.blackColor}>
-                Messages
-              </Text>
-            );
-          },
+          // tabBarLabel: ({focused}) => {
+          //   return (
+          //     <Text style={focused ? global.greenColor : global.blackColor}>
+          //       Messages
+          //     </Text>
+          //   );
+          // },
           tabBarIcon: ({focused}) => (
             <Icon
               name="messages"

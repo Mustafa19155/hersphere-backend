@@ -36,9 +36,8 @@ import {Pressable} from 'react-native';
 import SendRequest from '../screens/Search/SendRequest';
 import Chats from '../screens/Chat/Chats';
 import Chat from '../screens/Chat/Chat';
-import {Text} from 'react-native-paper';
-import {useNavigation} from '@react-navigation/native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import Requests from '../screens/Requests/Requests';
+import RequestDetails from '../screens/Requests/RequestDetails';
 
 export const InfluenceProfileStack = () => {
   return (
@@ -56,7 +55,6 @@ export const InfluenceProfileStack = () => {
       }}>
       <Stack.Screen name="ProfileMain" component={UserProfile} />
       <Stack.Screen name="SendRequest" component={SendRequest} />
-      <Stack.Screen name="Chat" component={Chat} options={{}} />
     </Stack.Navigator>
   );
 };
@@ -67,10 +65,34 @@ export const ChatStack = () => {
       screenOptions={{
         title: 'Chat',
       }}>
-      <Stack.Screen name="ChatsMain" component={Chats} />
+      <Stack.Screen
+        name="ChatsMain"
+        component={Chats}
+        options={{headerShown: false}}
+      />
       <Stack.Screen
         name="Chat"
         component={Chat}
+        options={{headerShown: false}}
+      />
+    </Stack.Navigator>
+  );
+};
+
+export const RequetsStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        title: 'Requests',
+      }}>
+      <Stack.Screen
+        name="Requests"
+        component={Requests}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="RequestDetails"
+        component={RequestDetails}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

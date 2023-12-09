@@ -19,7 +19,7 @@ import {loginWithGoogle} from '../api/user';
 
 const LoginScreen = () => {
   const [apiCalled, setapiCalled] = useState(false);
-  const [email, setemail] = useState('mustafa@gmail.com');
+  const [email, setemail] = useState('mustafa2@gmail.com');
   const [password, setpassword] = useState('123');
 
   const navigation = useNavigation();
@@ -34,13 +34,12 @@ const LoginScreen = () => {
     if (email && password) {
       login({email, password})
         .then(res => {
-          console.log(res);
           setuser(res);
-          if (res.profileCompleted) {
-            navigation.navigate('Main');
-          } else {
-            navigation.navigate('profileSetup');
-          }
+          // if (res.profileCompleted) {
+          //   navigation.navigate('Main');
+          // } else {
+          //   navigation.navigate('Authentication');
+          // }
         })
         .catch(err => {});
     }
@@ -53,7 +52,7 @@ const LoginScreen = () => {
         if (res.profileCompleted) {
           navigation.navigate('Main');
         } else {
-          navigation.navigate('profileSetup');
+          navigation.navigate('Authentication');
         }
       })
       .catch(err => {});

@@ -312,7 +312,6 @@ exports.verifyGender = async (req, res, next) => {
     const model = await tf.loadLayersModel(
       "file://trained-modals/gender_recognition/model.json"
     );
-    // const imageBuffer = await fs.readFile(req.file.buffer);
 
     const processedImageBuffer = await sharp(req.file.buffer)
       .resize(250, 250)
@@ -330,9 +329,13 @@ exports.verifyGender = async (req, res, next) => {
 
     const gender = genderProb >= 0.5 ? "Female" : "Male";
 
-    console.log(`Predicted Gender: ${gender}`);
-
-    res.json({ gender });
+    if (gender == "Female") {
+      res.json({ gender });
+    } else {
+      const err = new Error("Gender not verified");
+      err.status = 401;
+      return next(err);
+    }
   } catch (err) {
     next(err);
   }

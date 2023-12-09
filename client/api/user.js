@@ -164,6 +164,7 @@ export const verifyGender = async ({data}) => {
 
     return res.data;
   } catch (err) {
+    console.log(err);
     throw err;
   }
 };

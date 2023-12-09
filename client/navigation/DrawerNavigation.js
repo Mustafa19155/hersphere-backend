@@ -10,6 +10,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
 import {Image, TouchableWithoutFeedback, View} from 'react-native';
+import {useNavigation, useRoute} from '@react-navigation/native';
+import {useEffect} from 'react';
 
 const Drawer = createDrawerNavigator();
 
@@ -31,12 +33,15 @@ function CustomDrawerContent(props) {
 }
 
 export default function DashboardDrawer() {
+  const navigation = useNavigation();
+  const route = useRoute();
+
   return (
     <Drawer.Navigator
       screenOptions={({navigation, route}) => ({
-        headerShown: route.state?.routes.some(r => r.name === 'UserProfile'),
         drawerStyle: {backgroundColor: 'white'},
         headerStyle: {elevation: 0},
+
         headerLeft: props => (
           <TouchableWithoutFeedback onPress={navigation.toggleDrawer}>
             <Image

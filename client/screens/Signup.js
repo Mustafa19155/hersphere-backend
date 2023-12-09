@@ -46,7 +46,7 @@ const SignupScreen = () => {
       register({data: {email, password, username}})
         .then(res => {
           setuser(res);
-          navigation.navigate('profileSetup');
+          // navigation.navigate('Authentication');
         })
         .catch(err => {
           console.log(err);
@@ -54,7 +54,7 @@ const SignupScreen = () => {
       // createAccount({auth, email, password, username})
       //   .then(res => {
       //     setuser(res);
-      //     navigation.navigate('profileSetup');
+      //     navigation.navigate('Authentication');
       //   })
       //   .catch(err => {
       //     console.log(err);
@@ -70,7 +70,7 @@ const SignupScreen = () => {
         if (res.profileCompleted) {
           navigation.navigate('dashboard');
         } else {
-          navigation.navigate('profileSetup');
+          navigation.navigate('Authentication');
         }
       })
       .catch(err => {

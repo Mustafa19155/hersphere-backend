@@ -13,6 +13,7 @@ import UserProfilingStack, {
   InfluenceProfileStack,
 } from './navigation/StackNavigation';
 import DashboardDrawer from './navigation/DrawerNavigation';
+import Authentication from './screens/Authentication';
 
 const Stack = createStackNavigator();
 
@@ -22,14 +23,14 @@ function App() {
   const {user, setuser} = useContext(AuthContext);
 
   useEffect(() => {
-    navigation.navigate('Main');
-    // if (user == null) {
-    //   navigation.navigate('login');
-    // } else {
-    //   user.profileCompleted
-    //     ? navigation.navigate('Main')
-    //     : navigation.navigate('profileSetup');
-    // }
+    // navigation.navigate('Main');
+    if (user == null) {
+      navigation.navigate('login');
+    } else {
+      user.profileCompleted
+        ? navigation.navigate('Main')
+        : navigation.navigate('Authentication');
+    }
   }, [user]);
 
   return (
@@ -41,6 +42,7 @@ function App() {
       <Stack.Screen name="login" component={LoginScreen} />
       <Stack.Screen name="signup" component={SignupScreen} />
       <Stack.Screen name="profileSetup" component={ProfileSetup} />
+      <Stack.Screen name="Authentication" component={Authentication} />
       <Stack.Screen name="Main" component={DashboardDrawer} />
       <Stack.Screen
         name="InfluencerProfile"
