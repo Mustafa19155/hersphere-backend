@@ -27,6 +27,7 @@ const Step2 = ({isValidStep, setisValidStep}) => {
                 ? 'checked'
                 : 'unchecked'
             }
+            color="green"
             onPress={() =>
               setplatforms(
                 platforms.find(pl => pl == 'instagram')
@@ -45,6 +46,7 @@ const Step2 = ({isValidStep, setisValidStep}) => {
                 ? 'checked'
                 : 'unchecked'
             }
+            color="green"
             onPress={() =>
               setplatforms(
                 platforms.find(pl => pl == 'facebook')
@@ -63,6 +65,7 @@ const Step2 = ({isValidStep, setisValidStep}) => {
                 ? 'checked'
                 : 'unchecked'
             }
+            color="green"
             onPress={() =>
               setplatforms(
                 platforms.find(pl => pl == 'youtube')

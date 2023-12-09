@@ -51,7 +51,7 @@ const BottomHomeNavigation = () => {
           ),
         }}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Explore"
         component={SearchStack}
         options={{
@@ -71,7 +71,7 @@ const BottomHomeNavigation = () => {
             />
           ),
         }}
-      />
+      /> */}
       <Tab.Screen
         name="RequestsStack"
         component={RequetsStack}

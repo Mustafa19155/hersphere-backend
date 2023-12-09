@@ -18,6 +18,10 @@ import SendIcon from '../../assets/icons/send.png';
 import Messages from '../../components/Chat/Messages';
 import DocumentPicker from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
+import {getDownloadURL, ref, uploadString} from 'firebase/storage';
+import {storage} from '../../firebase';
+import RNFetchBlob from 'rn-fetch-blob';
+import RNFS, {DocumentDirectoryPath, readFile} from 'react-native-fs';
 
 const Chat = () => {
   const navigation = useNavigation();
@@ -96,6 +100,87 @@ const Chat = () => {
     // }
   };
 
+  const handleUploadDocument = async () => {
+    try {
+      if (file) {
+        const contentUri = file.uri;
+
+        const filePath = `${contentUri}/${file.name}`; // Replace with your desired file name
+
+        const fileExists = await RNFS.exists(
+          filePath.replace('content', 'file'),
+        );
+        console.log(fileExists);
+
+        const contentData = await readFile(contentUri, 'base64');
+
+        await readFile(filePath, 'base64');
+
+        const mainRef = ref(storage, `chatMedia/${Date.now()}/${file.name}`);
+        await uploadString(mainRef, contentData, 'base64');
+        const a = await getDownloadURL(mainRef);
+
+        // await uploadBytes(mainRef, blob);
+        // return await getDownloadURL(mainRef);
+
+        // await readFile(contentUri, 'base64')
+        //   .then(data => {
+        //     return readFile(filePath, 'base64');
+        //   })
+        //   .catch(error => {
+        //     console.error('Error reading file:', error);
+        //   });
+
+        // const blobData = `data:${response.mime};base64,${response.data}`;
+        // const filename = file.name; // Replace with your desired filename
+        // const storageRef = ref(storage, `chatMedia/${Date.now() + filename}`);
+        // await uploadString(storageRef, blobData, 'data_url');
+        // return await getDownloadURL(storageRef);
+        //
+        // const {Blob, fs} = RNFetchBlob;
+        // const filePath = file.uri;
+        // console.log(filePath);
+        // const data = await fs.readFile(filePath, 'base64');
+        // const blob = Blob.build(data, {type: `${file.type};BASE64`});
+        // const res = await fetch(file.uri);
+        // console.log(res);
+        // const blob = await res.blob();
+        // const filename = file.name;
+        // const mainRef = ref(storage, `chatMedia/${Date.now()}/${filename}`);
+        // await uploadBytes(mainRef, blob);
+        // return await getDownloadURL(mainRef);
+      }
+    } catch (err) {
+      throw err;
+    }
+  };
+
+  const handleSendMessage = async () => {
+    try {
+      if (message || file) {
+        const obj = {
+          message: message,
+          userID: 1,
+          time: new Date(),
+        };
+        if (file) {
+          const fileUrl = await handleUploadDocument();
+          obj['file'] = {
+            url: fileUrl,
+            name: file.name,
+          };
+        }
+        setchat({
+          ...chat,
+          chats: [...chat.chats, obj],
+        });
+        setmessage('');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     navigation
       .getParent()
@@ -132,7 +217,7 @@ const Chat = () => {
         {file && (
           <View style={styles.filePreview}>
             <Text
-              style={[global.textSmall]}
+              style={[global.textSmall, {width: '90%'}]}
               numberOfLines={1}
               ellipsizeMode="tail">
               {file.name}
@@ -164,23 +249,7 @@ const Chat = () => {
             width: '10%',
           }}>
           <TouchableOpacity
-            onPress={() => {
-              if (message) {
-                setchat({
-                  ...chat,
-                  chats: [
-                    ...chat.chats,
-                    {
-                      message: message,
-                      userID: 1,
-                      time: new Date(),
-                      file: null,
-                    },
-                  ],
-                });
-                setmessage('');
-              }
-            }}
+            onPress={handleSendMessage}
             style={[
               global.greenBack,
               {

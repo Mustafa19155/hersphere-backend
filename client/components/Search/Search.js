@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import React, {useContext, useState} from 'react';
@@ -15,8 +16,9 @@ import FilterModal from '../../components/Search/FilterModal';
 import {SearchContext} from '../../contexts/searchContext';
 import RecommendedSearch from '../../components/Search/RecommendedSearch';
 import SearchResults from '../../components/Search/SearchResults';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
-const Search = () => {
+const Search = ({searchActive, setsearchActive}) => {
   const [filterModalOpen, setfilterModalOpen] = useState(false);
 
   const {name, setname, platforms, categories} = useContext(SearchContext);
@@ -24,26 +26,45 @@ const Search = () => {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <FilterModal open={filterModalOpen} setopen={setfilterModalOpen} />
-      <View style={{flexDirection: 'row', gap: 5}}>
+      <View
+        style={{
+          flexDirection: 'row',
+          gap: 5,
+          marginTop: 20,
+          alignItems: 'center',
+        }}>
+        {searchActive && (
+          <TouchableWithoutFeedback
+            onPress={() => setsearchActive(false)}
+            style={{height: '100%'}}>
+            <Ionicons name="chevron-back" size={20} color="black" />
+          </TouchableWithoutFeedback>
+        )}
         <View style={styles.searchWrapper}>
           <Icon name="search1" size={20} />
           <TextInput
+            onPressIn={() => setsearchActive(true)}
             placeholder="Search"
             mode="flat"
             underlineColor="transparent"
             activeUnderlineColor="transparent"
-            // left={<TextInput.Icon icon="eye" />}
             value={name}
-            style={{backgroundColor: 'transparent', width: '100%'}}
+            style={{
+              width: searchActive ? '63%' : '72%',
+              backgroundColor: 'transparent',
+            }}
             onChangeText={setname}
           />
         </View>
         <Pressable
-          onPress={() => setfilterModalOpen(true)}
+          onPress={() => {
+            setsearchActive(true);
+            setfilterModalOpen(true);
+          }}
           style={[
             global.greenBack,
             {
-              paddingVertical: 10,
+              paddingVertical: 15,
               paddingHorizontal: 20,
               borderRadius: 15,
               justifyContent: 'center',
@@ -52,13 +73,15 @@ const Search = () => {
           <Image source={FilterIcon} />
         </Pressable>
       </View>
-      <View style={{marginTop: 20}}>
-        {name == '' && platforms.length == 0 && categories.length == 0 ? (
-          <RecommendedSearch />
-        ) : (
-          <SearchResults />
-        )}
-      </View>
+      {searchActive && (
+        <View style={{marginTop: 20}}>
+          {name == '' && platforms.length == 0 && categories.length == 0 ? (
+            <RecommendedSearch />
+          ) : (
+            <SearchResults />
+          )}
+        </View>
+      )}
     </ScrollView>
   );
 };
@@ -69,7 +92,6 @@ const styles = StyleSheet.create({
   searchWrapper: [
     global.gray2Back,
     {
-      width: '80%',
       borderRadius: 15,
       paddingHorizontal: 10,
       flexDirection: 'row',

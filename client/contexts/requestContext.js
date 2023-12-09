@@ -14,6 +14,7 @@ function RequestProvider({children}) {
   const [data, setdata] = useState([]);
   const [platforms, setplatforms] = useState([]);
   const [payment, setpayment] = useState(0);
+  const [paymentMethod, setpaymentMethod] = useState('wallet');
 
   const value = {
     category,
@@ -34,6 +35,8 @@ function RequestProvider({children}) {
     setplatforms,
     payment,
     setpayment,
+    paymentMethod,
+    setpaymentMethod,
   };
 
   return (

@@ -121,7 +121,19 @@ const CameraComp = () => {
             />
           )}
           {image && (
-            <View
+            // <View
+            // style={
+            // {
+            // height: (73 / 100) * Dimensions.get('screen').height,
+            // top: (9 / 100) * Dimensions.get('screen').height,
+            // width: '96%',
+            // left: '8%',
+            // position: 'absolute',
+            // overflow: 'hidden',
+            //   }
+            // }>
+            <Image
+              source={{uri: image}}
               style={{
                 height: (73 / 100) * Dimensions.get('screen').height,
                 top: (9 / 100) * Dimensions.get('screen').height,
@@ -129,17 +141,14 @@ const CameraComp = () => {
                 left: '8%',
                 position: 'absolute',
                 overflow: 'hidden',
-              }}>
-              <Image
-                source={{uri: image}}
-                style={{
-                  objectFit: 'cover',
-                  height: (73 / 100) * Dimensions.get('screen').height,
-                  width: (73 / 100) * Dimensions.get('screen').height,
-                  transform: 'rotate(90deg)',
-                }}
-              />
-            </View>
+
+                // objectFit: 'cover',
+                // height: (73 / 100) * Dimensions.get('screen').height,
+                // width: (73 / 100) * Dimensions.get('screen').height,
+                // transform: 'rotate(90deg)',
+              }}
+            />
+            // </View>
           )}
           {!image ? (
             <TouchableWithoutFeedback onPress={handleTakeImage}>

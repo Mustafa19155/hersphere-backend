@@ -13,8 +13,10 @@ import {
 } from '../../api/user';
 import global from '../../assets/styles/global';
 import ContinueButton from './ContinueButton';
+import {StackActions, useNavigation} from '@react-navigation/native';
 
 export default function SocialConnect({setisValidStep}) {
+  const navigation = useNavigation();
   const {user, setuser} = useContext(AuthContext);
   const [socialModalOpen, setsocialModalOpen] = useState(false);
   const [pages, setpages] = useState([]);
@@ -183,7 +185,9 @@ export default function SocialConnect({setisValidStep}) {
             setuser({...user, profileCompleted: true});
             await updateProfile({data: {...user, profileCompleted: true}});
             navigation.dispatch(StackActions.replace('Main'));
-          } catch (err) {}
+          } catch (err) {
+            console.log(err);
+          }
         }}
       />
       {/* </View> */}

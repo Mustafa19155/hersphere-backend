@@ -46,7 +46,7 @@ const SignupScreen = () => {
       register({data: {email, password, username}})
         .then(res => {
           setuser(res);
-          // navigation.navigate('Authentication');
+          navigation.navigate('Authentication');
         })
         .catch(err => {
           console.log(err);

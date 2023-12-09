@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import global from '../../assets/styles/global';
 import Step1 from '../../components/SendRequest/Step1';
 import Step2 from '../../components/SendRequest/Step2';
@@ -15,20 +15,42 @@ import Step3 from '../../components/SendRequest/Step3';
 import {Button, Modal, Portal} from 'react-native-paper';
 import TickIcon from '../../assets/icons/tick-green.png';
 import {useNavigation} from '@react-navigation/native';
+import ConfirmModal from '../../components/modals/ConfirmModal';
+import {RequestContext} from '../../contexts/requestContext';
 
 const SendRequest = () => {
   const maxSteps = 3;
   const [currentStep, setcurrentStep] = useState(1);
   const [isValidStep, setisValidStep] = useState(false);
+  const [requestSentModalOpen, setrequestSentModalOpen] = useState(false);
   const [confirmModalOpen, setconfirmModalOpen] = useState(false);
 
+  const {paymentMethod} = useContext(RequestContext);
+
   const handleSubmit = () => {
+    // if (paymentMethod == 'wallet') {
     setconfirmModalOpen(true);
+    // }
+    // setrequestSentModalOpen(true);
+  };
+
+  const handlePay = () => {
+    setconfirmModalOpen(false);
+    setrequestSentModalOpen(true);
   };
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom: 10}}>
-      <ConfirmModal open={confirmModalOpen} setopen={setconfirmModalOpen} />
+      <RequestSentModal
+        open={requestSentModalOpen}
+        setopen={setrequestSentModalOpen}
+      />
+      <ConfirmModal
+        open={confirmModalOpen}
+        setopen={setconfirmModalOpen}
+        onconfirm={handlePay}
+        text={'Are you sure you want to continue'}
+      />
       <View
         style={{
           flex: 1,
@@ -94,15 +116,15 @@ const SendRequest = () => {
                   3
                 </Text>
               </TouchableOpacity>
-              <Text style={{position: 'absolute', top: 24, left: -5}}>
+              <Text style={{position: 'absolute', top: 24, left: -10}}>
                 Step 3
               </Text>
             </View>
           </View>
           {currentStep == 1 ? (
-            <Step1 isValidStep={isValidStep} setisValidStep={setisValidStep} />
-          ) : currentStep == 2 ? (
             <Step2 isValidStep={isValidStep} setisValidStep={setisValidStep} />
+          ) : currentStep == 2 ? (
+            <Step1 isValidStep={isValidStep} setisValidStep={setisValidStep} />
           ) : (
             <Step3 isValidStep={isValidStep} setisValidStep={setisValidStep} />
           )}
@@ -110,8 +132,10 @@ const SendRequest = () => {
         <Button
           style={[global.greenBtn]}
           onPress={() =>
-            currentStep < maxSteps && isValidStep
-              ? setcurrentStep(currentStep + 1)
+            currentStep < maxSteps
+              ? isValidStep
+                ? setcurrentStep(currentStep + 1)
+                : null
               : handleSubmit()
           }>
           <Text style={global.greenBtnText}>Continue</Text>
@@ -123,7 +147,7 @@ const SendRequest = () => {
 
 export default SendRequest;
 
-const ConfirmModal = ({open, setopen}) => {
+const RequestSentModal = ({open, setopen}) => {
   const navigation = useNavigation();
 
   const containerStyle = {
@@ -159,6 +183,8 @@ const ConfirmModal = ({open, setopen}) => {
     </Portal>
   );
 };
+
+const confirmPaymentModal = ({open, setopen}) => {};
 
 const styles = StyleSheet.create({
   stepLine: {

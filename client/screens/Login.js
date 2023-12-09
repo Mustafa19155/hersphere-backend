@@ -35,11 +35,11 @@ const LoginScreen = () => {
       login({email, password})
         .then(res => {
           setuser(res);
-          // if (res.profileCompleted) {
-          //   navigation.navigate('Main');
-          // } else {
-          //   navigation.navigate('Authentication');
-          // }
+          if (res.profileCompleted) {
+            navigation.navigate('Main');
+          } else {
+            navigation.navigate('Authentication');
+          }
         })
         .catch(err => {});
     }

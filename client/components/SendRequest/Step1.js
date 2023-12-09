@@ -206,6 +206,27 @@ const Step1 = ({isValidStep, setisValidStep}) => {
             Allow influencer to add material
           </Text>
         </View>
+        <View style={styles.optWrapper}>
+          <Text style={[global.textSmall, global.fontBold]}>
+            Total payment will be
+          </Text>
+          <TextInput
+            disabled
+            value="$ 25"
+            underlineColor="transparent"
+            activeUnderlineColor="transparent"
+            mode="flat"
+            style={[
+              global.gray2Back,
+              {
+                height: 45,
+                width: 84,
+                justifyContent: 'center',
+                alignItems: 'center',
+              },
+            ]}
+          />
+        </View>
       </View>
     </View>
   );
@@ -214,6 +235,17 @@ const Step1 = ({isValidStep, setisValidStep}) => {
 export default Step1;
 
 const styles = StyleSheet.create({
+  optWrapper: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginHorizontal: 2,
+    borderRadius: 10,
+  },
   likesWrapepr: {
     flexDirection: 'row',
     justifyContent: 'space-between',

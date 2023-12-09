@@ -4,7 +4,7 @@ import PersonalInfo from '../screens/UserProfiling/PersonalInfo';
 import SoicalAccounts from '../screens/UserProfiling/SoicalAccounts';
 import Security from '../screens/UserProfiling/Security';
 import BusinessInfo from '../screens/UserProfiling/BusinessInfo';
-import Search from '../screens/Search/Search';
+import Search from '../components/Search/Search';
 import UserProfile from '../screens/Search/UserProfile';
 
 const Stack = createStackNavigator();
