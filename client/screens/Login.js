@@ -1,5 +1,5 @@
 import {useNavigation} from '@react-navigation/native';
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -9,17 +9,18 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {Card, TextInput, Button, Text} from 'react-native-paper';
-import {IconButton} from 'react-native-paper';
-// import Icon from 'react-native-vector-icons/MaterialIcons';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import {login} from '../api/user';
 import {AuthContext} from '../contexts/userContext';
 import global from '../assets/styles/global';
 import {loginWithGoogle} from '../api/user';
+import {useToast} from 'react-native-toast-notifications';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const LoginScreen = () => {
+  const toast = useToast();
+
   const [apiCalled, setapiCalled] = useState(false);
-  const [email, setemail] = useState('mustafa2@gmail.com');
+  const [email, setemail] = useState('asd@gmail.com');
   const [password, setpassword] = useState('123');
 
   const navigation = useNavigation();
@@ -32,8 +33,10 @@ const LoginScreen = () => {
 
   const handleLogin = () => {
     if (email && password) {
+      setapiCalled(true);
       login({email, password})
         .then(res => {
+          setapiCalled(false);
           setuser(res);
           if (res.profileCompleted) {
             navigation.navigate('Main');
@@ -41,7 +44,10 @@ const LoginScreen = () => {
             navigation.navigate('Authentication');
           }
         })
-        .catch(err => {});
+        .catch(err => {
+          toast.show('Invalid username or email', {type: 'danger'});
+          setapiCalled(false);
+        });
     }
   };
 
@@ -59,97 +65,105 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text
-        style={[
-          global.fontBold,
-          global.textExtraLarge,
-          {textAlign: 'center', marginBottom: 60},
-        ]}>
-        Welcome to {'\n'}HerSphere
-      </Text>
-      <View style={styles.inputsWrapper}>
-        <Text style={[global.fontBold, global.textLarge]}>Sign In</Text>
-        <TextInput
-          label="Email"
-          mode="flat"
-          underlineColor="transparent"
-          style={[global.input]}
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setemail}
-        />
-        <TextInput
-          label="Password"
-          mode="flat"
-          underlineColor="transparent"
-          secureTextEntry
-          right={<TextInput.Icon icon="eye" />}
-          value={password}
-          onChangeText={setpassword}
-        />
-        <Button
-          // mode="elevated"
-          style={[global.greenBtn]}
-          disabled={apiCalled}
-          onPress={handleLogin}>
-          <Text style={[global.greenBtnText]}>Login</Text>
-        </Button>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 20,
-          }}>
-          <View
-            style={{
-              borderWidth: 1,
-              height: 2,
-              width: 100,
-              borderColor: 'gray',
-              opacity: 0.5,
-            }}></View>
-          <Text style={{fontSize: 20, opacity: 0.5}}>or</Text>
-          <View
-            style={{
-              opacity: 0.5,
-              borderWidth: 1,
-              height: 2,
-              width: 100,
-              borderColor: 'gray',
-            }}></View>
-        </View>
-        <TouchableOpacity
+    <KeyboardAwareScrollView>
+      <View style={styles.container}>
+        <Text
           style={[
-            global.whiteBtn,
-            {
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              alignSelf: 'center',
-              gap: 10,
-              width: '100%',
-            },
-          ]}
-          onPress={handleGoogleLogin}>
-          <Image
-            source={require('../assets/icons/google.png')}
-            style={{width: 30, height: 30}}
+            global.fontBold,
+            global.textExtraLarge,
+            {textAlign: 'center', marginBottom: 60},
+          ]}>
+          Welcome to {'\n'}HerSphere
+        </Text>
+        <View style={styles.inputsWrapper}>
+          <Text style={[global.fontBold, global.textLarge]}>Sign In</Text>
+          <TextInput
+            placeholder="Email"
+            mode="outlined"
+            outlineColor="transparent"
+            activeOutlineColor="transparent"
+            style={[global.gray2Back]}
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setemail}
           />
-          <Text style={[global.whiteBtnText]} disabled={!apiCalled}>
-            Continue with Google
-          </Text>
-        </TouchableOpacity>
-
-        <View style={styles.registerLink}>
-          <Text style={{fontSize: 20}}>Dont have an account? </Text>
-          <TouchableOpacity onPress={handleRegisterNavigate}>
-            <Text style={[global.greenColor, global.textNormal]}>Register</Text>
+          <TextInput
+            placeholder="Password"
+            mode="outlined"
+            outlineColor="transparent"
+            activeOutlineColor="transparent"
+            secureTextEntry
+            right={<TextInput.Icon icon="eye" color="gray" />}
+            style={[global.input, global.gray2Back]}
+            value={password}
+            onChangeText={setpassword}
+          />
+          <Button
+            style={[global.greenBtn]}
+            disabled={apiCalled}
+            onPress={handleLogin}>
+            <Text style={[global.greenBtnText]}>
+              {apiCalled ? 'Loading...' : 'Login'}
+            </Text>
+          </Button>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 20,
+            }}>
+            <View
+              style={{
+                borderWidth: 1,
+                height: 2,
+                width: 100,
+                borderColor: 'gray',
+                opacity: 0.5,
+              }}></View>
+            <Text style={{fontSize: 20, opacity: 0.5}}>or</Text>
+            <View
+              style={{
+                opacity: 0.5,
+                borderWidth: 1,
+                height: 2,
+                width: 100,
+                borderColor: 'gray',
+              }}></View>
+          </View>
+          <TouchableOpacity
+            style={[
+              global.whiteBtn,
+              {
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                alignSelf: 'center',
+                gap: 10,
+                width: '100%',
+              },
+            ]}
+            onPress={handleGoogleLogin}>
+            <Image
+              source={require('../assets/icons/google.png')}
+              style={{width: 30, height: 30}}
+            />
+            <Text style={[global.whiteBtnText]} disabled={!apiCalled}>
+              Continue with Google
+            </Text>
           </TouchableOpacity>
+
+          <View style={styles.registerLink}>
+            <Text style={{fontSize: 20}}>Dont have an account? </Text>
+            <TouchableOpacity onPress={handleRegisterNavigate}>
+              <Text style={[global.greenColor, global.textNormal]}>
+                Register
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 

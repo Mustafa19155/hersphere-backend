@@ -13,7 +13,7 @@ exports.getFacebookPages = async (req, res, next) => {
     const { token, userType } = req.query;
 
     const response = await axios.get(
-      "https://graph.facebook.com/v12.0/me/accounts?fields=name,access_token,media_count,followers_count,tasks,id&access_token={access_token}",
+      "https://graph.facebook.com/v12.0/me/accounts?fields=name,access_token,media_count,followers_count,tasks,id",
       {
         params: {
           access_token: token,
@@ -22,6 +22,17 @@ exports.getFacebookPages = async (req, res, next) => {
     );
 
     let pages = response.data.data;
+
+    const finalPages = [];
+
+    await Promise.all(
+      pages.map(async (page) => {
+        const found = await User.findOne({ "facebookPage.id": page.id });
+        if (!found) {
+          finalPages.push(page);
+        }
+      })
+    );
 
     // filter pages based on no of posts and no of followers
 
@@ -36,7 +47,7 @@ exports.getFacebookPages = async (req, res, next) => {
     // }
     // pages = pages.filter((post) => post.totalPosts > 20);
     // }
-    res.send(pages);
+    res.send(finalPages);
   } catch (err) {
     next(err);
   }
@@ -58,12 +69,31 @@ exports.getInstagramPages = async (req, res, next) => {
     let pages = response.data.data;
     pages = pages.filter((page) => page.instagram_business_account);
 
-    for (const page of pages) {
+    pages = pages.map((page) => {
+      return {
+        id: page.instagram_business_account.id,
+        username: page.instagram_business_account.username,
+      };
+    });
+
+    const finalPages = [];
+
+    await Promise.all(
+      pages.map(async (page) => {
+        const found = await User.findOne({ "instagramPage.id": page.id });
+        if (!found) {
+          finalPages.push(page);
+        }
+      })
+    );
+
+    for (const page of finalPages) {
       const res = await axios.get(
-        `https://graph.facebook.com/v12.0/${page.instagram_business_account.id}?fields=media_count,followers_count&access_token=${token}`
+        `https://graph.facebook.com/v12.0/${page.id}?fields=media_count,followers_count&access_token=${token}`
       );
-      page["id"] = page.instagram_business_account.id;
-      page["name"] = page.instagram_business_account.username;
+      page["token"] = token;
+      page["id"] = page.id;
+      page["name"] = page.username;
       page["media_count"] = res.data.media_count;
       page["followers_count"] = res.data.followers_count;
 
@@ -77,7 +107,7 @@ exports.getInstagramPages = async (req, res, next) => {
     // } else {
     // pages = pages.filter((post) => post.totalPosts > 20);
     // }
-    res.send(pages);
+    res.send(finalPages);
   } catch (err) {
     next(err);
   }
@@ -91,20 +121,20 @@ exports.getYoutubeDetails = (req, res, next) => {
     access_token,
   });
 
-  const people = google.people({
-    version: "v1",
-    auth: oauth2Client,
-  });
+  // const people = google.people({
+  //   version: "v1",
+  //   auth: oauth2Client,
+  // });
 
-  people.people.get(
-    {
-      resourceName: "people/me",
-      personFields: "genders",
-    },
-    (err, res) => {
-      const gender = res.data;
-    }
-  );
+  // people.people.get(
+  //   {
+  //     resourceName: "people/me",
+  //     personFields: "genders",
+  //   },
+  //   (err, res) => {
+  //     const gender = res.data;
+  //   }
+  // );
 
   const youtube = google.youtube({
     version: "v3",
@@ -116,12 +146,25 @@ exports.getYoutubeDetails = (req, res, next) => {
       part: "snippet,contentDetails,statistics",
       // key: process.env.GOOGLE_API_KEY,
     },
-    (err, response) => {
+    async (err, response) => {
       if (err) {
+        next({
+          status: 400,
+          message: "Channel not found",
+        });
       } else {
-        const stats = response.data.items[0].statistics;
-
         const channelId = response.data.items[0].id;
+
+        const channelFound = await User.findOne({
+          "youtubeChannel.id": channelId,
+        });
+
+        if (channelFound && channelFound._id != req.userId) {
+          next({
+            status: 400,
+            message: "Channel already connected to another account",
+          });
+        }
 
         youtube.search
           .list({
@@ -145,7 +188,6 @@ exports.getYoutubeDetails = (req, res, next) => {
                     return;
                   }
 
-                  // Get the video details and statistics
                   const videoDetails = videoResponse.data.items[0].snippet;
                   const videoStats = videoResponse.data.items[0].statistics;
                 }
@@ -243,6 +285,14 @@ exports.login = async (req, res, next) => {
 exports.updateProfile = async (req, res, next) => {
   try {
     const data = req.body;
+    if (data.businessDetails && data.businessDetails.title) {
+      const userFound = await User.findOne({
+        "businessDetails.title": data.businessDetails.title,
+      });
+
+      if (userFound && userFound._id != req.userId)
+        return next({ status: 400, message: "Title not availble" });
+    }
 
     await User.findByIdAndUpdate(req.userId, data);
     res.send("User updated");

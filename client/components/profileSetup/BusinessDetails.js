@@ -10,6 +10,7 @@ import ContinueButton from './ContinueButton';
 import {updateProfile} from '../../api/user';
 import {StackActions, useNavigation} from '@react-navigation/native';
 import global from '../../assets/styles/global';
+import {useToast} from 'react-native-toast-notifications';
 
 export default function BusinessDetails({
   isValidStep,
@@ -18,12 +19,13 @@ export default function BusinessDetails({
   currentStep,
   setcurrentStep,
 }) {
+  const toast = useToast();
   const navigation = useNavigation();
   const {user, setuser} = useContext(AuthContext);
+  const [apiCalled, setapiCalled] = useState(false);
 
   const [title, settitle] = useState('');
   const [description, setdescription] = useState('');
-  const [category, setcategory] = useState('');
 
   const categories = [
     {
@@ -49,38 +51,58 @@ export default function BusinessDetails({
     },
   ];
 
+  const [category, setcategory] = useState(categories[0]);
   const [targetAudience, settargetAudience] = useState([]);
-
+  console.log(user);
   const handleAddBusinessDetails = async () => {
-    const obj = {
-      title,
-      description,
-    };
-    if (user.userType == 'startup') {
-      obj['category'] = category;
-    } else {
-      obj['targetAudience'] = targetAudience;
+    if (description) {
+      const obj = {
+        description,
+      };
+      if (userType == 'startup') {
+        if (!category || !title) {
+          return;
+        }
+        obj['category'] = category;
+        obj['title'] = title;
+      } else {
+        if (targetAudience.length == 0) {
+          return;
+        }
+        obj['targetAudience'] = targetAudience;
+      }
+      setapiCalled(true);
+      updateProfile({
+        data: {...user, businessDetails: obj, profileCompleted: false},
+      })
+        .then(res => {
+          setapiCalled(false);
+          setuser({
+            ...user,
+            businessDetails: obj,
+            profileCompleted: false,
+          });
+          setcurrentStep(currentStep + 1);
+        })
+        .catch(err => {
+          setapiCalled(false);
+          toast.show('Business Title not available', {type: 'danger'});
+        });
     }
-
-    // navigation.dispatch(StackActions.replace('Main'));
-    setuser({
-      ...user,
-      businessDetails: obj,
-
-      profileCompleted: false,
-    });
-    await updateProfile({
-      data: {...user, businessDetails: obj, profileCompleted: false},
-    });
-    setcurrentStep(currentStep + 1);
   };
 
   useEffect(() => {
-    setcategory(user?.businessDetails?.category);
-    settitle(user?.businessDetails?.title);
-    settargetAudience(user?.businessDetails?.targetAudience?.map(tar => tar));
-    setdescription(user?.businessDetails?.description);
-    setisValidStep(true);
+    if (user?.businessDetails) {
+      setcategory(user.businessDetails.category);
+      settitle(user.businessDetails.title);
+      settargetAudience(
+        user.businessDetails.targetAudience
+          ? user.businessDetails.targetAudience.map(tar => tar)
+          : [],
+      );
+      setdescription(user.businessDetails.description);
+      setisValidStep(true);
+    }
   }, []);
 
   return (
@@ -96,9 +118,11 @@ export default function BusinessDetails({
               <TextInput
                 value={title}
                 onChangeText={settitle}
-                // label="Business Title"
                 underlineColor="transparent"
-                mode="flat"
+                style={[global.gray2Back]}
+                mode="outlined"
+                outlineColor="transparent"
+                activeOutlineColor="transparent"
                 keyboardType="email-address"
               />
             </View>
@@ -114,9 +138,12 @@ export default function BusinessDetails({
               value={description}
               onChangeText={setdescription}
               multiline={true}
+              outlineColor="transparent"
+              activeOutlineColor="transparent"
+              style={[global.gray2Back]}
               numberOfLines={5}
               underlineColor="transparent"
-              mode="flat"
+              mode="outlined"
             />
           </View>
           {userType.toLowerCase() == 'startup' ? (
@@ -187,6 +214,8 @@ export default function BusinessDetails({
           text={'Continue'}
           isValidStep={isValidStep}
           clickHandler={handleAddBusinessDetails}
+          disabled={apiCalled}
+          apiCalled={apiCalled}
         />
       </View>
     </ScrollView>

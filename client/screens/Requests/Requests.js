@@ -18,6 +18,7 @@ const Requests = () => {
 
   const [requests, setrequests] = useState([
     {
+      id: 1,
       startDate: new Date(),
       endDate: new Date().setDate(12),
       status: 'active',
@@ -36,6 +37,7 @@ const Requests = () => {
       },
     },
     {
+      id: 2,
       startDate: new Date(),
       endDate: new Date(),
       status: 'active',
@@ -54,6 +56,7 @@ const Requests = () => {
       },
     },
     {
+      id: 3,
       startDate: new Date(),
       endDate: new Date(),
       completedOn: new Date(),
@@ -73,6 +76,7 @@ const Requests = () => {
       },
     },
     {
+      id: 4,
       startDate: new Date(),
       endDate: new Date(),
       completedOn: new Date(),
@@ -92,6 +96,7 @@ const Requests = () => {
       },
     },
     {
+      id: 5,
       startDate: new Date(),
       endDate: new Date(),
       status: 'new',
@@ -112,6 +117,7 @@ const Requests = () => {
       },
     },
     {
+      id: 6,
       startDate: new Date(),
       endDate: new Date(),
       status: 'new',
@@ -210,7 +216,11 @@ const Requests = () => {
             requests={requests.filter(req => req.status == 'active')}
           />
         ) : currentTab == 'New' ? (
-          <NewRequests requests={requests.filter(req => req.status == 'new')} />
+          <NewRequests
+            requests={requests.filter(req => req.status == 'new')}
+            mainRequests={requests}
+            setrequests={setrequests}
+          />
         ) : currentTab == 'Completed' ? (
           <CompletedRequests
             requests={requests.filter(req => req.status == 'completed')}

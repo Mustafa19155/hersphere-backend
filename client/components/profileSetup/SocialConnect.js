@@ -14,8 +14,10 @@ import {
 import global from '../../assets/styles/global';
 import ContinueButton from './ContinueButton';
 import {StackActions, useNavigation} from '@react-navigation/native';
+import {useToast} from 'react-native-toast-notifications';
 
 export default function SocialConnect({setisValidStep}) {
+  const toast = useToast();
   const navigation = useNavigation();
   const {user, setuser} = useContext(AuthContext);
   const [socialModalOpen, setsocialModalOpen] = useState(false);
@@ -53,7 +55,9 @@ export default function SocialConnect({setisValidStep}) {
           .then(res => {
             handleChoosePage(res.data, 'youtube');
           })
-          .catch(err => {});
+          .catch(err => {
+            toast.show(err.response.data.message, {type: 'danger'});
+          });
       },
     },
     {
@@ -65,7 +69,9 @@ export default function SocialConnect({setisValidStep}) {
         facebookSignin({userType: user.userType})
           .then(res => {
             setpages(res);
-            if (res.length > 1) {
+            if (res.length == 0) {
+              toast.show('No facebook pages to connect', {type: 'danger'});
+            } else if (res.length > 1) {
               setactiveType('facebook');
               setsocialModalOpen(true);
             } else {
@@ -86,7 +92,9 @@ export default function SocialConnect({setisValidStep}) {
         instagramSignin({userType: user.userType})
           .then(res => {
             setpages(res);
-            if (res.length > 1) {
+            if (res.length == 0) {
+              toast.show('No Instagram page to connect', {type: 'danger'});
+            } else if (res.length > 1) {
               setactiveType('instagram');
               setsocialModalOpen(true);
             } else {

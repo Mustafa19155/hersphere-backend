@@ -20,8 +20,11 @@ import {AuthContext} from '../contexts/userContext';
 import global from '../assets/styles/global';
 import {loginWithGoogle, register} from '../api/user';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useToast} from 'react-native-toast-notifications';
 
 const SignupScreen = () => {
+  const toast = useToast();
+
   const navigation = useNavigation();
 
   const {setuser} = useContext(AuthContext);
@@ -30,6 +33,7 @@ const SignupScreen = () => {
   const [password, setpassword] = useState('');
   const [username, setusername] = useState('');
   const [confirmPassword, setconfirmPassword] = useState('');
+  const [apiCalled, setapiCalled] = useState(false);
 
   const handleLoginNavigate = () => {
     navigation.navigate('login');
@@ -43,22 +47,17 @@ const SignupScreen = () => {
       confirmPassword &&
       password == confirmPassword
     ) {
+      setapiCalled(true);
       register({data: {email, password, username}})
         .then(res => {
+          setapiCalled(false);
           setuser(res);
           navigation.navigate('Authentication');
         })
         .catch(err => {
-          console.log(err);
+          setapiCalled(false);
+          toast.show('Email already in use', {type: 'danger'});
         });
-      // createAccount({auth, email, password, username})
-      //   .then(res => {
-      //     setuser(res);
-      //     navigation.navigate('Authentication');
-      //   })
-      //   .catch(err => {
-      //     console.log(err);
-      //   });
     }
   };
 
@@ -91,44 +90,55 @@ const SignupScreen = () => {
         </Text>
         <View style={styles.inputsWrapper}>
           <TextInput
-            label="Full Name"
-            mode="flat"
+            placeholder="Full Name"
+            mode="outlined"
+            outlineColor="transparent"
+            activeOutlineColor="transparent"
+            activeUnderlineColor="transparent"
             underlineColor="transparent"
-            style={global.input}
+            style={[global.input, global.gray2Back]}
             value={username}
             onChangeText={setusername}
           />
           <TextInput
-            label="Email"
-            mode="flat"
-            underlineColor="transparent"
-            style={global.input}
+            placeholder="Email"
+            mode="outlined"
+            outlineColor="transparent"
+            activeOutlineColor="transparent"
+            style={[global.input, global.gray2Back]}
             keyboardType="email-address"
             value={email}
             onChangeText={setemail}
           />
           <TextInput
-            label="Password"
-            mode="flat"
-            underlineColor="transparent"
+            placeholder="Password"
+            mode="outlined"
+            outlineColor="transparent"
+            activeOutlineColor="transparent"
             secureTextEntry
-            style={global.input}
+            style={[global.input, global.gray2Back]}
             right={<TextInput.Icon icon="eye" />}
             value={password}
             onChangeText={setpassword}
           />
           <TextInput
-            label="Confirm Password"
-            mode="flat"
-            underlineColor="transparent"
+            placeholder="Confirm Password"
+            mode="outlined"
+            outlineColor="transparent"
+            activeOutlineColor="transparent"
             secureTextEntry
-            style={global.input}
+            style={[global.input, global.gray2Back]}
             right={<TextInput.Icon icon="eye" />}
             value={confirmPassword}
             onChangeText={setconfirmPassword}
           />
-          <Button style={global.greenBtn} onPress={handleRegister}>
-            <Text style={[global.greenBtnText]}>Signup</Text>
+          <Button
+            style={global.greenBtn}
+            onPress={handleRegister}
+            disabled={apiCalled}>
+            <Text style={[global.greenBtnText]}>
+              {!apiCalled ? 'Signup' : 'Loading...'}
+            </Text>
           </Button>
           <View
             style={{

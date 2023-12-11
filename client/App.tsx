@@ -23,15 +23,15 @@ function App() {
 
   const {user, setuser} = useContext(AuthContext);
 
-  // useEffect(() => {
-  //   if (user == null) {
-  //     navigation.navigate('login');
-  //   } else {
-  //     user.profileCompleted
-  //       ? navigation.navigate('Main')
-  //       : navigation.navigate('Authentication');
-  //   }
-  // }, []);
+  useEffect(() => {
+    if (user == null) {
+      navigation.navigate('login');
+    } else {
+      user.profileCompleted
+        ? navigation.navigate('Main')
+        : navigation.navigate('Authentication');
+    }
+  }, []);
 
   return (
     <Stack.Navigator

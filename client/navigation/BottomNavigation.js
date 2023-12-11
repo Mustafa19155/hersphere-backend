@@ -1,25 +1,21 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import React from 'react';
-import Dashboard from '../screens/Dashboard';
-import UserProfilingStack, {
-  ChatStack,
-  RequetsStack,
-  SearchStack,
-} from './StackNavigation';
+import React, {useContext} from 'react';
+import StartupDashboard from '../screens/StartupDashboard';
+import {ChatStack, MarketplaceStack, RequetsStack} from './StackNavigation';
 import Icon from 'react-native-vector-icons/Feather';
 import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
-import {useNavigation} from '@react-navigation/native';
+import {AuthContext} from '../contexts/userContext';
+import InfluencerDashboard from '../screens/InfluencerDashboard';
 
 const Tab = createBottomTabNavigator();
 
 const BottomHomeNavigation = () => {
-  const navigation = useNavigation();
+  const {user} = useContext(AuthContext);
 
   return (
     <Tab.Navigator
       screenOptions={{
-        // headerShown: false,
         tabBarStyle: {
           backgroundColor: 'white',
           elevation: 0,
@@ -32,7 +28,9 @@ const BottomHomeNavigation = () => {
       }}>
       <Tab.Screen
         name="Home"
-        component={Dashboard}
+        component={
+          user.userType == 'startup' ? StartupDashboard : InfluencerDashboard
+        }
         options={{
           headerShown: false,
           tabBarLabel: ({focused}) => {
@@ -51,15 +49,15 @@ const BottomHomeNavigation = () => {
           ),
         }}
       />
-      {/* <Tab.Screen
+      <Tab.Screen
         name="Explore"
-        component={SearchStack}
+        component={MarketplaceStack}
         options={{
           headerShown: false,
           tabBarLabel: ({focused}) => {
             return (
               <Text style={focused ? global.greenColor : global.blackColor}>
-                Explore
+                Marketplace
               </Text>
             );
           },
@@ -71,7 +69,7 @@ const BottomHomeNavigation = () => {
             />
           ),
         }}
-      /> */}
+      />
       <Tab.Screen
         name="RequestsStack"
         component={RequetsStack}
@@ -98,13 +96,6 @@ const BottomHomeNavigation = () => {
         component={ChatStack}
         options={{
           headerShown: false,
-          // tabBarLabel: ({focused}) => {
-          //   return (
-          //     <Text style={focused ? global.greenColor : global.blackColor}>
-          //       Messages
-          //     </Text>
-          //   );
-          // },
           tabBarIcon: ({focused}) => (
             <Icon
               name="messages"
@@ -115,7 +106,7 @@ const BottomHomeNavigation = () => {
         }}
       />
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Settings"
         component={UserProfilingStack}
         options={{
@@ -135,7 +126,7 @@ const BottomHomeNavigation = () => {
             />
           ),
         }}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };

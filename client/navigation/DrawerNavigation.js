@@ -12,6 +12,7 @@ import global from '../assets/styles/global';
 import {Image, Pressable, TouchableWithoutFeedback, View} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useEffect} from 'react';
+import UserProfilingStack from './StackNavigation';
 
 const Drawer = createDrawerNavigator();
 
@@ -115,13 +116,34 @@ export default function DashboardDrawer() {
         }}
       />
       <Drawer.Screen
-        name="Promotion"
-        component={AnalyticsOptions}
+        name="Chatbot"
+        component={UserProfilingStack}
         options={{
           drawerLabel: ({focused}) => {
             return (
               <Text style={focused ? global.greenColor : global.blackColor}>
-                Promotions
+                Chat Bot
+              </Text>
+            );
+          },
+          drawerIcon: ({focused}) => (
+            <Icon
+              name="stats-chart-sharp"
+              size={20}
+              style={focused ? global.greenColor : global.blackColor}
+            />
+          ),
+        }}
+      />
+
+      <Drawer.Screen
+        name="Settings"
+        component={UserProfilingStack}
+        options={{
+          drawerLabel: ({focused}) => {
+            return (
+              <Text style={focused ? global.greenColor : global.blackColor}>
+                Settings
               </Text>
             );
           },

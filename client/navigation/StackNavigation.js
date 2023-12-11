@@ -41,6 +41,7 @@ import RequestDetails from '../screens/Requests/RequestDetails';
 import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
 import {useNavigation} from '@react-navigation/native';
+import Marketplace from '../screens/Marketplace/Marketplace';
 
 export const InfluenceProfileStack = () => {
   return (
@@ -107,6 +108,21 @@ export const RequetsStack = () => {
           headerTitleAlign: 'center',
           title: <Text style={[global.fontBold]}>Request Details</Text>,
         }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+export const MarketplaceStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        title: 'Marketplace',
+      }}>
+      <Stack.Screen
+        name="Marketplace"
+        component={Marketplace}
+        options={{headerShown: false}}
       />
     </Stack.Navigator>
   );

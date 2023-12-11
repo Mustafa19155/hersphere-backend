@@ -7,18 +7,33 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import MessageIcon from '../../assets/icons/message.png';
 import global from '../../assets/styles/global';
 import {useNavigation} from '@react-navigation/native';
+import ConfirmModal from '../modals/ConfirmModal';
 
-const NewRequests = ({requests}) => {
+const NewRequests = ({requests, setrequests, mainRequests}) => {
   const navigation = useNavigation();
+  const [showConfirmModal, setshowConfirmModal] = useState(false);
+  const [activeReq, setactiveReq] = useState(null);
+
+  const handleConfirm = () => {
+    setrequests(mainRequests.filter(r => r.id != activeReq.id));
+    setshowConfirmModal(false);
+    setactiveReq(null);
+  };
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{height: '80%'}}>
+      <ConfirmModal
+        text={'Are you sure you want to reject this request?'}
+        onconfirm={handleConfirm}
+        open={showConfirmModal}
+        setopen={setshowConfirmModal}
+      />
       <View style={{gap: 20, marginVertical: 10}}>
-        {requests.map(req => (
+        {requests.map((req, index) => (
           <Pressable
             onPress={() =>
               navigation.navigate('RequestDetails', {status: 'new'})
@@ -67,6 +82,7 @@ const NewRequests = ({requests}) => {
               <Pressable
                 onPress={e => {
                   e.stopPropagation();
+                  setactiveReq(req);
                 }}
                 style={[
                   global.greenBtnSm,
@@ -82,6 +98,8 @@ const NewRequests = ({requests}) => {
               <Pressable
                 onPress={e => {
                   e.stopPropagation();
+                  setactiveReq(req);
+                  setshowConfirmModal(true);
                 }}
                 style={[
                   global.redBtnSm,

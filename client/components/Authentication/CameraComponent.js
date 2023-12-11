@@ -18,8 +18,10 @@ import global from '../../assets/styles/global';
 import {verifyGender} from '../../api/user';
 import {launchCamera} from 'react-native-image-picker';
 import {StackActions, useNavigation} from '@react-navigation/native';
+import {useToast} from 'react-native-toast-notifications';
 
 const CameraComp = () => {
+  const toast = useToast();
   const navigation = useNavigation();
   const ref = useRef();
   const {hasPermission, requestPermission} = useCameraPermission();
@@ -64,6 +66,7 @@ const CameraComp = () => {
         setapiCalled(false);
       })
       .catch(err => {
+        toast.show('Verification failed. Please try again');
         navigation.dispatch(StackActions.replace('profileSetup'));
         setapiCalled(false);
       });
