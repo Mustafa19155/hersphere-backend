@@ -86,7 +86,6 @@ export default function ProfileSetup() {
                       currentStep >= 1
                         ? styles.completedStep
                         : styles.incompleteStep,
-                      global.textSmall,
                     ]}>
                     1
                   </Text>
@@ -102,7 +101,6 @@ export default function ProfileSetup() {
                     currentStep >= 2
                       ? styles.completedStep
                       : styles.incompleteStep,
-                    global.textSmall,
                   ]}>
                   2
                 </Text>
@@ -117,7 +115,6 @@ export default function ProfileSetup() {
                     currentStep >= 3
                       ? styles.completedStep
                       : styles.incompleteStep,
-                    global.textSmall,
                   ]}>
                   3
                 </Text>
@@ -132,7 +129,6 @@ export default function ProfileSetup() {
                     currentStep >= 4
                       ? styles.completedStep
                       : styles.incompleteStep,
-                    global.textSmall,
                   ]}>
                   4
                 </Text>

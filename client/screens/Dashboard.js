@@ -18,15 +18,19 @@ export default function Dashboard() {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
-        <Image source={Avatar} style={styles.profImg} />
-        <View>
-          <Text style={[global.textExtraSmall, global.grayColor]}>Welcome</Text>
-          <Text style={[global.textSmall, global.fontBold, {color: 'black'}]}>
-            {user?.username}
-          </Text>
+      {!searchActive && (
+        <View style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
+          <Image source={Avatar} style={styles.profImg} />
+          <View>
+            <Text style={[global.textExtraSmall, global.grayColor]}>
+              Welcome
+            </Text>
+            <Text style={[global.textSmall, global.fontBold, {color: 'black'}]}>
+              {user?.username}
+            </Text>
+          </View>
         </View>
-      </View>
+      )}
       <Search searchActive={searchActive} setsearchActive={setsearchActive} />
       {!searchActive && (
         <>

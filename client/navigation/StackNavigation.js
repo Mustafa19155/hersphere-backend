@@ -32,12 +32,15 @@ export const SearchStack = () => {
   );
 };
 import Icon from 'react-native-vector-icons/Ionicons';
-import {Pressable} from 'react-native';
+import {Pressable, View} from 'react-native';
 import SendRequest from '../screens/Search/SendRequest';
 import Chats from '../screens/Chat/Chats';
 import Chat from '../screens/Chat/Chat';
 import Requests from '../screens/Requests/Requests';
 import RequestDetails from '../screens/Requests/RequestDetails';
+import {Text} from 'react-native-paper';
+import global from '../assets/styles/global';
+import {useNavigation} from '@react-navigation/native';
 
 export const InfluenceProfileStack = () => {
   return (
@@ -93,7 +96,17 @@ export const RequetsStack = () => {
       <Stack.Screen
         name="RequestDetails"
         component={RequestDetails}
-        options={{headerShown: false}}
+        options={{
+          headerLeft: props => {
+            return (
+              <Pressable onPress={props.onPress}>
+                <Icon name="chevron-back" size={26} color="black" />
+              </Pressable>
+            );
+          },
+          headerTitleAlign: 'center',
+          title: <Text style={[global.fontBold]}>Request Details</Text>,
+        }}
       />
     </Stack.Navigator>
   );

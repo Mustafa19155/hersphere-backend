@@ -17,9 +17,10 @@ import TickIcon from '../../assets/icons/tick-green.png';
 import {useNavigation} from '@react-navigation/native';
 import ConfirmModal from '../../components/modals/ConfirmModal';
 import {RequestContext} from '../../contexts/requestContext';
+import Step4 from '../../components/SendRequest/Step4';
 
 const SendRequest = () => {
-  const maxSteps = 3;
+  const maxSteps = 4;
   const [currentStep, setcurrentStep] = useState(1);
   const [isValidStep, setisValidStep] = useState(false);
   const [requestSentModalOpen, setrequestSentModalOpen] = useState(false);
@@ -90,7 +91,9 @@ const SendRequest = () => {
             <View style={styles.stepLine} />
             <View style={styles.stepWrapper}>
               <TouchableOpacity
-                onPress={() => (isValidStep ? setcurrentStep(2) : null)}>
+                onPress={() =>
+                  isValidStep || currentStep > 2 ? setcurrentStep(2) : null
+                }>
                 <Text
                   style={[
                     currentStep >= 2
@@ -106,7 +109,12 @@ const SendRequest = () => {
             </View>
             <View style={styles.stepLine} />
             <View style={styles.stepWrapper}>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() =>
+                  (isValidStep && currentStep == 2) || currentStep > 3
+                    ? setcurrentStep(3)
+                    : null
+                }>
                 <Text
                   style={[
                     currentStep >= 3
@@ -120,13 +128,31 @@ const SendRequest = () => {
                 Step 3
               </Text>
             </View>
+            <View style={styles.stepLine} />
+            <View style={styles.stepWrapper}>
+              <TouchableOpacity>
+                <Text
+                  style={[
+                    currentStep >= 4
+                      ? styles.completedStep
+                      : styles.incompleteStep,
+                  ]}>
+                  4
+                </Text>
+              </TouchableOpacity>
+              <Text style={{position: 'absolute', top: 24, left: -10}}>
+                Step 4
+              </Text>
+            </View>
           </View>
           {currentStep == 1 ? (
-            <Step2 isValidStep={isValidStep} setisValidStep={setisValidStep} />
-          ) : currentStep == 2 ? (
             <Step1 isValidStep={isValidStep} setisValidStep={setisValidStep} />
-          ) : (
+          ) : currentStep == 2 ? (
+            <Step2 isValidStep={isValidStep} setisValidStep={setisValidStep} />
+          ) : currentStep == 3 ? (
             <Step3 isValidStep={isValidStep} setisValidStep={setisValidStep} />
+          ) : (
+            <Step4 />
           )}
         </View>
         <Button
@@ -189,7 +215,7 @@ const confirmPaymentModal = ({open, setopen}) => {};
 const styles = StyleSheet.create({
   stepLine: {
     height: 2,
-    width: '35%',
+    width: '18%',
     backgroundColor: '#13B887',
   },
   stepWrapper: {

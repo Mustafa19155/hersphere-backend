@@ -30,13 +30,13 @@ const Search = ({searchActive, setsearchActive}) => {
         style={{
           flexDirection: 'row',
           gap: 5,
-          marginTop: 20,
+          marginTop: 5,
           alignItems: 'center',
         }}>
         {searchActive && (
           <TouchableWithoutFeedback
             onPress={() => setsearchActive(false)}
-            style={{height: '100%'}}>
+            style={{height: '100%', width: '20%'}}>
             <Ionicons name="chevron-back" size={20} color="black" />
           </TouchableWithoutFeedback>
         )}

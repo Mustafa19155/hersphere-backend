@@ -9,7 +9,7 @@ import AnalyticsOptions from '../screens/Analytics/AnalyticsOptions';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
-import {Image, TouchableWithoutFeedback, View} from 'react-native';
+import {Image, Pressable, TouchableWithoutFeedback, View} from 'react-native';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useEffect} from 'react';
 
@@ -21,9 +21,14 @@ function CustomDrawerContent(props) {
       <DrawerItemList {...props} />
       <DrawerItem
         label={({focused}) => (
-          <Text style={[focused ? global.greenColor : global.blackColor]}>
-            Logout
-          </Text>
+          <Pressable
+            onPress={() => {
+              props.navigation.navigate('login');
+            }}>
+            <Text style={[focused ? global.greenColor : global.blackColor]}>
+              Logout
+            </Text>
+          </Pressable>
         )}
         icon={() => <Icon name="stats-chart-sharp" size={20} />}
         onPress={() => {}}
@@ -33,15 +38,11 @@ function CustomDrawerContent(props) {
 }
 
 export default function DashboardDrawer() {
-  const navigation = useNavigation();
-  const route = useRoute();
-
   return (
     <Drawer.Navigator
       screenOptions={({navigation, route}) => ({
         drawerStyle: {backgroundColor: 'white'},
-        headerStyle: {elevation: 0},
-
+        headerStyle: {elevation: 5},
         headerLeft: props => (
           <TouchableWithoutFeedback onPress={navigation.toggleDrawer}>
             <Image

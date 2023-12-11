@@ -1,82 +1,160 @@
-import {StyleSheet, Text, View} from 'react-native';
-import React, {useContext, useEffect} from 'react';
-import {Checkbox} from 'react-native-paper';
-import Icon from 'react-native-vector-icons/Ionicons';
-import global from '../../assets/styles/global';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableOpacityBase,
+  View,
+} from 'react-native';
+import React, {useContext, useEffect, useState} from 'react';
+import {Picker} from '@react-native-picker/picker';
 import {RequestContext} from '../../contexts/requestContext';
+import {Checkbox, TextInput} from 'react-native-paper';
+import global from '../../assets/styles/global';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 const Step2 = ({isValidStep, setisValidStep}) => {
-  const {platforms, setplatforms} = useContext(RequestContext);
+  const {
+    category,
+    setcategory,
+    description,
+    setdescription,
+    likes,
+    setlikes,
+    comments,
+    setcomments,
+    days,
+    setdays,
+    allowInfluencerToAddData,
+    setallowInfluencerToAddData,
+  } = useContext(RequestContext);
+
+  const categories = [
+    {
+      name: 'category 1',
+    },
+    {
+      name: 'category 2',
+    },
+    {
+      name: 'category 3',
+    },
+    {
+      name: 'category 4',
+    },
+    {
+      name: 'category 5',
+    },
+    {
+      name: 'category 6',
+    },
+    {
+      name: 'category 7',
+    },
+  ];
 
   useEffect(() => {
-    if (platforms.length > 0) {
-      setisValidStep(true);
-    } else {
-      setisValidStep(false);
+    if (category && description) {
+      if (
+        parseInt(likes) >= 25 &&
+        parseInt(comments) >= 25 &&
+        parseInt(days) >= 2
+      ) {
+        setisValidStep(true);
+      } else {
+        setisValidStep(false);
+      }
     }
-  }, [platforms]);
+  }, [category, description, allowInfluencerToAddData, likes, comments, days]);
 
   return (
     <View>
-      <Text style={[global.fontBold, global.textNormal]}>Choose Platform</Text>
-      <View style={{gap: 20, marginVertical: 15}}>
-        <View style={styles.optWrapper}>
-          <Checkbox
-            status={
-              platforms.some(plat => plat == 'instagram')
-                ? 'checked'
-                : 'unchecked'
-            }
-            color="green"
-            onPress={() =>
-              setplatforms(
-                platforms.find(pl => pl == 'instagram')
-                  ? platforms.filter(pl => pl != 'instagram')
-                  : [...platforms, 'instagram'],
-              )
-            }
+      <Text>Enter the details</Text>
+      <Picker
+        selectedValue={category}
+        style={{
+          height: 50,
+          width: '100%',
+          backgroundColor: '#EEEEEE',
+        }}
+        onValueChange={(itemValue, itemIndex) => setcategory(itemValue)}>
+        {categories.map(cat => (
+          <Picker.Item label={cat.name} value={cat.name} />
+        ))}
+      </Picker>
+      <TextInput
+        placeholder="Description"
+        value={description}
+        onChangeText={setdescription}
+        multiline={true}
+        numberOfLines={5}
+        underlineColor="transparent"
+        activeUnderlineColor="transparent"
+        mode="flat"
+        style={[global.gray2Back, {borderRadius: 10, marginVertical: 10}]}
+      />
+      <View style={styles.likesWrapepr}>
+        <View style={styles.likesSubWrapper}>
+          <Text style={[global.textExtraSmall, {fontWeight: 600}]}>
+            No. of likes
+          </Text>
+          <TextInput
+            value={likes}
+            onChangeText={text => setlikes(text.replace(/[^0-9]/g, ''))}
+            keyboardType="phone-pad"
+            underlineColor="transparent"
+            activeUnderlineColor="transparent"
+            mode="flat"
+            style={[global.gray2Back, {borderRadius: 10}]}
           />
-          <Text style={styles.text}>Instagram</Text>
-          <Icon name="logo-instagram" color="#bc2a8d" size={34} />
         </View>
-        <View style={styles.optWrapper}>
-          <Checkbox
-            status={
-              platforms.some(plat => plat == 'facebook')
-                ? 'checked'
-                : 'unchecked'
-            }
-            color="green"
-            onPress={() =>
-              setplatforms(
-                platforms.find(pl => pl == 'facebook')
-                  ? platforms.filter(pl => pl != 'facebook')
-                  : [...platforms, 'facebook'],
-              )
-            }
+        <View style={styles.likesSubWrapper}>
+          <Text style={[global.textExtraSmall, {fontWeight: 600}]}>
+            No. of comments
+          </Text>
+          <TextInput
+            value={comments}
+            onChangeText={text => setcomments(text.replace(/[^0-9]/g, ''))}
+            underlineColor="transparent"
+            activeUnderlineColor="transparent"
+            mode="flat"
+            style={[global.gray2Back, {borderRadius: 10}]}
           />
-          <Text style={styles.text}>Facebook</Text>
-          <Icon name="logo-facebook" color="#4267B2" size={34} />
         </View>
-        <View style={styles.optWrapper}>
-          <Checkbox
-            status={
-              platforms.some(plat => plat == 'youtube')
-                ? 'checked'
-                : 'unchecked'
-            }
-            color="green"
-            onPress={() =>
-              setplatforms(
-                platforms.find(pl => pl == 'youtube')
-                  ? platforms.filter(pl => pl != 'youtube')
-                  : [...platforms, 'youtube'],
-              )
-            }
+        <View style={styles.likesSubWrapper}>
+          <Text style={[global.textExtraSmall, {fontWeight: 600}]}>
+            No. of days
+          </Text>
+          <TextInput
+            value={days}
+            onChangeText={text => setdays(text.replace(/[^0-9]/g, ''))}
+            underlineColor="transparent"
+            activeUnderlineColor="transparent"
+            mode="flat"
+            style={[global.gray2Back, {borderRadius: 10}]}
           />
-          <Text style={styles.text}>Youtube</Text>
-          <Icon name="logo-youtube" color="#FF0000" size={34} />
         </View>
+      </View>
+      <View style={styles.optWrapper}>
+        <Text style={[global.textSmall, global.fontBold]}>
+          Total payment will be
+        </Text>
+        <TextInput
+          disabled
+          value="$ 25"
+          underlineColor="transparent"
+          activeUnderlineColor="transparent"
+          mode="flat"
+          style={[
+            global.gray2Back,
+            {
+              height: 45,
+              width: 84,
+              justifyContent: 'center',
+              alignItems: 'center',
+            },
+          ]}
+        />
       </View>
     </View>
   );
@@ -88,12 +166,37 @@ const styles = StyleSheet.create({
   optWrapper: {
     backgroundColor: 'white',
     flexDirection: 'row',
-    gap: 10,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    elevation: 5,
-    padding: 8,
+    marginVertical: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     marginHorizontal: 2,
     borderRadius: 10,
   },
-  text: [global.textSmall, {fontWeight: 600, width: 80}],
+  likesWrapepr: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  likesSubWrapper: {
+    gap: 7,
+    width: '30%',
+  },
+  checkboxWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    elevation: 5,
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 10,
+  },
+  imagePicker: {
+    borderWidth: 1,
+    height: 100,
+    width: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderStyle: 'dashed',
+  },
 });

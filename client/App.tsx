@@ -11,6 +11,7 @@ import VerifyGender from './screens/UserProfiling/VerifyGender';
 import UserProfilingStack, {
   ChatStack,
   InfluenceProfileStack,
+  RequetsStack,
 } from './navigation/StackNavigation';
 import DashboardDrawer from './navigation/DrawerNavigation';
 import Authentication from './screens/Authentication';

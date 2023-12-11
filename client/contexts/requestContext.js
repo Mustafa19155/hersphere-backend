@@ -10,8 +10,12 @@ function RequestProvider({children}) {
   const [comments, setcomments] = useState('25');
   const [days, setdays] = useState('2');
   const [allowInfluencerToAddData, setallowInfluencerToAddData] =
-    useState(false);
-  const [data, setdata] = useState([]);
+    useState(true);
+  const [data, setdata] = useState({
+    facebookData: {},
+    instagramData: {},
+    youtubeData: {},
+  });
   const [platforms, setplatforms] = useState([]);
   const [payment, setpayment] = useState(0);
   const [paymentMethod, setpaymentMethod] = useState('wallet');

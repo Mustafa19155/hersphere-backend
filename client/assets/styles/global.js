@@ -13,6 +13,9 @@ export default globalStyles = StyleSheet.create({
   gray2Color: {
     color: '#EEEEEE',
   },
+  gray3Color: {
+    color: 'rgba(35, 35, 35, 0.75)',
+  },
   greenColor: {
     color: '#13B887',
   },
@@ -49,6 +52,11 @@ export default globalStyles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 8,
   },
+  redBtnSm: {
+    backgroundColor: '#cc0000',
+    borderRadius: 8,
+    paddingVertical: 3,
+  },
   redButtonText: {
     color: 'white',
     fontSize: 20,
@@ -78,6 +86,9 @@ export default globalStyles = StyleSheet.create({
   },
   fontBold: {
     fontWeight: 'bold',
+  },
+  fontMedium: {
+    fontWeight: '600',
   },
   textExtraSmall: {
     color: 'black',
