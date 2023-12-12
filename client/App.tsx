@@ -15,6 +15,7 @@ import UserProfilingStack, {
 } from './navigation/StackNavigation';
 import DashboardDrawer from './navigation/DrawerNavigation';
 import Authentication from './screens/Authentication';
+import PostCreator from './screens/PostCreator/PostCreator';
 
 const Stack = createStackNavigator();
 
@@ -23,15 +24,15 @@ function App() {
 
   const {user, setuser} = useContext(AuthContext);
 
-  useEffect(() => {
-    if (user == null) {
-      navigation.navigate('login');
-    } else {
-      user.profileCompleted
-        ? navigation.navigate('Main')
-        : navigation.navigate('Authentication');
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (user == null) {
+  //     navigation.navigate('login');
+  //   } else {
+  //     user.profileCompleted
+  //       ? navigation.navigate('Main')
+  //       : navigation.navigate('Authentication');
+  //   }
+  // }, []);
 
   return (
     <Stack.Navigator
@@ -39,6 +40,7 @@ function App() {
         headerShown: false,
         headerStyle: {elevation: 0},
       }}>
+      <Stack.Screen name="PostCreator" component={PostCreator} />
       <Stack.Screen name="login" component={LoginScreen} />
       <Stack.Screen name="signup" component={SignupScreen} />
       <Stack.Screen name="profileSetup" component={ProfileSetup} />
