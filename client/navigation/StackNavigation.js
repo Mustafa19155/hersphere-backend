@@ -98,6 +98,7 @@ import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
 import {useNavigation} from '@react-navigation/native';
 import Marketplace from '../screens/Marketplace/Marketplace';
+import PostCreator from '../screens/PostCreator/PostCreator';
 
 export const InfluenceProfileStack = () => {
   return (
@@ -180,6 +181,18 @@ export const MarketplaceStack = () => {
         component={Marketplace}
         options={{headerShown: false}}
       />
+    </Stack.Navigator>
+  );
+};
+
+export const PostCreatorStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        title: 'Post Creator',
+        headerShown: false,
+      }}>
+      <Stack.Screen name="Main" component={PostCreator} />
     </Stack.Navigator>
   );
 };

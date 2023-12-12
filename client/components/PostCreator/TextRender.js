@@ -21,15 +21,17 @@ const TextRender = ({
   settemplate,
 }) => {
   const [size, setSize] = useState({width: img.width, height: img.height});
+  const [fontSize, setfontSize] = useState(img.fontSize);
   const [contentEditable, setcontentEditable] = useState(false);
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (event, gesture) => {
-      //   setcontentEditable(true);
+      // setcontentEditable(true);
       //   if (isSelected) {
       const newWidth = Math.max(50, size.width + gesture.dx);
       const newHeight = Math.max(50, size.height + gesture.dy);
+      setfontSize(newWidth / 7);
       setSize({width: newWidth, height: newHeight});
       //   }
     },
@@ -70,7 +72,6 @@ const TextRender = ({
             position: 'relative',
           }}
           onPress={() => {
-            console.log('A');
             setselectedIndex(index);
           }}>
           {contentEditable ? (
@@ -87,14 +88,15 @@ const TextRender = ({
               }}
               style={{
                 backgroundColor: 'tranparent',
-                fontSize: size.width / 10,
+                fontSize: img.fontSize,
                 color: img.color,
               }}></TextInput>
           ) : (
             <Text
               {...(selectedIndex == index ? panResponder.panHandlers : {})}
               style={{
-                fontSize: size.width / 10,
+                fontFamily: 'DMSans',
+                fontSize: fontSize,
                 color: img.color,
               }}>
               {img.text}

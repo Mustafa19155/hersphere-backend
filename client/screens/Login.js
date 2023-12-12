@@ -7,6 +7,7 @@ import {
   Image,
   Touchable,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import {Card, TextInput, Button, Text} from 'react-native-paper';
 import {login} from '../api/user';
@@ -30,7 +31,6 @@ const LoginScreen = () => {
   const handleRegisterNavigate = () => {
     navigation.navigate('signup');
   };
-
   const handleLogin = () => {
     if (email && password) {
       setapiCalled(true);
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   container: {
-    backgroundColor: 'white',
+    height: Dimensions.get('screen').height,
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',

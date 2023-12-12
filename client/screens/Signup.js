@@ -8,6 +8,7 @@ import {
   Image,
   Touchable,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import {Card, TextInput, Button, Text} from 'react-native-paper';
 import {IconButton} from 'react-native-paper';
@@ -213,6 +214,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   container: {
+    height: Dimensions.get('screen').height,
     backgroundColor: 'white',
     flex: 1,
     flexDirection: 'column',

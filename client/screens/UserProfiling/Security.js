@@ -5,25 +5,33 @@ import {Button, TextInput} from 'react-native-paper';
 import global from '../../assets/styles/global';
 import {updatePassword} from '../../api/user';
 import {useNavigation} from '@react-navigation/native';
+import FontAwesome5Icons from 'react-native-vector-icons/FontAwesome5';
+import {useToast} from 'react-native-toast-notifications';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const Security = () => {
+  const toast = useToast();
   const navigation = useNavigation();
-  const {user, setuser} = useContext(AuthContext);
   const [currentPassword, setcurrentPassword] = useState('');
   const [newPassword, setnewPassword] = useState('');
   const [confirmNewPassword, setconfirmNewPassword] = useState('');
+  const [apiCalled, setapiCalled] = useState(false);
 
   const handleUpdatePassword = () => {
     if (currentPassword && newPassword && confirmNewPassword) {
       if (newPassword == confirmNewPassword) {
+        setapiCalled(true);
         updatePassword({currentPassword, newPassword})
           .then(res => {
-            console.log(res);
+            setapiCalled(false);
+            toast.show('Password updated', {type: 'danger'});
           })
           .catch(err => {
-            console.log(err);
+            setapiCalled(false);
+            toast.show('Old password is not correct', {type: 'danger'});
           });
       } else {
+        toast.show('Passwords donot match', {type: 'danger'});
       }
     }
   };
@@ -36,55 +44,95 @@ const Security = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.inputsWrapper}>
-        {/* <Text style={[global.textSmall, global.fontBold, global.blackColor]}>
-            Current Password
-          </Text> */}
-        <TextInput
-          label="Current Password"
-          mode="flat"
-          underlineColor="transparent"
-          secureTextEntry
-          right={<TextInput.Icon icon="eye" />}
-          value={currentPassword}
-          onChangeText={setcurrentPassword}
-        />
-        <TextInput
-          label="New Password"
-          mode="flat"
-          underlineColor="transparent"
-          secureTextEntry
-          right={<TextInput.Icon icon="eye" />}
-          value={newPassword}
-          onChangeText={setnewPassword}
-        />
-        <TextInput
-          label="Confirm New Password"
-          mode="flat"
-          underlineColor="transparent"
-          secureTextEntry
-          right={<TextInput.Icon icon="eye" />}
-          value={confirmNewPassword}
-          onChangeText={setconfirmNewPassword}
-        />
+    <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      <View style={styles.container}>
+        <View style={styles.inputsWrapper}>
+          <Text style={[global.fontBold, global.textSmall]}>
+            Update Password
+          </Text>
+          <View>
+            <TextInput
+              value={currentPassword}
+              onChangeText={setcurrentPassword}
+              placeholder="Old Password"
+              mode="outlined"
+              secureTextEntry
+              outlineColor="black"
+              activeOutlineColor="black"
+              style={styles.input}
+              outlineStyle={{borderRadius: 10}}
+            />
+            <FontAwesome5Icons
+              name="pen"
+              color="gray"
+              size={16}
+              style={{right: 10, position: 'absolute', top: '40%'}}
+            />
+          </View>
+          <View>
+            <TextInput
+              value={newPassword}
+              onChangeText={setnewPassword}
+              placeholder="New Password"
+              mode="outlined"
+              secureTextEntry
+              outlineColor="black"
+              activeOutlineColor="black"
+              style={styles.input}
+              outlineStyle={{borderRadius: 10}}
+            />
+            <FontAwesome5Icons
+              name="pen"
+              color="gray"
+              size={16}
+              style={{right: 10, position: 'absolute', top: '40%'}}
+            />
+          </View>
+          <View>
+            <TextInput
+              value={confirmNewPassword}
+              onChangeText={setconfirmNewPassword}
+              placeholder="Confirm Password"
+              mode="outlined"
+              secureTextEntry
+              outlineColor="black"
+              activeOutlineColor="black"
+              style={styles.input}
+              outlineStyle={{borderRadius: 10}}
+            />
+            <FontAwesome5Icons
+              name="pen"
+              color="gray"
+              size={16}
+              style={{right: 10, position: 'absolute', top: '40%'}}
+            />
+          </View>
+          <Button
+            disabled={apiCalled}
+            style={[global.greenBtn, {marginTop: 20}]}
+            onPress={handleUpdatePassword}>
+            <Text style={[global.greenBtnText]}>
+              {apiCalled ? 'Loading...' : 'Update Password'}
+            </Text>
+          </Button>
+        </View>
       </View>
-      <Button style={[global.greenBtn]} onPress={handleUpdatePassword}>
-        <Text style={[global.greenBtnText]}>Update Password</Text>
-      </Button>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 export default Security;
 
 const styles = StyleSheet.create({
+  input: {
+    padding: 5,
+  },
+
   container: {
     flex: 1,
-    justifyContent: 'space-between',
-    padding: 20,
+    marginTop: 20,
   },
   inputsWrapper: {
-    gap: 12,
+    gap: 16,
   },
 });

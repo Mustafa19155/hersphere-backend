@@ -153,7 +153,7 @@ export default function SocialAccounts() {
           {accountTypes.map((type, index) => (
             <View key={index}>
               <TouchableWithoutFeedback
-                style={[global.whiteBtn, styles.button]}
+                style={[global.whiteBtn, styles.button, {paddingVertical: 15}]}
                 onPress={() =>
                   type.connected ? null : type.clickHandler(index)
                 }>
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     color: 'gray',
   },
   typesWrapper: {
-    gap: 30,
+    gap: 20,
     marginTop: 20,
   },
   button: {
@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     textAlign: 'center',
-    borderWidth: 0,
-    backgroundColor: '#EEEEEE',
+    borderWidth: 1,
+    // backgroundColor: '#EEEEEE',
   },
   headingWrapper: {
     flexDirection: 'column',

@@ -1,6 +1,6 @@
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import React, {useContext} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, {useContext, useState} from 'react';
+import {StackActions, useNavigation} from '@react-navigation/native';
 import LineIcons from 'react-native-vector-icons/SimpleLineIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntIcons from 'react-native-vector-icons/AntDesign';
@@ -8,13 +8,25 @@ import {AuthContext} from '../../contexts/userContext';
 import PasswordIcon from '../../assets/icons/password.png';
 import DeleteIcon from '../../assets/icons/delete.png';
 import global from '../../assets/styles/global';
+import ConfirmModal from '../../components/modals/ConfirmModal';
 
 const UserProfiling = () => {
   const navigation = useNavigation();
-  const {user} = useContext(AuthContext);
+  const [confirmModalOpen, setconfirmModalOpen] = useState(false);
+
+  const handleDeleteAcc = () => {
+    setconfirmModalOpen(false);
+    navigation.dispatch(StackActions.replace('login'));
+  };
 
   return (
     <View style={{marginTop: 15}}>
+      <ConfirmModal
+        text={'Are you sure you want to delete your account permanently?'}
+        open={confirmModalOpen}
+        setopen={setconfirmModalOpen}
+        onconfirm={handleDeleteAcc}
+      />
       <View>
         <Text style={[global.fontBold, global.textNormal, styles.mainHeading]}>
           Information
@@ -96,6 +108,7 @@ const UserProfiling = () => {
           paddingTop: 15,
         }}>
         <Pressable
+          onPress={() => setconfirmModalOpen(true)}
           style={[
             global.redButton,
             {

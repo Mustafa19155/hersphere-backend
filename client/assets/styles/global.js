@@ -71,6 +71,7 @@ export default globalStyles = StyleSheet.create({
   },
   greenBtnTextSm: {
     color: 'white',
+    fontFamily: 'DMSans-VariableFont_opsz,wght',
     fontSize: 12,
   },
   greenBtnTextMd: {

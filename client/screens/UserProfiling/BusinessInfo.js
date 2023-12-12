@@ -1,4 +1,11 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React, {useContext, useEffect, useState} from 'react';
 import {AuthContext} from '../../contexts/userContext';
 import {launchImageLibrary} from 'react-native-image-picker';
@@ -9,9 +16,14 @@ import DynamicTextBoxList from '../../components/profileSetup/TextBoxList';
 import global from '../../assets/styles/global';
 import {updateProfile} from '../../api/user';
 import {useNavigation} from '@react-navigation/native';
+import FontAwesome5Icons from 'react-native-vector-icons/FontAwesome5';
+import {useToast} from 'react-native-toast-notifications';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const BusinessInfo = () => {
+  const toast = useToast();
   const navigation = useNavigation();
+  const [apiCalled, setapiCalled] = useState(false);
   const {user, setuser} = useContext(AuthContext);
 
   const [title, settitle] = useState(user?.businessDetails.title);
@@ -48,12 +60,33 @@ const BusinessInfo = () => {
   ];
 
   const handleInfoUpdate = () => {
-    setuser({...user, businessDetails: {title, description, targetAudience}});
-    updateProfile({
-      data: {businessDetails: {title, description, targetAudience}},
-    })
-      .then(res => {})
-      .catch(err => {});
+    let isValid = false;
+    if (title && description) {
+      if (user.userType == 'startup') {
+        if (category) {
+          isValid = true;
+        }
+      } else {
+        if (targetAudience.length > 0) {
+          isValid = true;
+        }
+      }
+    }
+
+    if (isValid) {
+      setapiCalled(true);
+      setuser({...user, businessDetails: {title, description, targetAudience}});
+      updateProfile({
+        data: {businessDetails: {title, description, targetAudience}},
+      })
+        .then(res => {
+          toast.show('Information updated', {type: 'success'});
+          setapiCalled(false);
+        })
+        .catch(err => {
+          setapiCalled(false);
+        });
+    }
   };
 
   useEffect(() => {
@@ -64,47 +97,64 @@ const BusinessInfo = () => {
   }, []);
 
   return (
-    <View style={[global.container, {justifyContent: 'space-between'}]}>
-      <View style={{gap: 20}}>
-        {user?.userType?.toLowerCase() == 'startup' && (
-          <View style={{gap: 4}}>
-            <Text
-              style={[global.textSmall, global.fontBold, global.blackColor]}>
-              Business Title
+    <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
+      <View style={[{justifyContent: 'space-between', marginTop: 20}]}>
+        <View style={{gap: 30}}>
+          {user?.userType?.toLowerCase() == 'startup' && (
+            <View style={{gap: 10}}>
+              <Text style={[global.textSmall, global.fontBold]}>
+                Business Title
+              </Text>
+              <View>
+                <TextInput
+                  value={title}
+                  onChangeText={settitle}
+                  mode="outlined"
+                  outlineColor="black"
+                  activeOutlineColor="black"
+                  style={styles.input}
+                  outlineStyle={{borderRadius: 10}}
+                />
+                <FontAwesome5Icons
+                  name="pen"
+                  color="gray"
+                  size={16}
+                  style={{right: 10, position: 'absolute', top: '40%'}}
+                />
+              </View>
+            </View>
+          )}
+          <View style={{gap: 10}}>
+            <Text style={[global.textSmall, global.fontBold]}>
+              {user?.userType?.toLowerCase() == 'startup' ? 'Business' : ''}{' '}
+              Description
             </Text>
-            <TextInput
-              value={title}
-              onChangeText={settitle}
-              // label="Business Title"
-              underlineColor="transparent"
-              mode="flat"
-              keyboardType="email-address"
-            />
-          </View>
-        )}
-        <View style={styles.desWrapper}>
-          <Text style={[global.textSmall, global.fontBold, global.blackColor]}>
-            {user?.userType?.toLowerCase() == 'startup' ? 'Business' : ''}{' '}
-            Description
-          </Text>
-
-          <TextInput
-            value={description}
-            onChangeText={setdescription}
-            multiline={true}
-            numberOfLines={5}
-            underlineColor="transparent"
-            mode="flat"
-          />
-        </View>
-        {user?.userType?.toLowerCase() == 'startup' ? (
-          <View style={styles.desWrapper}>
             <View>
+              <TextInput
+                value={description}
+                onChangeText={setdescription}
+                mode="outlined"
+                outlineColor="black"
+                activeOutlineColor="black"
+                style={styles.input}
+                outlineStyle={{borderRadius: 10}}
+                multiline={true}
+                numberOfLines={5}
+              />
+              <FontAwesome5Icons
+                name="pen"
+                color="gray"
+                size={16}
+                style={{right: 10, position: 'absolute', top: '15%'}}
+              />
+            </View>
+          </View>
+          {user?.userType?.toLowerCase() == 'startup' ? (
+            <View style={{gap: 10}}>
               <Text
                 style={[global.textSmall, global.fontBold, global.blackColor]}>
                 Business Category
               </Text>
-
               <Picker
                 selectedValue={category}
                 style={{
@@ -120,47 +170,54 @@ const BusinessInfo = () => {
                 ))}
               </Picker>
             </View>
-          </View>
-        ) : (
-          <View>
-            <Text
-              style={[global.textSmall, global.fontBold, global.blackColor]}>
-              Target Audience
-            </Text>
-            <Picker
-              selectedValue={category}
-              style={{
-                height: 50,
-                width: '100%',
-                backgroundColor: '#EEEEEE',
-              }}
-              onValueChange={(itemValue, itemIndex) => {
-                setcategory(itemValue);
-                if (!targetAudience.find(ta => ta == itemValue)) {
-                  settargetAudience([...targetAudience, itemValue]);
-                }
-              }}>
-              {categories.map(cat => (
-                <Picker.Item label={cat.name} value={cat.name} />
-              ))}
-            </Picker>
-            <DynamicTextBoxList
-              tags={targetAudience}
-              setTags={settargetAudience}
-            />
-          </View>
-        )}
+          ) : (
+            <View>
+              <Text style={[global.textSmall, global.fontBold]}>
+                Target Audience
+              </Text>
+              <Picker
+                selectedValue={category}
+                style={{
+                  height: 50,
+                  width: '100%',
+                  backgroundColor: '#EEEEEE',
+                }}
+                onValueChange={(itemValue, itemIndex) => {
+                  setcategory(itemValue);
+                  if (!targetAudience.find(ta => ta == itemValue)) {
+                    settargetAudience([...targetAudience, itemValue]);
+                  }
+                }}>
+                {categories.map(cat => (
+                  <Picker.Item label={cat.name} value={cat.name} />
+                ))}
+              </Picker>
+              <DynamicTextBoxList
+                tags={targetAudience}
+                setTags={settargetAudience}
+              />
+            </View>
+          )}
+        </View>
+        <Button
+          disabled={apiCalled}
+          style={[global.greenBtn, {marginTop: 20}]}
+          onPress={handleInfoUpdate}>
+          <Text style={[global.greenBtnText]}>
+            {apiCalled ? 'Loading...' : 'Update'}
+          </Text>
+        </Button>
       </View>
-      <Button style={[global.greenBtn]} onPress={handleInfoUpdate}>
-        <Text style={[global.greenBtnText]}>Update Information</Text>
-      </Button>
-    </View>
+    </KeyboardAwareScrollView>
   );
 };
 
 export default BusinessInfo;
 
 const styles = StyleSheet.create({
+  input: {
+    padding: 5,
+  },
   container: {
     marginTop: 20,
     width: '90%',

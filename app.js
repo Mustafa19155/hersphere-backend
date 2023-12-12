@@ -31,7 +31,11 @@ app.use(
   cors({
     credentials: true,
     // origin: ["http://localhost:3000",],
-    origin: ["http://localhost:19000", "http://192.168.18.60:19000"],
+    origin: [
+      "http://localhost:19000",
+      "http://192.168.18.60:19000",
+      "http://172.20.10.2:19000",
+    ],
 
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],

@@ -11,6 +11,7 @@ import VerifyGender from './screens/UserProfiling/VerifyGender';
 import UserProfilingStack, {
   ChatStack,
   InfluenceProfileStack,
+  PostCreatorStack,
   RequetsStack,
 } from './navigation/StackNavigation';
 import DashboardDrawer from './navigation/DrawerNavigation';
@@ -40,7 +41,7 @@ function App() {
         headerShown: false,
         headerStyle: {elevation: 0},
       }}>
-      {/* <Stack.Screen name="PostCreator" component={PostCreator} /> */}
+      <Stack.Screen name="PostCreator" component={PostCreator} />
       <Stack.Screen name="login" component={LoginScreen} />
       <Stack.Screen name="signup" component={SignupScreen} />
       <Stack.Screen name="profileSetup" component={ProfileSetup} />
@@ -51,6 +52,7 @@ function App() {
         component={InfluenceProfileStack}
       />
       <Stack.Screen name="Chats" component={ChatStack} />
+      {/* <Stack.Screen name="PostCreator" component={PostCreatorStack} /> */}
     </Stack.Navigator>
   );
 }

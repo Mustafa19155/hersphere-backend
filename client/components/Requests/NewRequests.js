@@ -83,6 +83,7 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
                 onPress={e => {
                   e.stopPropagation();
                   setactiveReq(req);
+                  navigation.navigate('PostCreator');
                 }}
                 style={[
                   global.greenBtnSm,
