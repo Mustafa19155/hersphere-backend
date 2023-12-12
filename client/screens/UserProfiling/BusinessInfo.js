@@ -1,5 +1,5 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {AuthContext} from '../../contexts/userContext';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {Button, TextInput} from 'react-native-paper';
@@ -8,8 +8,10 @@ import {Picker} from '@react-native-picker/picker';
 import DynamicTextBoxList from '../../components/profileSetup/TextBoxList';
 import global from '../../assets/styles/global';
 import {updateProfile} from '../../api/user';
+import {useNavigation} from '@react-navigation/native';
 
 const BusinessInfo = () => {
+  const navigation = useNavigation();
   const {user, setuser} = useContext(AuthContext);
 
   const [title, settitle] = useState(user?.businessDetails.title);
@@ -54,10 +56,17 @@ const BusinessInfo = () => {
       .catch(err => {});
   };
 
+  useEffect(() => {
+    navigation.getParent().setOptions({headerShown: false});
+    return () => {
+      navigation.getParent().setOptions({headerShown: true});
+    };
+  }, []);
+
   return (
     <View style={[global.container, {justifyContent: 'space-between'}]}>
       <View style={{gap: 20}}>
-        {user?.userType.toLowerCase() == 'startup' && (
+        {user?.userType?.toLowerCase() == 'startup' && (
           <View style={{gap: 4}}>
             <Text
               style={[global.textSmall, global.fontBold, global.blackColor]}>
@@ -75,7 +84,7 @@ const BusinessInfo = () => {
         )}
         <View style={styles.desWrapper}>
           <Text style={[global.textSmall, global.fontBold, global.blackColor]}>
-            {user?.userType.toLowerCase() == 'startup' ? 'Business' : ''}{' '}
+            {user?.userType?.toLowerCase() == 'startup' ? 'Business' : ''}{' '}
             Description
           </Text>
 
@@ -88,7 +97,7 @@ const BusinessInfo = () => {
             mode="flat"
           />
         </View>
-        {user?.userType.toLowerCase() == 'startup' ? (
+        {user?.userType?.toLowerCase() == 'startup' ? (
           <View style={styles.desWrapper}>
             <View>
               <Text

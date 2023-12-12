@@ -2,7 +2,8 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import React, {useContext} from 'react';
 import StartupDashboard from '../screens/StartupDashboard';
 import {ChatStack, MarketplaceStack, RequetsStack} from './StackNavigation';
-import Icon from 'react-native-vector-icons/Feather';
+import AntIcons from 'react-native-vector-icons/AntDesign';
+import FeatherIcons from 'react-native-vector-icons/Feather';
 import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
 import {AuthContext} from '../contexts/userContext';
@@ -20,11 +21,13 @@ const BottomHomeNavigation = () => {
           backgroundColor: 'white',
           elevation: 0,
           borderColor: 'white',
+          width: '120%',
+          left: '-10%',
         },
       }}
       sceneContainerStyle={{
         backgroundColor: 'white',
-        padding: 15,
+        // padding: 15,
       }}>
       <Tab.Screen
         name="Home"
@@ -41,7 +44,7 @@ const BottomHomeNavigation = () => {
             );
           },
           tabBarIcon: ({focused}) => (
-            <Icon
+            <FeatherIcons
               name="home"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
@@ -62,8 +65,8 @@ const BottomHomeNavigation = () => {
             );
           },
           tabBarIcon: ({focused}) => (
-            <Icon
-              name="search"
+            <AntIcons
+              name="shoppingcart"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
             />
@@ -83,8 +86,8 @@ const BottomHomeNavigation = () => {
             );
           },
           tabBarIcon: ({focused}) => (
-            <Icon
-              name="request"
+            <FeatherIcons
+              name="folder-plus"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
             />
@@ -97,8 +100,8 @@ const BottomHomeNavigation = () => {
         options={{
           headerShown: false,
           tabBarIcon: ({focused}) => (
-            <Icon
-              name="messages"
+            <FeatherIcons
+              name="message-square"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
             />
@@ -119,7 +122,7 @@ const BottomHomeNavigation = () => {
             );
           },
           tabBarIcon: ({focused}) => (
-            <Icon
+            <AntIcons
               name="settings"
               size={20}
               style={focused ? global.greenColor : global.blackColor}

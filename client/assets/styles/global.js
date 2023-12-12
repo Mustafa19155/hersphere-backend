@@ -48,18 +48,22 @@ export default globalStyles = StyleSheet.create({
     paddingVertical: 8,
   },
   redButton: {
-    backgroundColor: '#cc0000',
+    backgroundColor: '#C20C0C',
     borderRadius: 8,
     paddingVertical: 8,
   },
   redBtnSm: {
-    backgroundColor: '#cc0000',
+    backgroundColor: '#C20C0C',
     borderRadius: 8,
     paddingVertical: 3,
   },
   redButtonText: {
     color: 'white',
     fontSize: 20,
+  },
+  redBtnTextSm: {
+    color: 'white',
+    fontSize: 12,
   },
   greenBtnText: {
     color: 'white',

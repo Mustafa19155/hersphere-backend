@@ -6,12 +6,14 @@ import {
 } from '@react-navigation/drawer';
 import BottomHomeNavigation from './BottomNavigation';
 import AnalyticsOptions from '../screens/Analytics/AnalyticsOptions';
-import Icon from 'react-native-vector-icons/Ionicons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AntIcons from 'react-native-vector-icons/AntDesign';
+import EntypoIcons from 'react-native-vector-icons/Entypo';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FeatherIcons from 'react-native-vector-icons/Feather';
 import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
 import {Image, Pressable, TouchableWithoutFeedback, View} from 'react-native';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {useEffect} from 'react';
 import UserProfilingStack from './StackNavigation';
 
 const Drawer = createDrawerNavigator();
@@ -31,7 +33,7 @@ function CustomDrawerContent(props) {
             </Text>
           </Pressable>
         )}
-        icon={() => <Icon name="stats-chart-sharp" size={20} />}
+        icon={() => <FeatherIcons name="log-out" size={20} />}
         onPress={() => {}}
       />
     </DrawerContentScrollView>
@@ -42,6 +44,7 @@ export default function DashboardDrawer() {
   return (
     <Drawer.Navigator
       screenOptions={({navigation, route}) => ({
+        sceneContainerStyle: {paddingHorizontal: 15},
         drawerStyle: {backgroundColor: 'white'},
         headerStyle: {elevation: 5},
         headerLeft: props => (
@@ -66,8 +69,8 @@ export default function DashboardDrawer() {
           },
           headerTitle: '',
           drawerIcon: ({focused}) => (
-            <Icon
-              name="stats-chart-sharp"
+            <MaterialIcons
+              name="dashboard"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
             />
@@ -87,8 +90,8 @@ export default function DashboardDrawer() {
             );
           },
           drawerIcon: ({focused}) => (
-            <Icon
-              name="stats-chart-sharp"
+            <AntIcons
+              name="shoppingcart"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
             />
@@ -107,8 +110,8 @@ export default function DashboardDrawer() {
             );
           },
           drawerIcon: ({focused}) => (
-            <Icon
-              name="stats-chart-sharp"
+            <EntypoIcons
+              name="wallet"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
             />
@@ -127,8 +130,8 @@ export default function DashboardDrawer() {
             );
           },
           drawerIcon: ({focused}) => (
-            <Icon
-              name="stats-chart-sharp"
+            <MaterialCommunityIcons
+              name="robot-outline"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
             />
@@ -140,6 +143,7 @@ export default function DashboardDrawer() {
         name="Settings"
         component={UserProfilingStack}
         options={{
+          headerTitle: '',
           drawerLabel: ({focused}) => {
             return (
               <Text style={focused ? global.greenColor : global.blackColor}>
@@ -148,8 +152,28 @@ export default function DashboardDrawer() {
             );
           },
           drawerIcon: ({focused}) => (
-            <Icon
-              name="stats-chart-sharp"
+            <AntIcons
+              name="setting"
+              size={20}
+              style={focused ? global.greenColor : global.blackColor}
+            />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Teams"
+        component={UserProfilingStack}
+        options={{
+          drawerLabel: ({focused}) => {
+            return (
+              <Text style={focused ? global.greenColor : global.blackColor}>
+                Teams
+              </Text>
+            );
+          },
+          drawerIcon: ({focused}) => (
+            <FeatherIcons
+              name="users"
               size={20}
               style={focused ? global.greenColor : global.blackColor}
             />

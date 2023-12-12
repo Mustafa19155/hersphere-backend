@@ -40,7 +40,7 @@ function App() {
         headerShown: false,
         headerStyle: {elevation: 0},
       }}>
-      <Stack.Screen name="PostCreator" component={PostCreator} />
+      {/* <Stack.Screen name="PostCreator" component={PostCreator} /> */}
       <Stack.Screen name="login" component={LoginScreen} />
       <Stack.Screen name="signup" component={SignupScreen} />
       <Stack.Screen name="profileSetup" component={ProfileSetup} />

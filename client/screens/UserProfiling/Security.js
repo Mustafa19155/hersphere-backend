@@ -1,11 +1,13 @@
 import {StyleSheet, Text, View} from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {AuthContext} from '../../contexts/userContext';
 import {Button, TextInput} from 'react-native-paper';
 import global from '../../assets/styles/global';
 import {updatePassword} from '../../api/user';
+import {useNavigation} from '@react-navigation/native';
 
 const Security = () => {
+  const navigation = useNavigation();
   const {user, setuser} = useContext(AuthContext);
   const [currentPassword, setcurrentPassword] = useState('');
   const [newPassword, setnewPassword] = useState('');
@@ -25,6 +27,13 @@ const Security = () => {
       }
     }
   };
+
+  useEffect(() => {
+    navigation.getParent().setOptions({headerShown: false});
+    return () => {
+      navigation.getParent().setOptions({headerShown: true});
+    };
+  }, []);
 
   return (
     <View style={styles.container}>

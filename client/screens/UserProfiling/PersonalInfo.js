@@ -1,5 +1,5 @@
 import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {AuthContext} from '../../contexts/userContext';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {Button, TextInput} from 'react-native-paper';
@@ -8,8 +8,10 @@ import global from '../../assets/styles/global';
 import {deleteObject, getDownloadURL, ref, uploadBytes} from 'firebase/storage';
 import {storage} from '../../firebase';
 import {updateProfile} from '../../api/user';
+import {useNavigation} from '@react-navigation/native';
 
 const PersonalInfo = () => {
+  const navigation = useNavigation();
   const {user, setuser} = useContext(AuthContext);
 
   const [imageUri, setImageUri] = useState(user?.profileImage);
@@ -45,10 +47,15 @@ const PersonalInfo = () => {
         data['profileImage'] = downloadimg;
       }
       await updateProfile({data});
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   };
+
+  useEffect(() => {
+    navigation.getParent().setOptions({headerShown: false});
+    return () => {
+      navigation.getParent().setOptions({headerShown: true});
+    };
+  }, []);
 
   return (
     <View style={[global.container, {justifyContent: 'space-between'}]}>

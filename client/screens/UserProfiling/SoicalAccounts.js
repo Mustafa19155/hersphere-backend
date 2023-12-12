@@ -12,8 +12,10 @@ import {
   youtubeSignin,
 } from '../../api/user';
 import global from '../../assets/styles/global';
+import {useNavigation} from '@react-navigation/native';
 
 export default function SocialAccounts() {
+  const navigation = useNavigation();
   const {user, setuser} = useContext(AuthContext);
   const [socialModalOpen, setsocialModalOpen] = useState(false);
   const [pages, setpages] = useState([]);
@@ -127,6 +129,13 @@ export default function SocialAccounts() {
       }),
     );
   }, [user]);
+
+  useEffect(() => {
+    navigation.getParent().setOptions({headerShown: false});
+    return () => {
+      navigation.getParent().setOptions({headerShown: true});
+    };
+  }, []);
 
   return (
     <View>

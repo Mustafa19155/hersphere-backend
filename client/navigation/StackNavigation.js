@@ -6,16 +6,72 @@ import Security from '../screens/UserProfiling/Security';
 import BusinessInfo from '../screens/UserProfiling/BusinessInfo';
 import Search from '../components/Search/Search';
 import UserProfile from '../screens/Search/UserProfile';
+import AntIcons from 'react-native-vector-icons/AntDesign';
 
 const Stack = createStackNavigator();
 export default function UserProfilingStack() {
   return (
-    <Stack.Navigator screenOptions={{headerShown: false}}>
-      <Stack.Screen name="Main" component={UserProfiling} />
-      <Stack.Screen name="PersonalInfo" component={PersonalInfo} />
-      <Stack.Screen name="SocialAccounts" component={SoicalAccounts} />
-      <Stack.Screen name="Security" component={Security} />
-      <Stack.Screen name="BusinessInfo" component={BusinessInfo} />
+    <Stack.Navigator
+      screenOptions={{
+        headerTitleAlign: 'center',
+        // headerStyle: {elevation: 5, backgroundColor: 'white'},
+        headerLeft: props => {
+          return (
+            <Pressable onPress={props.onPress}>
+              <AntIcons name="left" size={20} color="black" />
+            </Pressable>
+          );
+        },
+      }}>
+      <Stack.Screen
+        name="Main"
+        component={UserProfiling}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="PersonalInfo"
+        component={PersonalInfo}
+        options={{
+          title: (
+            <Text style={[global.fontMedium, global.textNormal]}>
+              Personal Information
+            </Text>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="SocialAccounts"
+        component={SoicalAccounts}
+        options={{
+          title: (
+            <Text style={[global.fontMedium, global.textNormal]}>
+              Social Accounts
+            </Text>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="Security"
+        component={Security}
+        options={{
+          title: (
+            <Text style={[global.fontMedium, global.textNormal]}>
+              Change Password
+            </Text>
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="BusinessInfo"
+        component={BusinessInfo}
+        options={{
+          title: (
+            <Text style={[global.fontMedium, global.textNormal]}>
+              Business Information
+            </Text>
+          ),
+        }}
+      />
     </Stack.Navigator>
   );
 }
