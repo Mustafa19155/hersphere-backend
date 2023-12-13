@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Draggable from 'react-native-draggable';
 import global from '../../assets/styles/global';
 import {launchImageLibrary} from 'react-native-image-picker';
@@ -46,35 +46,15 @@ const ImageRender = ({
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (event, gesture) => {
-      //   if (isSelected) {
       const newWidth = Math.max(50, size.width + gesture.dx);
       const newHeight = Math.max(50, size.height + gesture.dy);
       setSize({width: newWidth, height: newHeight});
-      //   }
     },
   });
 
   return (
     <Pressable style={{position: 'relative', zIndex: img.zIndex}}>
-      <Draggable
-        disabled={selectedIndex == index}
-        x={img.x}
-        y={img.y}
-        // onDragRelease={e => {
-        //   console.log(
-        //     'pageX, pageY = ' +
-        //       e.nativeEvent.pageX +
-        //       ', ' +
-        //       e.nativeEvent.pageY,
-        //   );
-        //   console.log(
-        //     'locX, locY = ' +
-        //       e.nativeEvent.locationX +
-        //       ', ' +
-        //       e.nativeEvent.locationY,
-        //   );
-        // }}
-      >
+      <Draggable disabled={selectedIndex == index} x={img.x} y={img.y}>
         <Pressable
           style={{
             borderWidth: selectedIndex == index ? 2 : 0,
@@ -110,23 +90,11 @@ const ImageRender = ({
               </Pressable>
             </View>
           )}
-          {/* <View
-            {...panResponder.panHandlers}
-            style={[
-              styles.resizableBox,
-              {
-                width: size.width,
-                height: size.height,
-                // position: 'relative',
-                // overflow: 'hidden',
-              },
-            ]}> */}
           <Image
             {...(selectedIndex == index ? panResponder.panHandlers : {})}
             source={{uri: img.source}}
             style={{width: size.width, height: size.height}}
           />
-          {/* </View> */}
         </Pressable>
       </Draggable>
     </Pressable>

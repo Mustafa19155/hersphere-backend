@@ -70,7 +70,7 @@ const Template = ({mainTemplate}) => {
   };
 
   useEffect(() => {
-    settemplate(mainTemplate);
+    settemplate(JSON.parse(JSON.stringify(mainTemplate)));
   }, [mainTemplate]);
 
   return (
@@ -78,7 +78,7 @@ const Template = ({mainTemplate}) => {
       {template && (
         <>
           <Pressable
-            style={{flex: 1, alignItems: 'center', justifyContent: 'flex-end'}}
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}
             onPress={() => setselectedIndex(-3)}>
             <Pressable
               style={[
@@ -93,7 +93,7 @@ const Template = ({mainTemplate}) => {
                 },
               ]}>
               {template.images.map((img, index) => (
-                <>
+                <View>
                   {img.type == 'image' ? (
                     <ImageRender
                       img={img}
@@ -113,7 +113,7 @@ const Template = ({mainTemplate}) => {
                       settemplate={settemplate}
                     />
                   )}
-                </>
+                </View>
               ))}
               <ImageBackground
                 source={{uri: template.background}}
@@ -124,18 +124,6 @@ const Template = ({mainTemplate}) => {
                   onLongPress={selectImage}></Pressable>
               </ImageBackground>
             </Pressable>
-            <View style={{flexDirection: 'row', gap: 10, marginVertical: 10}}>
-              <Pressable
-                onPress={uploadNewImg}
-                style={[global.greenBtn, {padding: 20}]}>
-                <Text style={[global.greenBtnTextSm]}>Upload Photo</Text>
-              </Pressable>
-              <Pressable
-                onPress={uploadNewTextField}
-                style={[global.greenBtn, {padding: 20}]}>
-                <Text style={[global.greenBtnTextSm]}>Add new text</Text>
-              </Pressable>
-            </View>
           </Pressable>
         </>
       )}

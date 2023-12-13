@@ -14,6 +14,12 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-hersphere-hersphereTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-hersphere-hersphereTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		83DFD042C5C84026BC4241A3 /* DMSans.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3D689F75AFCF491CA63BE2DB /* DMSans.ttf */; };
+		34F44A3427F147D38499EF83 /* DMSans-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CB1BB0F32F14486F80C36576 /* DMSans-Bold.ttf */; };
+		F3F51CCD9C804A34BC96AD7E /* DMSans-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 59F6B5A1FFD64FE2841538E1 /* DMSans-Medium.ttf */; };
+		83D85A78227F49C6B3752F6C /* DMSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 81C97C10FCA746CD966E2994 /* DMSans-SemiBold.ttf */; };
+		CD7A877078A84189B25C70CF /* RubikBubbles.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AAB582ECCDC74400A10607F8 /* RubikBubbles.ttf */; };
+		FB276F3B83A14A158527C4DB /* Whisper.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F27DF142D0B244DD828ABFA6 /* Whisper.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +50,12 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = hersphere/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-hersphere-hersphereTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hersphere-hersphereTests.release.xcconfig"; path = "Target Support Files/Pods-hersphere-hersphereTests/Pods-hersphere-hersphereTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		3D689F75AFCF491CA63BE2DB /* DMSans.ttf */ = {isa = PBXFileReference; name = "DMSans.ttf"; path = "../assets/fonts/DMSans.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		CB1BB0F32F14486F80C36576 /* DMSans-Bold.ttf */ = {isa = PBXFileReference; name = "DMSans-Bold.ttf"; path = "../assets/fonts/DMSans-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		59F6B5A1FFD64FE2841538E1 /* DMSans-Medium.ttf */ = {isa = PBXFileReference; name = "DMSans-Medium.ttf"; path = "../assets/fonts/DMSans-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		81C97C10FCA746CD966E2994 /* DMSans-SemiBold.ttf */ = {isa = PBXFileReference; name = "DMSans-SemiBold.ttf"; path = "../assets/fonts/DMSans-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		AAB582ECCDC74400A10607F8 /* RubikBubbles.ttf */ = {isa = PBXFileReference; name = "RubikBubbles.ttf"; path = "../assets/fonts/RubikBubbles.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		F27DF142D0B244DD828ABFA6 /* Whisper.ttf */ = {isa = PBXFileReference; name = "Whisper.ttf"; path = "../assets/fonts/Whisper.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +134,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				658457D2F8544E73B1D6452A /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -147,6 +160,20 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		658457D2F8544E73B1D6452A /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				3D689F75AFCF491CA63BE2DB /* DMSans.ttf */,
+				CB1BB0F32F14486F80C36576 /* DMSans-Bold.ttf */,
+				59F6B5A1FFD64FE2841538E1 /* DMSans-Medium.ttf */,
+				81C97C10FCA746CD966E2994 /* DMSans-SemiBold.ttf */,
+				AAB582ECCDC74400A10607F8 /* RubikBubbles.ttf */,
+				F27DF142D0B244DD828ABFA6 /* Whisper.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -244,6 +271,12 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				83DFD042C5C84026BC4241A3 /* DMSans.ttf in Resources */,
+				34F44A3427F147D38499EF83 /* DMSans-Bold.ttf in Resources */,
+				F3F51CCD9C804A34BC96AD7E /* DMSans-Medium.ttf in Resources */,
+				83D85A78227F49C6B3752F6C /* DMSans-SemiBold.ttf in Resources */,
+				CD7A877078A84189B25C70CF /* RubikBubbles.ttf in Resources */,
+				FB276F3B83A14A158527C4DB /* Whisper.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

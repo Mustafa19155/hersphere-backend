@@ -90,14 +90,15 @@ const TextRender = ({
                 backgroundColor: 'tranparent',
                 fontSize: img.fontSize,
                 color: img.color,
+                fontFamily: img.fontFamily,
               }}></TextInput>
           ) : (
             <Text
               {...(selectedIndex == index ? panResponder.panHandlers : {})}
               style={{
-                fontFamily: 'DMSans',
                 fontSize: fontSize,
                 color: img.color,
+                fontFamily: img.fontFamily,
               }}>
               {img.text}
             </Text>
