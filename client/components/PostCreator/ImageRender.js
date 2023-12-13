@@ -10,6 +10,7 @@ import React, {useEffect, useState} from 'react';
 import Draggable from 'react-native-draggable';
 import global from '../../assets/styles/global';
 import {launchImageLibrary} from 'react-native-image-picker';
+import AntIcons from 'react-native-vector-icons/AntDesign';
 
 const ImageRender = ({
   selectedIndex,
@@ -34,6 +35,11 @@ const ImageRender = ({
       settemplate(templateCopy);
       setshowUpperBar(false);
     }
+  };
+
+  const handleDelete = () => {
+    setselectedIndex(-2);
+    settemplate({...template, images: template.images.filter(i => i != img)});
   };
 
   const handleZIndex = async () => {
@@ -67,26 +73,25 @@ const ImageRender = ({
             setshowUpperBar(false);
           }}
           onLongPress={handleShowUpperBar}>
-          {showUpperBar && (
+          {selectedIndex == index && (
             <View
               style={{
                 position: 'absolute',
-                top: -30,
-                paddingHorizontal: 10,
-                borderRadius: 10,
+                top: -35,
+                paddingHorizontal: 12,
+                paddingVertical: 7,
                 flexDirection: 'row',
                 alignItems: 'center',
-                gap: 5,
+                gap: 20,
+                backgroundColor: 'white',
+                elevation: 5,
+                borderRadius: 15,
               }}>
-              <Pressable
-                onPress={selectImage}
-                style={{backgroundColor: 'white', elevation: 5}}>
-                <Text style={[global.textNormal]}>+</Text>
+              <Pressable onPress={selectImage}>
+                <AntIcons name="plus" color="black" size={16} />
               </Pressable>
-              <Pressable
-                onPress={handleZIndex}
-                style={{backgroundColor: 'white', elevation: 5}}>
-                <Text style={[global.textExtraSmall]}>ZIndex</Text>
+              <Pressable onPress={handleDelete}>
+                <AntIcons name="delete" color="black" size={16} />
               </Pressable>
             </View>
           )}

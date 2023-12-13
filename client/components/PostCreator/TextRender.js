@@ -6,11 +6,11 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Draggable from 'react-native-draggable';
-import global from '../../assets/styles/global';
-import {launchImageLibrary} from 'react-native-image-picker';
 import {TextInput} from 'react-native-paper';
+import AntIcons from 'react-native-vector-icons/AntDesign';
+import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
 
 const TextRender = ({
   selectedIndex,
@@ -20,6 +20,8 @@ const TextRender = ({
   template,
   settemplate,
 }) => {
+  const textInputRef = useRef();
+  const [text, settext] = useState('');
   const [size, setSize] = useState({width: img.width, height: img.height});
   const [fontSize, setfontSize] = useState(img.fontSize);
   const [contentEditable, setcontentEditable] = useState(false);
@@ -27,15 +29,17 @@ const TextRender = ({
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onPanResponderMove: (event, gesture) => {
-      // setcontentEditable(true);
-      //   if (isSelected) {
       const newWidth = Math.max(50, size.width + gesture.dx);
       const newHeight = Math.max(50, size.height + gesture.dy);
       setfontSize(newWidth / 7);
       setSize({width: newWidth, height: newHeight});
-      //   }
     },
   });
+
+  const handleDelete = () => {
+    setselectedIndex(-2);
+    settemplate({...template, images: template.images.filter(i => i != img)});
+  };
 
   useEffect(() => {
     if (selectedIndex != index) {
@@ -43,30 +47,22 @@ const TextRender = ({
     }
   }, [selectedIndex]);
 
+  useEffect(() => {
+    if (contentEditable) {
+      textInputRef.current.focus();
+    }
+  }, [contentEditable]);
+
+  useEffect(() => {
+    settext(img.text);
+  }, [img]);
+
   return (
     <Pressable style={{zIndex: img.zIndex}}>
-      <Draggable
-        disabled={selectedIndex == index}
-        x={img.x}
-        y={img.y}
-        onDragRelease={e => {
-          console.log(
-            'pageX, pageY = ' +
-              e.nativeEvent.pageX +
-              ', ' +
-              e.nativeEvent.pageY,
-          );
-          console.log(
-            'locX, locY = ' +
-              e.nativeEvent.locationX +
-              ', ' +
-              e.nativeEvent.locationY,
-          );
-        }}>
+      <Draggable disabled={selectedIndex == index} x={img.x} y={img.y}>
         <Pressable
           style={{
             width: 'auto',
-            // height: size.height,
             borderWidth: selectedIndex == index ? 2 : 0,
             borderColor: 'red',
             position: 'relative',
@@ -74,23 +70,53 @@ const TextRender = ({
           onPress={() => {
             setselectedIndex(index);
           }}>
+          {selectedIndex == index && (
+            <View
+              style={{
+                position: 'absolute',
+                top: -35,
+                paddingHorizontal: 12,
+                paddingVertical: 7,
+                flexDirection: 'row',
+                alignItems: 'center',
+                gap: 20,
+                minWidth: 75,
+                backgroundColor: 'white',
+                elevation: 5,
+                borderRadius: 15,
+              }}>
+              <Pressable onPress={() => setcontentEditable(true)}>
+                <SimpleLineIcons name="pencil" color="black" size={16} />
+              </Pressable>
+              <Pressable onPress={handleDelete}>
+                <AntIcons name="delete" color="black" size={16} />
+              </Pressable>
+            </View>
+          )}
+
           {contentEditable ? (
             <TextInput
+              ref={textInputRef}
               mode="outlined"
               outlineColor="transparent"
               activeOutlineColor="transparent"
-              value={img.text}
+              value={text}
               multiline
-              onChangeText={text => {
-                const templateCopy = {...template};
-                templateCopy.images[index].text = text;
-                settemplate(templateCopy);
+              contentStyle={{fontFamily: img.fontFamily}}
+              onChangeText={mainText => {
+                settext(mainText);
+                // const templateCopy = {...template};
+                // templateCopy.images[index].text = text;
+                // settemplate(templateCopy);
               }}
+              fontFamily={'DMSans'}
+              theme={{fonts: {regular: ''}}}
               style={{
                 backgroundColor: 'tranparent',
                 fontSize: img.fontSize,
+                fontWeight: 'normal',
                 color: img.color,
-                fontFamily: img.fontFamily,
+                // fontFamily: img.fontFamily,
               }}></TextInput>
           ) : (
             <Text
@@ -100,7 +126,7 @@ const TextRender = ({
                 color: img.color,
                 fontFamily: img.fontFamily,
               }}>
-              {img.text}
+              {text}
             </Text>
           )}
         </Pressable>

@@ -15,6 +15,7 @@ import TextRender from '../../components/PostCreator/TextRender';
 import Template from '../../components/PostCreator/Template';
 import TemplatesPreview from '../../components/PostCreator/TemplatesPreview';
 import TextsPreview from '../../components/PostCreator/TextsPreview';
+import Backgrounds from '../../components/PostCreator/Backgrounds';
 
 const PostCreator = () => {
   const [activeTab, setactiveTab] = useState('templates');
@@ -38,16 +39,6 @@ const PostCreator = () => {
           type: 'image',
         },
         {
-          x: 50,
-          y: 20,
-          height: Dimensions.get('screen').height / 7,
-          width: Dimensions.get('screen').width / 3,
-          zIndex: 1,
-          source:
-            'https://plus.unsplash.com/premium_photo-1698057772115-954a2e4ffec0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8',
-          type: 'image',
-        },
-        {
           x: 20,
           y: 20,
           zIndex: 999,
@@ -58,6 +49,17 @@ const PostCreator = () => {
           color: 'black',
           type: 'text',
         },
+        {
+          x: 50,
+          y: 20,
+          height: Dimensions.get('screen').height / 7,
+          width: Dimensions.get('screen').width / 3,
+          zIndex: 1,
+          source:
+            'https://plus.unsplash.com/premium_photo-1698057772115-954a2e4ffec0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8',
+          type: 'image',
+        },
+
         {
           x: 20,
           y: 50,
@@ -89,16 +91,6 @@ const PostCreator = () => {
           type: 'image',
         },
         {
-          x: 50,
-          y: 20,
-          height: Dimensions.get('screen').height / 7,
-          width: Dimensions.get('screen').width / 3,
-          zIndex: 1,
-          source:
-            'https://plus.unsplash.com/premium_photo-1698057772115-954a2e4ffec0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8',
-          type: 'image',
-        },
-        {
           x: 20,
           y: 20,
           zIndex: 999,
@@ -109,11 +101,23 @@ const PostCreator = () => {
           color: 'black',
           type: 'text',
         },
+        {
+          x: 50,
+          y: 20,
+          height: Dimensions.get('screen').height / 7,
+          width: Dimensions.get('screen').width / 3,
+          zIndex: 1,
+          source:
+            'https://plus.unsplash.com/premium_photo-1698057772115-954a2e4ffec0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8',
+          type: 'image',
+        },
       ],
     },
   ]);
 
-  const [activeTemplate, setactiveTemplate] = useState(templates[0]);
+  const [activeTemplate, setactiveTemplate] = useState(
+    JSON.parse(JSON.stringify(templates[0])),
+  );
   const [selectedIndex, setselectedIndex] = useState(-1);
   const [key, setkey] = useState(Math.random() * 10);
   const prevActiveTemplateRef = useRef(activeTemplate);
@@ -127,9 +131,9 @@ const PostCreator = () => {
     // );
 
     // if (updatedProperties.length > 0) {
-    //   if (updatedProperties.find(p => p == 'background')) {
-    //     setkey(Math.random() * 10);
-    //   }
+    //   // if (updatedProperties.find(p => p == 'background')) {
+    //   //   setkey(Math.random() * 10);
+    //   // }
     // }
     // prevActiveTemplateRef.current = {...activeTemplate};
   }, [activeTemplate]);
@@ -224,6 +228,19 @@ const PostCreator = () => {
             Texts
           </Text>
         </Pressable>
+        <Pressable onPress={() => setactiveTab('images')}>
+          <Text
+            style={[
+              global.fontBold,
+              global.textSmall,
+              {
+                textDecorationLine:
+                  activeTab == 'images' ? 'underline' : 'none',
+              },
+            ]}>
+            Images
+          </Text>
+        </Pressable>
       </View>
       <View style={{height: 70}}>
         {activeTab == 'templates' ? (
@@ -232,8 +249,13 @@ const PostCreator = () => {
             activeTemplate={activeTemplate}
             setactiveTemplate={setactiveTemplate}
           />
-        ) : (
+        ) : activeTab == 'texts' ? (
           <TextsPreview
+            template={activeTemplate}
+            settemplate={setactiveTemplate}
+          />
+        ) : (
+          <Backgrounds
             template={activeTemplate}
             settemplate={setactiveTemplate}
           />

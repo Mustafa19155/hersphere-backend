@@ -72,7 +72,9 @@ const TemplatesPreview = ({templates, activeTemplate, setactiveTemplate}) => {
               }}>
               <Pressable
                 style={{width: '100%', height: '100%'}}
-                onPress={() => setactiveTemplate(temp)}></Pressable>
+                onPress={() =>
+                  setactiveTemplate(JSON.parse(JSON.stringify(temp)))
+                }></Pressable>
             </ImageBackground>
           </View>
         ))}
