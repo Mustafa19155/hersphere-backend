@@ -14,7 +14,13 @@ const MongoStore = require("connect-mongo");
 
 const mongoose = require("mongoose");
 
+const { verifyJWT } = require("./middlewares/verifyJwt");
+
 const userRouter = require("./routes/users");
+const socialmediaRouter = require("./routes/socialmediaPosts");
+const worklaceRouter = require("./routes/workplace");
+const jobRouter = require("./routes/jobs");
+const jobRequestRouter = require("./routes/jobRequest");
 
 var app = express();
 
@@ -34,7 +40,10 @@ app.use(
     origin: [
       "http://localhost:19000",
       "http://192.168.18.60:19000",
+      "http://192.168.18.64:19000",
+      "http://192.168.18.12:19000",
       "http://172.20.10.2:19000",
+      process.env.CLIENT_BASE_URL,
     ],
 
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -78,6 +87,10 @@ app.get(
   }
 );
 app.use("/api/user", userRouter);
+app.use("/api/socialmediaposts", socialmediaRouter);
+app.use("/api/workplace", worklaceRouter);
+app.use("/api/job", verifyJWT, jobRouter);
+app.use("/api/job-request", verifyJWT, jobRequestRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public", "index.html"));

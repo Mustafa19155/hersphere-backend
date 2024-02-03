@@ -17,6 +17,7 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
   const navigation = useNavigation();
   const [showConfirmModal, setshowConfirmModal] = useState(false);
   const [activeReq, setactiveReq] = useState(null);
+  const [currentAction, setcurrentAction] = useState('accept');
 
   const handleConfirm = () => {
     setrequests(mainRequests.filter(r => r.id != activeReq.id));
@@ -24,11 +25,16 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
     setactiveReq(null);
   };
 
+  const handleAccept = () => {
+    navigation.navigate('PostCreator');
+    setshowConfirmModal(false);
+  };
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{height: '80%'}}>
       <ConfirmModal
         text={'Are you sure you want to reject this request?'}
-        onconfirm={handleConfirm}
+        onconfirm={currentAction == 'accept' ? handleAccept : handleConfirm}
         open={showConfirmModal}
         setopen={setshowConfirmModal}
       />
@@ -81,9 +87,10 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
               }}>
               <Pressable
                 onPress={e => {
+                  setcurrentAction('accept');
                   e.stopPropagation();
+                  setshowConfirmModal(true);
                   setactiveReq(req);
-                  navigation.navigate('PostCreator');
                 }}
                 style={[
                   global.greenBtnSm,
@@ -98,6 +105,7 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
               </Pressable>
               <Pressable
                 onPress={e => {
+                  setcurrentAction('reject');
                   e.stopPropagation();
                   setactiveReq(req);
                   setshowConfirmModal(true);

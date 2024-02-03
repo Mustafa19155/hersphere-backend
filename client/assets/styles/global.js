@@ -47,6 +47,12 @@ export default globalStyles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 8,
   },
+  disabledBtnSm: {
+    opacity: 0.7,
+    backgroundColor: 'gray',
+    borderRadius: 8,
+    paddingVertical: 3,
+  },
   redButton: {
     backgroundColor: '#C20C0C',
     borderRadius: 8,
@@ -89,7 +95,6 @@ export default globalStyles = StyleSheet.create({
     fontSize: 20,
   },
   fontBold: {
-    // fontFamily: 'DMSans-Bold',
     fontWeight: 'bold',
   },
   fontMedium: {

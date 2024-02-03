@@ -66,7 +66,7 @@ const CameraComp = () => {
         setapiCalled(false);
       })
       .catch(err => {
-        toast.show('Verification failed. Please try again');
+        // toast.show('Verification failed. Please try again');
         navigation.dispatch(StackActions.replace('profileSetup'));
         setapiCalled(false);
       });

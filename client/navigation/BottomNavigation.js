@@ -32,7 +32,7 @@ const BottomHomeNavigation = () => {
       <Tab.Screen
         name="Home"
         component={
-          user.userType == 'startup' ? StartupDashboard : InfluencerDashboard
+          user.userType == 'startup' ? StartupDashboard : StartupDashboard
         }
         options={{
           headerShown: false,

@@ -46,7 +46,6 @@ export const loginWithGoogle = async () => {
       email: userInfo.user.email,
       profileCompleted: false,
     });
-    console.log(res.data);
     return res.data;
   } catch (err) {
     throw err;

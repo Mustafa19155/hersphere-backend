@@ -39,7 +39,11 @@ const ImageRender = ({
 
   const handleDelete = () => {
     setselectedIndex(-2);
-    settemplate({...template, images: template.images.filter(i => i != img)});
+    const templateCopy = {...template};
+    templateCopy.images[index].zIndex = -999;
+    templateCopy.images[index].opacity = 0;
+    settemplate(templateCopy);
+    // settemplate({...template, images: template.images.filter(i => i != img)});
   };
 
   const handleZIndex = async () => {
@@ -64,6 +68,7 @@ const ImageRender = ({
         <Pressable
           style={{
             borderWidth: selectedIndex == index ? 2 : 0,
+            opacity: img.opacity == 0 ? 0 : 1,
             borderColor: 'red',
             position: 'relative',
             zIndex: img.zIndex,
@@ -97,7 +102,9 @@ const ImageRender = ({
           )}
           <Image
             {...(selectedIndex == index ? panResponder.panHandlers : {})}
-            source={{uri: img.source}}
+            source={
+              typeof img.source == 'number' ? img.source : {uri: img.source}
+            }
             style={{width: size.width, height: size.height}}
           />
         </Pressable>

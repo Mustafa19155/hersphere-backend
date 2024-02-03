@@ -25,6 +25,7 @@ const TextRender = ({
   const [size, setSize] = useState({width: img.width, height: img.height});
   const [fontSize, setfontSize] = useState(img.fontSize);
   const [contentEditable, setcontentEditable] = useState(false);
+  const [width, setwidth] = useState(img.width);
 
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -32,13 +33,18 @@ const TextRender = ({
       const newWidth = Math.max(50, size.width + gesture.dx);
       const newHeight = Math.max(50, size.height + gesture.dy);
       setfontSize(newWidth / 7);
+
       setSize({width: newWidth, height: newHeight});
     },
   });
 
   const handleDelete = () => {
     setselectedIndex(-2);
-    settemplate({...template, images: template.images.filter(i => i != img)});
+    // settemplate({...template, images: template.images.filter(i => i != img)});
+    const templateCopy = {...template};
+    templateCopy.images[index].zIndex = -1;
+    templateCopy.images[index].opacity = 0;
+    settemplate(templateCopy);
   };
 
   useEffect(() => {
@@ -63,6 +69,7 @@ const TextRender = ({
         <Pressable
           style={{
             width: 'auto',
+            opacity: img.opacity == 0 ? 0 : 1,
             borderWidth: selectedIndex == index ? 2 : 0,
             borderColor: 'red',
             position: 'relative',
@@ -101,20 +108,21 @@ const TextRender = ({
               outlineColor="transparent"
               activeOutlineColor="transparent"
               value={text}
-              multiline
-              contentStyle={{fontFamily: img.fontFamily}}
+              // multiline
+              contentStyle={{
+                fontFamily: img.fontFamily,
+                fontSize: fontSize,
+                color: img.color,
+              }}
               onChangeText={mainText => {
                 settext(mainText);
                 // const templateCopy = {...template};
                 // templateCopy.images[index].text = text;
                 // settemplate(templateCopy);
               }}
-              fontFamily={'DMSans'}
-              theme={{fonts: {regular: ''}}}
               style={{
                 backgroundColor: 'tranparent',
-                fontSize: img.fontSize,
-                fontWeight: 'normal',
+                // fontSize: img.fontSize,
                 color: img.color,
                 // fontFamily: img.fontFamily,
               }}></TextInput>
@@ -125,6 +133,7 @@ const TextRender = ({
                 fontSize: fontSize,
                 color: img.color,
                 fontFamily: img.fontFamily,
+                // width: size.width,
               }}>
               {text}
             </Text>

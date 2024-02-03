@@ -5,16 +5,19 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import global from '../../assets/styles/global';
 import Avatar from '../../assets/images/avatar.png';
 import ActiveRequests from '../../components/Requests/ActiveRequests';
 import NewRequests from '../../components/Requests/NewRequests';
 import CompletedRequests from '../../components/Requests/CompletedRequests';
 import TeamRequests from '../../components/Requests/TeamRequests';
+import {AuthContext} from '../../contexts/userContext';
 
 const Requests = () => {
   const [currentTab, setcurrentTab] = useState('Active');
+
+  const {user} = useContext(AuthContext);
 
   const [requests, setrequests] = useState([
     {
@@ -39,7 +42,7 @@ const Requests = () => {
     {
       id: 2,
       startDate: new Date(),
-      endDate: new Date(),
+      endDate: new Date().setDate(12),
       status: 'active',
       startupID: {
         name: 'ClosetDoor',
@@ -169,27 +172,52 @@ const Requests = () => {
             </Text>
           </View>
         </TouchableWithoutFeedback>
-        <TouchableWithoutFeedback onPress={() => setcurrentTab('New')}>
-          <View
-            style={[currentTab == 'New' ? styles.active : {}, styles.wrapper]}>
-            <Text
+        {user.userType != 'startup' ? (
+          <TouchableWithoutFeedback onPress={() => setcurrentTab('New')}>
+            <View
               style={[
-                currentTab == 'New'
-                  ? styles.activeText
-                  : {
-                      color: 'black',
-                    },
-                {fontWeight: 'bold'},
+                currentTab == 'New' ? styles.active : {},
+                styles.wrapper,
               ]}>
-              New
-              {currentTab == 'New'
-                ? requests.filter(req => req.status == 'new').length > 0
-                  ? '   ' + requests.filter(req => req.status == 'new').length
-                  : ''
-                : ''}
-            </Text>
-          </View>
-        </TouchableWithoutFeedback>
+              <Text
+                style={[
+                  currentTab == 'New'
+                    ? styles.activeText
+                    : {
+                        color: 'black',
+                      },
+                  {fontWeight: 'bold'},
+                ]}>
+                New
+                {currentTab == 'New'
+                  ? requests.filter(req => req.status == 'new').length > 0
+                    ? '   ' + requests.filter(req => req.status == 'new').length
+                    : ''
+                  : ''}
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
+        ) : (
+          <TouchableWithoutFeedback onPress={() => setcurrentTab('Jobs')}>
+            <View
+              style={[
+                currentTab == 'Jobs' ? styles.active : {},
+                styles.wrapper,
+              ]}>
+              <Text
+                style={[
+                  currentTab == 'Jobs'
+                    ? styles.activeText
+                    : {
+                        color: 'black',
+                      },
+                  {fontWeight: 'bold'},
+                ]}>
+                Jobs
+              </Text>
+            </View>
+          </TouchableWithoutFeedback>
+        )}
         <TouchableWithoutFeedback onPress={() => setcurrentTab('Completed')}>
           <View
             style={[

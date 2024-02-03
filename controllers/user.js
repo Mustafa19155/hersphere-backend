@@ -153,6 +153,9 @@ exports.getYoutubeDetails = (req, res, next) => {
           message: "Channel not found",
         });
       } else {
+        if (!response.data.items) {
+          return next({ message: "No channel found", status: 400 });
+        }
         const channelId = response.data.items[0].id;
 
         const channelFound = await User.findOne({
@@ -239,9 +242,11 @@ exports.register = async (req, res, next) => {
       process.env.TOKEN_SECRET,
       { expiresIn: "7d" }
     );
+
     user.password = undefined;
-    user["token"] = token;
-    return res.send({ user });
+    // user["token"] = token;
+
+    return res.send({ ...user._doc, token });
   } catch (err) {
     next(err);
   }

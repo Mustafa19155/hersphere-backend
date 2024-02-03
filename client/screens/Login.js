@@ -21,8 +21,8 @@ const LoginScreen = () => {
   const toast = useToast();
 
   const [apiCalled, setapiCalled] = useState(false);
-  const [email, setemail] = useState('asd@gmail.com');
-  const [password, setpassword] = useState('123');
+  const [email, setemail] = useState('');
+  const [password, setpassword] = useState('');
 
   const navigation = useNavigation();
 
@@ -93,7 +93,7 @@ const LoginScreen = () => {
             outlineColor="transparent"
             activeOutlineColor="transparent"
             secureTextEntry
-            right={<TextInput.Icon icon="eye" color="gray" />}
+            // right={<TextInput.Icon icon="eye" color="gray" />}
             style={[global.input, global.gray2Back]}
             value={password}
             onChangeText={setpassword}

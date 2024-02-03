@@ -1,19 +1,26 @@
 import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
-import RightIcon from '../../assets/icons/right-arrow.png';
+import React, {useContext} from 'react';
 import Stars from './Stars';
 import global from '../../assets/styles/global';
 import Icon from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
+import {AuthContext} from '../../contexts/userContext';
 
 const BestPerformersCard = ({cardData, index}) => {
+  const {user} = useContext(AuthContext);
   const navigation = useNavigation();
 
   return (
     <Pressable
       style={styles.card}
-      onPress={() => navigation.navigate('InfluencerProfile')}>
-      <Icon name="arrowright" style={styles.rightArrow} size={16} />
+      onPress={() =>
+        user?.userType == 'startup'
+          ? navigation.navigate('InfluencerProfile')
+          : null
+      }>
+      {user.userType == 'startup' && (
+        <Icon name="arrowright" style={styles.rightArrow} size={16} />
+      )}
       <Image source={cardData.image} style={styles.image} />
       <Text style={[global.textNormal, global.fontBold]}>{cardData.name}</Text>
       <Text style={[global.textExtraSmall]}>

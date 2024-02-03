@@ -19,8 +19,6 @@ export default function BusinessDetails({
   currentStep,
   setcurrentStep,
 }) {
-  const toast = useToast();
-  const navigation = useNavigation();
   const {user, setuser} = useContext(AuthContext);
   const [apiCalled, setapiCalled] = useState(false);
 
@@ -53,7 +51,6 @@ export default function BusinessDetails({
 
   const [category, setcategory] = useState(categories[0]);
   const [targetAudience, settargetAudience] = useState([]);
-  console.log(user);
   const handleAddBusinessDetails = async () => {
     if (description) {
       const obj = {
@@ -73,7 +70,12 @@ export default function BusinessDetails({
       }
       setapiCalled(true);
       updateProfile({
-        data: {...user, businessDetails: obj, profileCompleted: false},
+        data: {
+          ...user,
+          businessDetails: obj,
+          profileCompleted: false,
+          userType,
+        },
       })
         .then(res => {
           setapiCalled(false);
@@ -81,12 +83,12 @@ export default function BusinessDetails({
             ...user,
             businessDetails: obj,
             profileCompleted: false,
+            userType,
           });
           setcurrentStep(currentStep + 1);
         })
         .catch(err => {
           setapiCalled(false);
-          toast.show('Business Title not available', {type: 'danger'});
         });
     }
   };

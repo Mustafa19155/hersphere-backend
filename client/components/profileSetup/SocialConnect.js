@@ -190,12 +190,19 @@ export default function SocialConnect({setisValidStep}) {
         isValidStep={true}
         clickHandler={async () => {
           try {
-            setuser({...user, profileCompleted: true});
-            await updateProfile({data: {...user, profileCompleted: true}});
-            navigation.dispatch(StackActions.replace('Main'));
-          } catch (err) {
-            console.log(err);
-          }
+            if (user.facebookPage || user.instagramPage) {
+              setuser({...user, profileCompleted: true});
+              await updateProfile({data: {...user, profileCompleted: true}});
+              navigation.dispatch(StackActions.replace('Main'));
+            } else {
+              setuser({...user, profileCompleted: true});
+              await updateProfile({data: {...user, profileCompleted: true}});
+              navigation.dispatch(StackActions.replace('Main'));
+              // toast.show('Facebook or instagram page must be conntected', {
+              //   type: 'danger',
+              // });
+            }
+          } catch (err) {}
         }}
       />
       {/* </View> */}

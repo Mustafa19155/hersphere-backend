@@ -1,4 +1,5 @@
 import {
+  Dimensions,
   Image,
   ImageBackground,
   Pressable,
@@ -11,8 +12,8 @@ import React from 'react';
 import Draggable from 'react-native-draggable';
 
 const TemplatesPreview = ({templates, activeTemplate, setactiveTemplate}) => {
-  const size = 70;
-
+  const height = 70;
+  const width = 70;
   return (
     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
       <View style={{flexDirection: 'row', gap: 10}}>
@@ -20,30 +21,35 @@ const TemplatesPreview = ({templates, activeTemplate, setactiveTemplate}) => {
           <View
             style={{
               overflow: 'hidden',
-              height: size,
-              width: size,
-              backgroundColor: 'red',
+              height: height,
+              width: width,
               borderWidth: temp == activeTemplate ? 2 : 0,
               borderColor: 'red',
               position: 'relative',
               borderRadius: 7,
             }}>
-            {temp.images.map(img => (
+            {temp.images.map((img, index) => (
               <Pressable style={{position: 'relative', zIndex: img.zIndex}}>
                 <Draggable
                   disabled
-                  x={(img.x / temp.width) * size}
-                  y={(img.y / temp.height) * size}>
+                  x={(img.x / temp.width) * width}
+                  y={(img.y / temp.height) * height}>
                   <Pressable
+                    onPress={() => {
+                      setTimeout(() => {
+                        setactiveTemplate(JSON.parse(JSON.stringify(temp)));
+                      }, 0);
+                      setactiveTemplate(null);
+                    }}
                     style={{
                       position: 'relative',
                       zIndex: img.zIndex,
-                      width: (img.width / temp.width) * size,
-                      height: (img.height / temp.height) * size,
+                      width: (img.width / temp.width) * width,
+                      height: (img.height / temp.height) * height,
                     }}>
                     {img.type == 'image' ? (
                       <Image
-                        source={{uri: img.source}}
+                        source={img.source}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -51,9 +57,8 @@ const TemplatesPreview = ({templates, activeTemplate, setactiveTemplate}) => {
                       />
                     ) : (
                       <Text
-                        numberOfLines={1}
                         style={{
-                          fontSize: (img.fontSize / temp.width) * size,
+                          fontSize: (img.fontSize / temp.height) * height,
                           color: img.color,
                         }}>
                         {img.text}
@@ -64,7 +69,7 @@ const TemplatesPreview = ({templates, activeTemplate, setactiveTemplate}) => {
               </Pressable>
             ))}
             <ImageBackground
-              source={{uri: temp.background}}
+              source={temp.background}
               style={{
                 width: '100%',
                 height: '100%',
@@ -72,9 +77,12 @@ const TemplatesPreview = ({templates, activeTemplate, setactiveTemplate}) => {
               }}>
               <Pressable
                 style={{width: '100%', height: '100%'}}
-                onPress={() =>
-                  setactiveTemplate(JSON.parse(JSON.stringify(temp)))
-                }></Pressable>
+                onPress={() => {
+                  setTimeout(() => {
+                    setactiveTemplate(JSON.parse(JSON.stringify(temp)));
+                  }, 0);
+                  setactiveTemplate(null);
+                }}></Pressable>
             </ImageBackground>
           </View>
         ))}

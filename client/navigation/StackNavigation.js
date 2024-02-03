@@ -99,6 +99,12 @@ import global from '../assets/styles/global';
 import {useNavigation} from '@react-navigation/native';
 import Marketplace from '../screens/Marketplace/Marketplace';
 import PostCreator from '../screens/PostCreator/PostCreator';
+import CreateWorkplace from '../screens/Marketplace/CreateWorkplace';
+import CreateJob from '../screens/Marketplace/CreateJob';
+import {useContext} from 'react';
+import {AuthContext} from '../contexts/userContext';
+import Jobs from '../screens/Marketplace/Jobs';
+import CreateJobRequest from '../screens/Marketplace/CreateJobRequest';
 
 export const InfluenceProfileStack = () => {
   return (
@@ -171,6 +177,8 @@ export const RequetsStack = () => {
 };
 
 export const MarketplaceStack = () => {
+  const {user} = useContext(AuthContext);
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -178,7 +186,22 @@ export const MarketplaceStack = () => {
       }}>
       <Stack.Screen
         name="Marketplace"
-        component={Marketplace}
+        component={user.userType == 'influencer' ? Jobs : Marketplace}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="CreateWorkplace"
+        component={CreateWorkplace}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="CreateJob"
+        component={CreateJob}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="CreateJobRequest"
+        component={CreateJobRequest}
         options={{headerShown: false}}
       />
     </Stack.Navigator>
@@ -190,7 +213,13 @@ export const PostCreatorStack = () => {
     <Stack.Navigator
       screenOptions={{
         title: 'Post Creator',
-        headerShown: false,
+        headerTitleAlign: 'center',
+        headerTitle: () => (
+          <Text style={[global.fontBold, global.textNormal]}>
+            Post Creator System
+          </Text>
+        ),
+        // headerShown: false,
       }}>
       <Stack.Screen name="Main" component={PostCreator} />
     </Stack.Navigator>

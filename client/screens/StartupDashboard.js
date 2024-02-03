@@ -20,7 +20,10 @@ export default function Dashboard() {
     <ScrollView showsVerticalScrollIndicator={false}>
       {!searchActive && (
         <View style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
-          <Image source={Avatar} style={styles.profImg} />
+          <Image
+            source={user.profileImage ? {uri: user.profileImage} : Avatar}
+            style={styles.profImg}
+          />
           <View>
             <Text style={[global.textExtraSmall, global.grayColor]}>
               Welcome

@@ -66,9 +66,8 @@ const SignupScreen = () => {
     loginWithGoogle()
       .then(res => {
         setuser(res);
-
         if (res.profileCompleted) {
-          navigation.navigate('dashboard');
+          navigation.navigate('Main');
         } else {
           navigation.navigate('Authentication');
         }
@@ -118,7 +117,7 @@ const SignupScreen = () => {
             activeOutlineColor="transparent"
             secureTextEntry
             style={[global.input, global.gray2Back]}
-            right={<TextInput.Icon icon="eye" />}
+            // right={<TextInput.Icon icon="eye" />}
             value={password}
             onChangeText={setpassword}
           />
@@ -129,7 +128,7 @@ const SignupScreen = () => {
             activeOutlineColor="transparent"
             secureTextEntry
             style={[global.input, global.gray2Back]}
-            right={<TextInput.Icon icon="eye" />}
+            // right={<TextInput.Icon icon="eye" />}
             value={confirmPassword}
             onChangeText={setconfirmPassword}
           />

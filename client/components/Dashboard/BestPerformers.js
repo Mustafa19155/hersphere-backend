@@ -1,5 +1,5 @@
 import {Dimensions, ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import global from '../../assets/styles/global';
 import BestPerformersCard from './BestPerformersCard';
 import Avatar from '../../assets/images/avatar.png';
