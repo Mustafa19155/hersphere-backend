@@ -1,7 +1,7 @@
 import {Dimensions, ScrollView, StyleSheet, Text, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {getAllWorkplaces} from '../../api/workplace';
-import {createJob, getAllJobs} from '../../api/job';
+import {createJob, getAllJobs, getAllJobsOfWorkplace} from '../../api/job';
 import {useNavigation} from '@react-navigation/native';
 import {useToast} from 'react-native-toast-notifications';
 import {Picker} from '@react-native-picker/picker';
@@ -48,8 +48,8 @@ const CreateJob = () => {
     if (activeWorkplace) {
       try {
         setloadingJobs(true);
-        const data = await getAllJobs(activeWorkplace._id);
-
+        const data = await getAllJobsOfWorkplace(activeWorkplace._id);
+        console.log(data);
         const workCatCopy = JSON.parse(
           JSON.stringify(activeWorkplace.categories),
         );

@@ -8,3 +8,12 @@ export const createJobRequest = async data => {
     throw error;
   }
 };
+
+export const getJobRequestsForUser = async () => {
+  try {
+    const res = await axiosClient.get('/job-request');
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

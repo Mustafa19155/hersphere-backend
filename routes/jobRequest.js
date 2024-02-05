@@ -6,7 +6,10 @@ const jobRequestController = require("../controllers/jobRequests");
 router.post("/", jobRequestController.createJobRequest);
 
 // Get all job requests for a specific user
-router.get("/user/:id", jobRequestController.getJobRequestsByUser);
+router.get("/user", jobRequestController.getJobRequestsByUser);
+
+// Get all jobs of all workplaces of user
+router.get("/", jobRequestController.getJobRequestsForUser);
 
 // Update the status of a job request
 router.put("/:id/update-status", jobRequestController.updateJobRequestStatus);

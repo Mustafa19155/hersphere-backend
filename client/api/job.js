@@ -11,9 +11,19 @@ export const createJob = async data => {
 };
 
 // Get all jobs
-export const getAllJobs = async id => {
+export const getAllJobs = async () => {
   try {
     const res = await axiosClient.get(`/job`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Get jobs of workplace
+export const getAllJobsOfWorkplace = async id => {
+  try {
+    const res = await axiosClient.get(`/job/workplace/${id}`);
     return res.data;
   } catch (error) {
     throw error;

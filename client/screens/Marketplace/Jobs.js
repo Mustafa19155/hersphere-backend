@@ -36,33 +36,38 @@ const Jobs = () => {
     <ScrollView>
       <View style={{gap: 10}}>
         <Text style={[global.textLarge]}>Jobs</Text>
-        <View style={{gap: 10}}>
-          {jobs.map(job => (
-            <View>
-              <Text>{job.title}</Text>
-              <Button
-                style={[
-                  !job.hasApplied ? global.greenBtnSm : global.disabledBtnSm,
-                ]}
-                onPress={() => {
-                  setapiCalled(true);
-                  createJobRequest({jobID: job._id}).then(res => {
-                    setapiCalled(false);
-                    toast.show('Applied successfully', {type: 'success'});
-                  });
-                  getAllJobs().catch(err => {
-                    setapiCalled(false);
-                  });
-                  //   navigation.navigate('CreateJobRe+quest');
-                }}
-                disabled={apiCalled || job.hasApplied}>
-                <Text style={[global.greenBtnTextSm]}>
-                  {job.hasApplied ? 'Applied' : 'Apply Now'}
-                </Text>
-              </Button>
-            </View>
-          ))}
-        </View>
+        {loadingJobs ? (
+          <View></View>
+        ) : (
+          <View style={{gap: 10}}>
+            {jobs.map(job => (
+              <View>
+                <Text>{job.title}</Text>
+                <Button
+                  style={[
+                    !job.hasApplied ? global.greenBtnSm : global.disabledBtnSm,
+                  ]}
+                  onPress={() => {
+                    setapiCalled(true);
+                    createJobRequest({jobID: job._id}).then(res => {
+                      setapiCalled(false);
+                      toast.show('Applied successfully', {type: 'success'});
+                      handleGetAllJobs();
+                    });
+                    getAllJobs().catch(err => {
+                      setapiCalled(false);
+                    });
+                    //   navigation.navigate('CreateJobRe+quest');
+                  }}
+                  disabled={apiCalled || job.hasApplied}>
+                  <Text style={[global.greenBtnTextSm]}>
+                    {job.hasApplied ? 'Applied' : 'Apply Now'}
+                  </Text>
+                </Button>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </ScrollView>
   );

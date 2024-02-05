@@ -8,7 +8,7 @@ router.post("/", jobController.createJob);
 router.get("/", jobController.getAllJobs);
 
 // Get all jobs of workplace
-router.get("/:id", jobController.getAllWorkplaceJobs);
+router.get("/workplace/:id", jobController.getAllWorkplaceJobs);
 
 // Get a specific job by ID
 router.get("/:id", jobController.getJobById);
