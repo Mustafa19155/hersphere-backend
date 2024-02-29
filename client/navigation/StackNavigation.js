@@ -105,6 +105,7 @@ import {useContext} from 'react';
 import {AuthContext} from '../contexts/userContext';
 import Jobs from '../screens/Marketplace/Jobs';
 import CreateJobRequest from '../screens/Marketplace/CreateJobRequest';
+import Workplace from '../screens/Marketplace/Workplace';
 
 export const InfluenceProfileStack = () => {
   return (
@@ -185,11 +186,6 @@ export const MarketplaceStack = () => {
         title: 'Marketplace',
       }}>
       <Stack.Screen
-        name="Marketplace"
-        component={user.userType == 'influencer' ? Jobs : Marketplace}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
         name="CreateWorkplace"
         component={CreateWorkplace}
         options={{headerShown: false}}
@@ -222,6 +218,18 @@ export const PostCreatorStack = () => {
         // headerShown: false,
       }}>
       <Stack.Screen name="Main" component={PostCreator} />
+    </Stack.Navigator>
+  );
+};
+
+export const ChatroomStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Workplace"
+        component={Workplace}
+        options={{headerShown: false}}
+      />
     </Stack.Navigator>
   );
 };

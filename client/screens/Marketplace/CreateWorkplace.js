@@ -1,4 +1,12 @@
-import {StyleSheet, Text, TouchableWithoutFeedback, View} from 'react-native';
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {Button, Modal, TextInput} from 'react-native-paper';
@@ -7,6 +15,11 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useToast} from 'react-native-toast-notifications';
 import {createWorkplace} from '../../api/workplace';
 import moment from 'moment';
+import {launchImageLibrary} from 'react-native-image-picker';
+import AntDesignIcons from 'react-native-vector-icons/AntDesign';
+import EntypoIcons from 'react-native-vector-icons/Entypo';
+import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
+import {storage} from '../../firebase';
 
 const CreateWorkplace = () => {
   const toast = useToast();
@@ -19,8 +32,16 @@ const CreateWorkplace = () => {
   const [categories, setcategories] = useState([]);
   const [showCategoryModal, setshowCategoryModal] = useState(false);
   const [apiCalled, setapiCalled] = useState(false);
+  const [imageUri, setimageUri] = useState(null);
 
-  const handleContinue = () => {
+  const selectImage = async () => {
+    const result = await launchImageLibrary();
+    if (!result.didCancel) {
+      setimageUri(result.assets[0].uri);
+    }
+  };
+
+  const handleContinue = async () => {
     if (currentStep == 1) {
       //   if (name && description && noOfEmployees && noOfDays) {
       setcurrentStep(currentStep + 1);
@@ -35,12 +56,25 @@ const CreateWorkplace = () => {
         toast.show('All employees must be in atleast one category');
       } else {
         setapiCalled(true);
+
+        const res = await fetch(imageUri);
+        const blob = await res.blob();
+
+        const filename = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+
+        const mainRef = ref(storage, `workplace-images/${filename}`);
+
+        await uploadBytes(mainRef, blob);
+
+        const downloadimg = await getDownloadURL(mainRef);
+
         createWorkplace({
           name: teamName,
           description,
           endDate: moment().add(noOfDays, 'days').toDate(),
           totalMembers: noOfEmployees,
           categories,
+          image: downloadimg,
         })
           .then(res => {
             toast.show('Workplace created', {type: 'success'});
@@ -76,7 +110,7 @@ const CreateWorkplace = () => {
   //   }, [navigation]);
 
   return (
-    <View style={{flex: 1}}>
+    <ScrollView style={{flex: 1}} showsVerticalScrollIndicator={false}>
       <CategoryModal
         open={showCategoryModal}
         setopen={setshowCategoryModal}
@@ -87,13 +121,29 @@ const CreateWorkplace = () => {
       <View
         style={{
           flex: 1,
+          height: Dimensions.get('window').height - 25,
           justifyContent: 'space-between',
           gap: 10,
           marginBottom: 10,
-          padding: 5,
+          padding: 15,
         }}>
         {currentStep == 1 ? (
           <View style={{gap: 20}}>
+            <View style={{justifyContent: 'center', alignItems: 'center'}}>
+              {imageUri ? (
+                <TouchableOpacity onPress={selectImage}>
+                  <Image source={{uri: imageUri}} style={styles.image} />
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.imgPlaceholder}>
+                  <EntypoIcons
+                    name="network"
+                    onPress={selectImage}
+                    size={124}
+                  />
+                </View>
+              )}
+            </View>
             <View style={{gap: 7}}>
               <Text style={[global.blackColor, global.textSmall]}>
                 Team Name
@@ -189,7 +239,7 @@ const CreateWorkplace = () => {
           </Text>
         </Button>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -304,4 +354,13 @@ const CategoryModal = ({
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  image: {
+    width: 124,
+    height: 124,
+    resizeMode: 'cover',
+    borderRadius: 100,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+});

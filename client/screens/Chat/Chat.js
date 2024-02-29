@@ -93,62 +93,26 @@ const Chat = () => {
       const result = await DocumentPicker.pickSingle();
       setfile(result);
     } catch (err) {}
-    // const result = await launchImageLibrary();
-    // if (!result.didCancel) {
-    //   console.log(result.assets[0]);
-    //   setfile(result.assets[0].uri);
-    // }
   };
 
   const handleUploadDocument = async () => {
     try {
       if (file) {
-        const contentUri = file.uri;
+        const res = await fetch(file.fileCopyUri);
+        const blob = await res.blob();
 
-        const filePath = `${contentUri}/${file.name}`; // Replace with your desired file name
-
-        const fileExists = await RNFS.exists(
-          filePath.replace('content', 'file'),
+        const filename = file.fileCopyUri.substring(
+          file.fileCopyUri.lastIndexOf('/') + 1,
         );
-        console.log(fileExists);
 
-        const contentData = await readFile(contentUri, 'base64');
+        const mainRef = ref(
+          storage,
+          `chatroom-${chatroom._id}/${Date.now()}-${filename}`,
+        );
 
-        await readFile(filePath, 'base64');
+        await uploadBytes(mainRef, blob);
 
-        const mainRef = ref(storage, `chatMedia/${Date.now()}/${file.name}`);
-        await uploadString(mainRef, contentData, 'base64');
-        const a = await getDownloadURL(mainRef);
-
-        // await uploadBytes(mainRef, blob);
-        // return await getDownloadURL(mainRef);
-
-        // await readFile(contentUri, 'base64')
-        //   .then(data => {
-        //     return readFile(filePath, 'base64');
-        //   })
-        //   .catch(error => {
-        //     console.error('Error reading file:', error);
-        //   });
-
-        // const blobData = `data:${response.mime};base64,${response.data}`;
-        // const filename = file.name; // Replace with your desired filename
-        // const storageRef = ref(storage, `chatMedia/${Date.now() + filename}`);
-        // await uploadString(storageRef, blobData, 'data_url');
-        // return await getDownloadURL(storageRef);
-        //
-        // const {Blob, fs} = RNFetchBlob;
-        // const filePath = file.uri;
-        // console.log(filePath);
-        // const data = await fs.readFile(filePath, 'base64');
-        // const blob = Blob.build(data, {type: `${file.type};BASE64`});
-        // const res = await fetch(file.uri);
-        // console.log(res);
-        // const blob = await res.blob();
-        // const filename = file.name;
-        // const mainRef = ref(storage, `chatMedia/${Date.now()}/${filename}`);
-        // await uploadBytes(mainRef, blob);
-        // return await getDownloadURL(mainRef);
+        return await getDownloadURL(mainRef);
       }
     } catch (err) {
       throw err;

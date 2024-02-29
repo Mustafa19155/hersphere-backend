@@ -1,10 +1,14 @@
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import React, {useEffect, useRef} from 'react';
+import {Image, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useContext, useEffect, useRef} from 'react';
 import global from '../../assets/styles/global';
 import moment from 'moment';
+import {AuthContext} from '../../contexts/userContext';
+import AntIcons from 'react-native-vector-icons/AntDesign';
 
 const Messages = ({messages}) => {
   const ref = useRef();
+
+  const {user} = useContext(AuthContext);
 
   useEffect(() => {
     ref.current.scrollToEnd({animated: true});
@@ -23,18 +27,41 @@ const Messages = ({messages}) => {
                   marginBottom: 10,
                 },
             styles.messageWrapper,
-            mess.userID == 1
+            mess.sentBy == user._id
               ? styles.myMessageWrapper
               : styles.otherMessageWrapper,
           ]}>
           <View
             style={[
-              mess.userID == 1 ? styles.myMessage : styles.otherMessage,
+              mess.sentBy == user._id ? styles.myMessage : styles.otherMessage,
               styles.message,
             ]}>
-            <Text style={[global.textSmall, global.blackColor, {opacity: 0.5}]}>
-              {mess.message}
-            </Text>
+            {mess.messageType === 'document' ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  justifyContent: 'space-between',
+                }}>
+                <AntIcons name="file1" size={20} />
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={[
+                    global.textSmall,
+                    global.blackColor,
+                    {opacity: 0.5, maxWidth: '80%'},
+                  ]}>
+                  {mess.file.name}
+                </Text>
+                <AntIcons name="download" size={20} />
+              </View>
+            ) : (
+              <Text
+                style={[global.textSmall, global.blackColor, {opacity: 0.5}]}>
+                {mess.message}
+              </Text>
+            )}
           </View>
           <Text style={[global.grayColor, global.textExtraSmall, {padding: 5}]}>
             {moment(mess.time).format('ddd hh:mm A')}

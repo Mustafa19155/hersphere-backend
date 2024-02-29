@@ -1,4 +1,5 @@
 const Workplace = require("../models/workplace");
+const Chatroom = require("../models/chatroom");
 
 // Create a new workplace
 exports.createWorkplace = async (req, res, next) => {
@@ -18,6 +19,13 @@ exports.createWorkplace = async (req, res, next) => {
       ...req.body,
       createdBy: userId,
     });
+
+    await Chatroom.create({
+      workplaceID: workplace._id,
+      membersID: [userId],
+      chats: [],
+    });
+
     res.status(201).json(workplace);
   } catch (error) {
     next(error);

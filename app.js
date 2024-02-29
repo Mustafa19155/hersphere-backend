@@ -11,6 +11,8 @@ const cors = require("cors");
 const passport = require("passport"); // authentication
 const { initializingPassport } = require("./passportConfig");
 const MongoStore = require("connect-mongo");
+var debug = require("debug")("tyre-project:server");
+var http = require("http");
 
 const mongoose = require("mongoose");
 
@@ -21,8 +23,16 @@ const socialmediaRouter = require("./routes/socialmediaPosts");
 const worklaceRouter = require("./routes/workplace");
 const jobRouter = require("./routes/jobs");
 const jobRequestRouter = require("./routes/jobRequest");
+const { Server } = require("socket.io");
 
 var app = express();
+var server = http.createServer(app);
+io = new Server(server);
+module.exports = io;
+
+const chatroomRouter = require("./routes/chatroom");
+
+// exxport io to be used in other files
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -56,7 +66,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(
   session({
     name: "finSess",
-    secret: process.env.TOKEN_SECRET || "IAMCASTUDENT",
+    secret: process.env.TOKEN_SECRET || "TCABACKEND",
     resave: false,
     store: MongoStore.create({
       mongoUrl: process.env.MONGO_CONNECTION,
@@ -91,6 +101,7 @@ app.use("/api/socialmediaposts", socialmediaRouter);
 app.use("/api/workplace", worklaceRouter);
 app.use("/api/job", verifyJWT, jobRouter);
 app.use("/api/job-request", verifyJWT, jobRequestRouter);
+app.use("/api/chatroom", verifyJWT, chatroomRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public", "index.html"));
@@ -117,13 +128,8 @@ mongoose.connect(db, (err) => {
   if (err) console.log(err);
 });
 
-var debug = require("debug")("tyre-project:server");
-var http = require("http");
-
 var port = normalizePort(process.env.PORT || "3001");
 app.set("port", port);
-
-var server = http.createServer(app);
 
 server.listen(port);
 server.on("error", onError);

@@ -1,6 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
-import React, {useState, useContext} from 'react';
+import React, {useState, useContext, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -22,6 +22,7 @@ import global from '../assets/styles/global';
 import {loginWithGoogle, register} from '../api/user';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {useToast} from 'react-native-toast-notifications';
+import axios from 'axios';
 
 const SignupScreen = () => {
   const toast = useToast();
@@ -76,6 +77,25 @@ const SignupScreen = () => {
         console.log(err);
       });
   };
+
+  useEffect(() => {
+    const a = async () => {
+      try {
+        const b = await axios.post(
+          'http://192.168.18.55:8000/api/todo/add-task',
+          {
+            text: 'asd',
+            completed: false,
+          },
+        );
+
+        console.log(b.data);
+      } catch (err) {
+        console.log(err.response.data);
+      }
+    };
+    a();
+  }, []);
 
   return (
     <KeyboardAwareScrollView>

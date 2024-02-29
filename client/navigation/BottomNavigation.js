@@ -8,6 +8,8 @@ import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
 import {AuthContext} from '../contexts/userContext';
 import InfluencerDashboard from '../screens/InfluencerDashboard';
+import Jobs from '../screens/Marketplace/Jobs';
+import Marketplace from '../screens/Marketplace/Marketplace';
 
 const Tab = createBottomTabNavigator();
 
@@ -54,7 +56,8 @@ const BottomHomeNavigation = () => {
       />
       <Tab.Screen
         name="Explore"
-        component={MarketplaceStack}
+        // component={MarketplaceStack}
+        component={user.userType == 'influencer' ? Jobs : Marketplace}
         options={{
           headerShown: false,
           tabBarLabel: ({focused}) => {

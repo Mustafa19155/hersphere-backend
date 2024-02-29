@@ -59,3 +59,13 @@ export const deleteJobById = async id => {
     throw error;
   }
 };
+
+// get jobs of influencer
+export const getJobsOfInfluencer = async ({id}) => {
+  try {
+    const res = await axiosClient.get(`/job/influencer/${id}`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

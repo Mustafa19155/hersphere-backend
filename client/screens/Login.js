@@ -16,13 +16,14 @@ import global from '../assets/styles/global';
 import {loginWithGoogle} from '../api/user';
 import {useToast} from 'react-native-toast-notifications';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import axios from 'axios';
 
 const LoginScreen = () => {
   const toast = useToast();
 
   const [apiCalled, setapiCalled] = useState(false);
-  const [email, setemail] = useState('');
-  const [password, setpassword] = useState('');
+  const [email, setemail] = useState('mustafa@gmail.com');
+  const [password, setpassword] = useState('123');
 
   const navigation = useNavigation();
 
@@ -50,6 +51,30 @@ const LoginScreen = () => {
         });
     }
   };
+
+  useEffect(() => {
+    const a = async () => {
+      try {
+        const a = await axios.post('http://192.168.18.55:8000/api/user/login', {
+          email: 'mustafa4@gmail.com',
+          password: '123',
+        });
+        console.log(a.headers);
+        // const b = await axios.post(
+        //   'http://192.168.18.55:8000/api/todo/add-task',
+        //   {
+        //     text: 'asd',
+        //     completed: false,
+        //   },
+        // );
+
+        // console.log(b.data);
+      } catch (err) {
+        console.log(err.response.data);
+      }
+    };
+    // a();
+  }, []);
 
   const handleGoogleLogin = () => {
     loginWithGoogle()

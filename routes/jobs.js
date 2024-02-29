@@ -19,4 +19,7 @@ router.put("/:id", jobController.updateJobById);
 // Delete a job by ID
 router.delete("/:id", jobController.deleteJobById);
 
+// get jobs of influencer
+router.get("/influencer/:id", jobController.getJobsOfInfluencer);
+
 module.exports = router;

@@ -13,8 +13,18 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import FeatherIcons from 'react-native-vector-icons/Feather';
 import {Text} from 'react-native-paper';
 import global from '../assets/styles/global';
-import {Image, Pressable, TouchableWithoutFeedback, View} from 'react-native';
+import {
+  Image,
+  Pressable,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import UserProfilingStack from './StackNavigation';
+import {useContext, useEffect, useState} from 'react';
+import {getJobsOfInfluencer} from '../api/job';
+import {AuthContext} from '../contexts/userContext';
+import {useNavigation} from '@react-navigation/native';
 
 const Drawer = createDrawerNavigator();
 
@@ -22,6 +32,7 @@ function CustomDrawerContent(props) {
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItemList {...props} />
+      <TeamsDrawer {...props} />
       <DrawerItem
         label={({focused}) => (
           <Pressable
@@ -47,14 +58,14 @@ export default function DashboardDrawer() {
         sceneContainerStyle: {paddingHorizontal: 15},
         drawerStyle: {backgroundColor: 'white'},
         headerStyle: {elevation: 5},
-        headerLeft: props => (
-          <TouchableWithoutFeedback onPress={navigation.toggleDrawer}>
-            <Image
-              source={require('../assets/icons/drawer.png')}
-              style={{margin: 20}}
-            />
-          </TouchableWithoutFeedback>
-        ),
+        // headerLeft: props => (
+        //   <TouchableWithoutFeedback onPress={navigation.toggleDrawer}>
+        //     <Image
+        //       source={require('../assets/icons/drawer.png')}
+        //       style={{margin: 20}}
+        //     />
+        //   </TouchableWithoutFeedback>
+        // ),
       })}
       drawerContent={props => <CustomDrawerContent {...props} />}>
       <Drawer.Screen
@@ -160,16 +171,12 @@ export default function DashboardDrawer() {
           ),
         }}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Teams"
         component={UserProfilingStack}
         options={{
           drawerLabel: ({focused}) => {
-            return (
-              <Text style={focused ? global.greenColor : global.blackColor}>
-                Teams
-              </Text>
-            );
+            return <TeamsDrawer focused={focused} />;
           },
           drawerIcon: ({focused}) => (
             <FeatherIcons
@@ -179,7 +186,87 @@ export default function DashboardDrawer() {
             />
           ),
         }}
-      />
+      /> */}
     </Drawer.Navigator>
   );
 }
+
+const TeamsDrawer = props => {
+  const navigation = useNavigation();
+  // sidebar options that can be toggled
+  const [showTeams, setshowTeams] = useState(false);
+
+  const {user} = useContext(AuthContext);
+
+  if (user.userType == 'startup')
+    return (
+      <View style={{paddingVertical: 10, paddingHorizontal: 20}}>
+        <Pressable
+          style={[
+            {
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 25,
+            },
+          ]}
+          onPress={e => {
+            setshowTeams(!showTeams);
+          }}>
+          <View>
+            <FeatherIcons name="users" size={20} style={global.blackColor} />
+          </View>
+          <Text style={global.blackColor}>Teams</Text>
+        </Pressable>
+      </View>
+    );
+
+  const [jobs, setjobs] = useState([]);
+
+  const handleGetJobs = () => {
+    getJobsOfInfluencer({id: user._id})
+      .then(res => {
+        setjobs(res);
+      })
+      .catch(err => {});
+  };
+
+  useEffect(() => {
+    if (user) handleGetJobs();
+  }, [user]);
+
+  return (
+    <View style={{paddingVertical: 10, paddingHorizontal: 20}}>
+      <Pressable
+        style={[
+          {
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 25,
+          },
+        ]}
+        onPress={e => {
+          setshowTeams(!showTeams);
+        }}>
+        <View>
+          <FeatherIcons name="users" size={20} style={global.blackColor} />
+        </View>
+        <Text style={global.blackColor}>Teams</Text>
+      </Pressable>
+      {showTeams && (
+        <View style={{gap: 20, paddingTop: 20, paddingLeft: 50}}>
+          {jobs.map(job => (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Chatroom', {
+                  screen: 'Workplace',
+                  params: {id: job.workplaceID},
+                });
+              }}>
+              <Text style={[global.blackColor]}>{job.title}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+};

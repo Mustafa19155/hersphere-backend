@@ -117,90 +117,100 @@ const CreateJob = () => {
 
   return (
     <KeyboardAwareScrollView showsVerticalScrollIndicator={false}>
-      <View style={{gap: 10}}>
-        <View style={{gap: 7}}>
-          <Text style={[global.blackColor, global.textSmall]}>Job Title</Text>
-          <TextInput
-            placeholder="Name"
-            value={title}
-            onChangeText={settitle}
-            outlineColor="transparent"
-            activeOutlineColor="transparent"
-            style={[global.gray2Back]}
-            underlineColor="transparent"
-            mode="outlined"
-          />
-        </View>
-        <View style={{gap: 7}}>
-          <Text style={[global.blackColor, global.textSmall]}>
-            Job Description
-          </Text>
-          <TextInput
-            placeholder="Description"
-            value={description}
-            onChangeText={setdescription}
-            outlineColor="transparent"
-            multiline={true}
-            numberOfLines={5}
-            activeOutlineColor="transparent"
-            style={[global.gray2Back]}
-            underlineColor="transparent"
-            mode="outlined"
-          />
-        </View>
-        <View style={{gap: 7}}>
-          <Text style={[global.blackColor, global.textSmall]}>Job Budget</Text>
-          <TextInput
-            placeholder="Budget"
-            value={price}
-            keyboardType="number-pad"
-            onChangeText={setprice}
-            outlineColor="transparent"
-            activeOutlineColor="transparent"
-            style={[global.gray2Back]}
-            underlineColor="transparent"
-            mode="outlined"
-          />
-        </View>
-        <View style={{gap: 7}}>
-          <Text>Workplace</Text>
-          <Picker
-            selectedValue={activeWorkplace}
-            style={{
-              height: 50,
-              width: '100%',
-              backgroundColor: '#EEEEEE',
-            }}
-            onValueChange={(itemValue, itemIndex) =>
-              setactiveWorkplace(itemValue)
-            }>
-            {workplaces.map(cat => (
-              <Picker.Item label={cat.name} value={cat} />
-            ))}
-          </Picker>
-        </View>
-        {/* {activeWorkplace && ( */}
-        <View style={{gap: 7}}>
-          <Text>Select Category</Text>
-          <Picker
-            selectedValue={activeCategory}
-            style={{
-              height: 50,
-              width: '100%',
-              backgroundColor: '#EEEEEE',
-            }}
-            onValueChange={(itemValue, itemIndex) => {
-              setactiveCategory(itemValue);
-            }}>
-            {categories.map(cat => (
-              <Picker.Item label={cat.name} value={cat} />
-            ))}
-          </Picker>
-        </View>
-        {/* )} */}
-        <View style={{gap: 7}}>
-          <Text>skill set</Text>
-          <TagInput tags={skillset} setTags={setskillset} />
+      <View
+        style={{
+          padding: 15,
+          flex: 1,
+          justifyContent: 'space-between',
+          height: Dimensions.get('window').height - 20,
+        }}>
+        <View style={{gap: 10}}>
+          <View style={{gap: 7}}>
+            <Text style={[global.blackColor, global.textSmall]}>Job Title</Text>
+            <TextInput
+              placeholder="Name"
+              value={title}
+              onChangeText={settitle}
+              outlineColor="transparent"
+              activeOutlineColor="transparent"
+              style={[global.gray2Back]}
+              underlineColor="transparent"
+              mode="outlined"
+            />
+          </View>
+          <View style={{gap: 7}}>
+            <Text style={[global.blackColor, global.textSmall]}>
+              Job Description
+            </Text>
+            <TextInput
+              placeholder="Description"
+              value={description}
+              onChangeText={setdescription}
+              outlineColor="transparent"
+              multiline={true}
+              numberOfLines={5}
+              activeOutlineColor="transparent"
+              style={[global.gray2Back]}
+              underlineColor="transparent"
+              mode="outlined"
+            />
+          </View>
+          <View style={{gap: 7}}>
+            <Text style={[global.blackColor, global.textSmall]}>
+              Job Budget
+            </Text>
+            <TextInput
+              placeholder="Budget"
+              value={price}
+              keyboardType="number-pad"
+              onChangeText={setprice}
+              outlineColor="transparent"
+              activeOutlineColor="transparent"
+              style={[global.gray2Back]}
+              underlineColor="transparent"
+              mode="outlined"
+            />
+          </View>
+          <View style={{gap: 7}}>
+            <Text>Workplace</Text>
+            <Picker
+              selectedValue={activeWorkplace}
+              style={{
+                height: 50,
+                width: '100%',
+                backgroundColor: '#EEEEEE',
+              }}
+              onValueChange={(itemValue, itemIndex) =>
+                setactiveWorkplace(itemValue)
+              }>
+              {workplaces.map(cat => (
+                <Picker.Item label={cat.name} value={cat} />
+              ))}
+            </Picker>
+          </View>
+          {/* {activeWorkplace && ( */}
+          <View style={{gap: 7}}>
+            <Text>Select Category</Text>
+            <Picker
+              selectedValue={activeCategory}
+              style={{
+                height: 50,
+                width: '100%',
+                backgroundColor: '#EEEEEE',
+              }}
+              onValueChange={(itemValue, itemIndex) => {
+                setactiveCategory(itemValue);
+              }}>
+              {categories.map(cat => (
+                <Picker.Item label={cat.name} value={cat} />
+              ))}
+            </Picker>
+          </View>
+          {/* )} */}
+          <View style={{gap: 7}}>
+            <Text>skill set</Text>
+            <TagInput tags={skillset} setTags={setskillset} />
+          </View>
         </View>
         <Button
           style={[global.greenBtn]}

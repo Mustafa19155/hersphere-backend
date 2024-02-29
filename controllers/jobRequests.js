@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const JobRequest = require("../models/jobRequest");
 const Workplace = require("../models/workplace");
+const Job = require("../models/job");
+const Chatroom = require("../models/chatroom");
 
 // Create a new job request
 exports.createJobRequest = async (req, res, next) => {
@@ -19,6 +21,8 @@ exports.createJobRequest = async (req, res, next) => {
 exports.getJobRequestsForUser = async (req, res, next) => {
   try {
     const { userId } = req;
+
+    const { status } = req.params;
 
     const jobRequests = await Workplace.aggregate([
       {
@@ -70,6 +74,7 @@ exports.getJobRequestsForUser = async (req, res, next) => {
               input: "$jobRequests",
               as: "i",
               in: {
+                _id: "$$i._id",
                 jobID: {
                   $first: {
                     $filter: {
@@ -94,12 +99,24 @@ exports.getJobRequestsForUser = async (req, res, next) => {
         },
       },
       {
+        $addFields: {
+          jobRequests: {
+            $filter: {
+              input: "$jobRequests",
+              as: "i",
+              cond: { $eq: ["$$i.status", status] },
+            },
+          },
+        },
+      },
+      {
         $group: {
           _id: "$_id",
           workplace: { $first: "$$ROOT" },
         },
       },
     ]);
+
     res.status(200).json(jobRequests);
   } catch (error) {
     next(error);
@@ -126,7 +143,7 @@ exports.updateJobRequestStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-
+    console.log(id, status);
     const updatedJobRequest = await JobRequest.findByIdAndUpdate(
       id,
       { status },
@@ -138,6 +155,47 @@ exports.updateJobRequestStatus = async (req, res, next) => {
     }
 
     res.status(200).json(updatedJobRequest);
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Accept job request
+exports.acceptJobRequest = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const request = await JobRequest.findById(id);
+
+    if (!request) {
+      return res.status(404).json({ message: "Job request not found" });
+    }
+
+    const job = await Job.findById(request.jobID);
+
+    job.employee = { userID: request.userID, joinedOn: new Date() };
+
+    await job.save();
+
+    await Chatroom.findOneAndUpdate(
+      { workplaceID: job.workplaceID },
+      { $push: { membersID: request.userID } }
+    );
+
+    await JobRequest.updateMany(
+      { _id: { $ne: id }, jobID: request.jobID },
+      {
+        $set: {
+          status: "rejected",
+        },
+      }
+    );
+
+    request.status = "accepted";
+
+    await request.save();
+
+    res.status(200).json("Request accepted");
   } catch (error) {
     next(error);
   }

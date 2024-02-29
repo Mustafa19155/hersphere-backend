@@ -23,8 +23,21 @@ exports.getAllJobs = async (req, res, next) => {
     const jobsWithStatus = await Job.aggregate([
       {
         $match: {
-          // Add any conditions for filtering jobs if needed
+          // employee.userID is null, meaning the job is not taken
+          "employee.userID": null,
         },
+      },
+      // populate workplace
+      {
+        $lookup: {
+          from: "workplaces", // The name of the Workplace collection
+          localField: "workplaceID", // The field in the Job collection
+          foreignField: "_id", // The field in the Workplace collection
+          as: "workplaceID",
+        },
+      },
+      {
+        $unwind: "$workplaceID", // Deconstruct the array from the previous lookup stage
       },
       {
         $lookup: {
@@ -116,6 +129,18 @@ exports.deleteJobById = async (req, res, next) => {
       return res.status(404).json({ message: "Job not found" });
     }
     res.status(204).json();
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get jobs of influencer
+exports.getJobsOfInfluencer = async (req, res, next) => {
+  try {
+    const { userId } = req;
+
+    const jobs = await Job.find({ "employee.userID": userId });
+    res.status(200).json(jobs);
   } catch (error) {
     next(error);
   }

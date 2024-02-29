@@ -9,7 +9,9 @@ import {Image, View} from 'react-native';
 import VerifyGender from './screens/UserProfiling/VerifyGender';
 import UserProfilingStack, {
   ChatStack,
+  ChatroomStack,
   InfluenceProfileStack,
+  MarketplaceStack,
   PostCreatorStack,
   RequetsStack,
 } from './navigation/StackNavigation';
@@ -65,6 +67,8 @@ function App() {
         />
         <Stack.Screen name="Chats" component={ChatStack} />
         <Stack.Screen name="PostCreator" component={PostCreatorStack} />
+        <Stack.Screen name="Chatroom" component={ChatroomStack} />
+        <Stack.Screen name="Marketplace" component={MarketplaceStack} />
       </Stack.Navigator>
     </>
   );
