@@ -22,7 +22,7 @@ const LoginScreen = () => {
   const toast = useToast();
 
   const [apiCalled, setapiCalled] = useState(false);
-  const [email, setemail] = useState('mustafa@gmail.com');
+  const [email, setemail] = useState('mustafa2@gmail.com');
   const [password, setpassword] = useState('123');
 
   const navigation = useNavigation();

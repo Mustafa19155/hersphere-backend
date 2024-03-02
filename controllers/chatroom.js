@@ -1,4 +1,5 @@
 const Chatroom = require("../models/chatroom");
+const Job = require("../models/job");
 
 exports.getChatrooms = async (req, res, next) => {
   try {
@@ -14,8 +15,28 @@ exports.getChatroomById = async (req, res, next) => {
     const chatroom = await Chatroom.findOne({
       workplaceID: req.params.id,
     })
-      .populate("workplaceID membersID")
+      .populate("workplaceID membersID chats.sentBy")
       .select("-membersID.password");
+
+    if (!chatroom) {
+      return res.status(404).send({ message: "Chatroom not found" });
+    }
+
+    for (let i = 0; i < chatroom.membersID.length; i++) {
+      const member = chatroom.membersID[i];
+
+      // find job with the same workplaceID and userID
+      const job = await Job.findOne({
+        workplaceID: req.params.id,
+        "employee.userID": member._id,
+      });
+
+      // Update the job property for the member
+      chatroom.membersID[i] = {
+        ...member._doc,
+        job: job,
+      };
+    }
 
     res.send(chatroom);
   } catch (error) {

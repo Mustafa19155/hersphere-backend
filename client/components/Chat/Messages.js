@@ -27,13 +27,15 @@ const Messages = ({messages}) => {
                   marginBottom: 10,
                 },
             styles.messageWrapper,
-            mess.sentBy == user._id
+            mess.sentBy._id == user._id
               ? styles.myMessageWrapper
               : styles.otherMessageWrapper,
           ]}>
           <View
             style={[
-              mess.sentBy == user._id ? styles.myMessage : styles.otherMessage,
+              mess.sentBy._id == user._id
+                ? styles.myMessage
+                : styles.otherMessage,
               styles.message,
             ]}>
             {mess.messageType === 'document' ? (
@@ -64,7 +66,7 @@ const Messages = ({messages}) => {
             )}
           </View>
           <Text style={[global.grayColor, global.textExtraSmall, {padding: 5}]}>
-            {moment(mess.time).format('ddd hh:mm A')}
+            {moment(mess.date).format('ddd hh:mm A')}
           </Text>
         </View>
       ))}

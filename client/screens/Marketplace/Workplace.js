@@ -1,5 +1,7 @@
 import {
+  Dimensions,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -11,21 +13,20 @@ import {useNavigation} from '@react-navigation/native';
 import {baseURL} from '../../variables';
 import {io} from 'socket.io-client';
 import {getChatroomById} from '../../api/chatroom';
-import {TextInput} from 'react-native-paper';
+import {Modal, Portal, TextInput} from 'react-native-paper';
 import SendIcon from '../../assets/icons/send.png';
 import UploadIcon from '../../assets/icons/upload-media.png';
-import Messages from '../../components/Chat/Messages';
+import Messages from '../../components/Chatroom/Messages';
 import {AuthContext} from '../../contexts/userContext';
 import global from '../../assets/styles/global';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
 import Avatar from '../../assets/images/avatar.png';
-import RNFS, {DocumentDirectoryPath, readFile} from 'react-native-fs';
 import {getDownloadURL, ref, uploadBytes, uploadString} from 'firebase/storage';
 import {storage} from '../../firebase';
 import DocumentPicker from 'react-native-document-picker';
 import Icon from 'react-native-vector-icons/AntDesign';
 import AntIcons from 'react-native-vector-icons/AntDesign';
+import moment from 'moment';
 
 const Workplace = ({route}) => {
   const navigation = useNavigation();
@@ -38,6 +39,7 @@ const Workplace = ({route}) => {
   const [sendingMessage, setsendingMessage] = useState(false);
   const [message, setmessage] = useState('');
   const [file, setfile] = useState(null);
+  const [showDetails, setshowDetails] = useState(false);
 
   const {id} = route.params;
 
@@ -131,7 +133,18 @@ const Workplace = ({route}) => {
     socket.emit('join', {room: id});
     socket.on('message', data => {
       setchatroom(chats => {
-        return {...chats, chats: [...chats.chats, data.message]};
+        return {
+          ...chats,
+          chats: [
+            ...chats.chats,
+            {
+              ...data.message,
+              sentBy: chats.membersID.find(
+                member => member._id == data.message.sentBy,
+              ),
+            },
+          ],
+        };
       });
     });
 
@@ -146,6 +159,13 @@ const Workplace = ({route}) => {
         justifyContent: 'space-between',
         flex: 1,
       }}>
+      {showDetails && (
+        <Details
+          open={showDetails}
+          setopen={setshowDetails}
+          chatroom={chatroom}
+        />
+      )}
       {!loadingchatroom && chatroom ? (
         <>
           <View style={styles.mainTopWrapper}>
@@ -155,10 +175,12 @@ const Workplace = ({route}) => {
               </TouchableOpacity>
               <View
                 style={{flexDirection: 'row', alignItems: 'center', gap: 5}}>
-                <Image
-                  source={Avatar}
-                  style={{height: 60, width: 60, borderRadius: 100}}
-                />
+                <TouchableWithoutFeedback onPress={() => setshowDetails(true)}>
+                  <Image
+                    source={{uri: chatroom.workplaceID.image}}
+                    style={{height: 60, width: 60, borderRadius: 100}}
+                  />
+                </TouchableWithoutFeedback>
                 <View>
                   <Text style={[global.textSmall, global.fontBold]}>
                     {chatroom.workplaceID.name}
@@ -238,7 +260,252 @@ const Workplace = ({route}) => {
 
 export default Workplace;
 
+const Details = ({open, setopen, chatroom}) => {
+  const containerStyle = {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 20,
+    height: '90%',
+  };
+
+  const [activeTab, setactiveTab] = useState('members');
+
+  return (
+    <Portal>
+      <Modal
+        style={styles.modal}
+        visible={open}
+        onDismiss={() => setopen(false)}
+        contentContainerStyle={containerStyle}>
+        <ScrollView>
+          <View style={{gap: 15}}>
+            <View
+              style={{justifyContent: 'center', alignItems: 'center', gap: 10}}>
+              <Image
+                source={{uri: chatroom.workplaceID.image}}
+                style={{
+                  height: 100,
+                  width: 100,
+                  borderRadius: 100,
+                }}
+              />
+              <Text style={[global.textMedium, global.fontBold]}>
+                {chatroom.workplaceID.name}
+              </Text>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <TouchableWithoutFeedback onPress={() => setactiveTab('members')}>
+                <View
+                  style={[
+                    activeTab == 'members' ? global.greenBack : '',
+                    {
+                      padding: 10,
+                      borderRadius: 20,
+                      width: '50%',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    },
+                  ]}>
+                  <Text
+                    style={{
+                      color: activeTab == 'members' ? 'white' : 'black',
+                    }}>
+                    MEMBERS
+                  </Text>
+                </View>
+              </TouchableWithoutFeedback>
+              <TouchableWithoutFeedback onPress={() => setactiveTab('files')}>
+                <View
+                  style={[
+                    activeTab == 'files' ? global.greenBack : '',
+                    {
+                      padding: 10,
+                      borderRadius: 20,
+                      width: '50%',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    },
+                  ]}>
+                  <Text
+                    style={{color: activeTab == 'files' ? 'white' : 'black'}}>
+                    FILES
+                  </Text>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+            <View>
+              {activeTab == 'members' ? (
+                <View style={{gap: 15}}>
+                  <Text style={[global.textNormal, global.fontBold]}>
+                    Members - {chatroom.membersID.length}
+                  </Text>
+                  <View style={{gap: 15, margin: 2}}>
+                    {chatroom.membersID.map(member => (
+                      <View
+                        key={member._id}
+                        style={{
+                          position: 'relative',
+                          overflow: 'hidden',
+                          flexDirection: 'row',
+                          gap: 10,
+                          padding: 10,
+                          elevation: 3,
+                          backgroundColor: 'white',
+                          borderRadius: 5,
+                        }}>
+                        <Image
+                          source={{uri: member.profileImage}}
+                          style={{height: 50, width: 50, borderRadius: 100}}
+                        />
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            width: '100%',
+                          }}>
+                          <View style={{gap: 3}}>
+                            <Text style={[global.textSmall, global.fontMedium]}>
+                              {member.username}
+                            </Text>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                justifyContent: 'space-between',
+                                width: Dimensions.get('window').width - 120,
+                              }}>
+                              <Text
+                                style={[
+                                  global.textExtraSmall,
+                                  global.grayColor,
+                                  global.fontBold,
+                                ]}>
+                                {member.job
+                                  ? member.job?.workplaceCategoryID
+                                  : 'Admin'}
+                              </Text>
+                              {member.job && (
+                                <View>
+                                  <Text
+                                    style={[
+                                      global.textExtraSmall,
+                                      global.grayColor,
+                                      global.fontBold,
+                                    ]}>
+                                    Joined{' '}
+                                    {moment(
+                                      member.job.employee.joinedOn,
+                                    ).fromNow()}
+                                  </Text>
+                                </View>
+                              )}
+                            </View>
+                          </View>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              ) : (
+                <View style={{gap: 15}}>
+                  <Text style={[global.textNormal, global.fontBold]}>
+                    Files - {chatroom.chats.filter(chat => chat.file).length}
+                  </Text>
+                  <View style={{gap: 10, margin: 2}}>
+                    {chatroom.chats.map(chat => {
+                      if (chat.file) {
+                        return (
+                          <View
+                            key={chat._id}
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: 10,
+                              elevation: 3,
+                              backgroundColor: 'white',
+                              borderRadius: 5,
+                            }}>
+                            <View
+                              style={{
+                                flexDirection: 'row',
+                                gap: 10,
+                                alignItems: 'center',
+                              }}>
+                              {/* <Image
+                                source={{uri: chat.sentBy.profileImage}}
+                                style={{
+                                  height: 50,
+                                  width: 50,
+                                  borderRadius: 100,
+                                }}
+                              /> */}
+                              <AntIcons name="file1" size={20} />
+                              <View style={{gap: 4}}>
+                                <View>
+                                  <Text
+                                    style={[
+                                      global.textSmall,
+                                      global.fontBold,
+                                      {
+                                        width:
+                                          Dimensions.get('window').width - 120,
+                                      },
+                                    ]}
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail">
+                                    {chat.file.name}
+                                  </Text>
+                                </View>
+                                <View
+                                  style={[
+                                    {
+                                      flexDirection: 'row',
+                                      justifyContent: 'space-between',
+                                      width:
+                                        Dimensions.get('window').width - 120,
+                                    },
+                                  ]}>
+                                  <Text
+                                    style={[
+                                      global.textExtraSmall,
+                                      global.grayColor,
+                                      global.fontBold,
+                                    ]}>
+                                    {chat.sentBy.username}
+                                  </Text>
+                                  <Text
+                                    style={[
+                                      global.textExtraSmall,
+                                      global.grayColor,
+                                      global.fontBold,
+                                    ]}>
+                                    {moment(chat.date).fromNow()}
+                                  </Text>
+                                </View>
+                              </View>
+                            </View>
+                          </View>
+                        );
+                      }
+                    })}
+                  </View>
+                </View>
+              )}
+            </View>
+          </View>
+        </ScrollView>
+      </Modal>
+    </Portal>
+  );
+};
+
 const styles = StyleSheet.create({
+  modal: {
+    bottom: -8,
+    justifyContent: 'flex-end',
+  },
+
   filePreview: {
     position: 'absolute',
     zIndex: 2,

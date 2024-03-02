@@ -18,6 +18,7 @@ import {useNavigation} from '@react-navigation/native';
 import ConfirmModal from '../../components/modals/ConfirmModal';
 import {RequestContext} from '../../contexts/requestContext';
 import Step4 from '../../components/SendRequest/Step4';
+import SuccessModal from '../../components/SuccessModal';
 
 const SendRequest = () => {
   const maxSteps = 4;
@@ -42,9 +43,10 @@ const SendRequest = () => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom: 10}}>
-      <RequestSentModal
+      <SuccessModal
         open={requestSentModalOpen}
         setopen={setrequestSentModalOpen}
+        text={'Your request has been sent successfully!'}
       />
       <ConfirmModal
         open={confirmModalOpen}
@@ -172,43 +174,6 @@ const SendRequest = () => {
 };
 
 export default SendRequest;
-
-const RequestSentModal = ({open, setopen}) => {
-  const navigation = useNavigation();
-
-  const containerStyle = {
-    backgroundColor: 'white',
-    paddingHorizontal: 20,
-    paddingVertical: 40,
-    borderRadius: 10,
-    width: '90%',
-    alignSelf: 'center',
-  };
-
-  return (
-    <Portal>
-      <Modal
-        visible={open}
-        onDismiss={() => {
-          setopen(false);
-          navigation.goBack();
-        }}
-        contentContainerStyle={containerStyle}>
-        <View style={{gap: 25, alignItems: 'center'}}>
-          <Text
-            style={[
-              global.blackColor,
-              global.textNormal,
-              {textAlign: 'center'},
-            ]}>
-            Request has been created Successfully
-          </Text>
-          <Image source={TickIcon} />
-        </View>
-      </Modal>
-    </Portal>
-  );
-};
 
 const confirmPaymentModal = ({open, setopen}) => {};
 

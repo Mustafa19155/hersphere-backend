@@ -235,13 +235,25 @@ const TeamsDrawer = props => {
   }, [user]);
 
   return (
-    <View style={{paddingVertical: 10, paddingHorizontal: 20}}>
+    <View
+      style={
+        {
+          // paddingVertical: 10,
+          // paddingHorizontal: 20,
+        }
+      }>
       <Pressable
         style={[
           {
+            paddingVertical: 12,
+            marginLeft: 15,
+            paddingLeft: 5,
+            width: '90%',
             flexDirection: 'row',
             alignItems: 'center',
             gap: 25,
+            backgroundColor: showTeams ? '#D8D8D8' : 'white',
+            borderRadius: 5,
           },
         ]}
         onPress={e => {
@@ -250,20 +262,55 @@ const TeamsDrawer = props => {
         <View>
           <FeatherIcons name="users" size={20} style={global.blackColor} />
         </View>
-        <Text style={global.blackColor}>Teams</Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            width: '75%',
+          }}>
+          <Text style={global.blackColor}>Teams</Text>
+          <AntIcons
+            name={showTeams ? 'up' : 'down'}
+            size={16}
+            style={global.blackColor}
+          />
+        </View>
       </Pressable>
       {showTeams && (
-        <View style={{gap: 20, paddingTop: 20, paddingLeft: 50}}>
+        <View style={{gap: 20, paddingTop: 10, paddingLeft: 50}}>
           {jobs.map(job => (
-            <TouchableOpacity
+            <TouchableWithoutFeedback
               onPress={() => {
                 navigation.navigate('Chatroom', {
                   screen: 'Workplace',
-                  params: {id: job.workplaceID},
+                  params: {id: job.workplaceID._id},
                 });
               }}>
-              <Text style={[global.blackColor]}>{job.title}</Text>
-            </TouchableOpacity>
+              <View style={{flexDirection: 'row', gap: 10}}>
+                <Image
+                  source={{uri: job.workplaceID?.image}}
+                  style={{height: 32, width: 32, borderRadius: 32}}
+                />
+                <View>
+                  <Text
+                    style={[
+                      global.blackColor,
+                      global.fontMedium,
+                      global.textSmall,
+                    ]}>
+                    {job.title}
+                  </Text>
+                  <Text
+                    style={[
+                      global.textExtraSmall,
+                      global.grayColor,
+                      global.fontBold,
+                    ]}>
+                    {job.chatroomID?.membersID?.length} members
+                  </Text>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
           ))}
         </View>
       )}

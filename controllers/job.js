@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Job = require("../models/job");
 const Workplace = require("../models/workplace");
+const JobRequest = require("../models/jobRequest");
+const Chatroom = require("../models/chatroom");
 
 // Create a new job
 exports.createJob = async (req, res, next) => {
@@ -88,11 +90,19 @@ exports.getAllWorkplaceJobs = async (req, res, next) => {
 // Get a specific job by ID
 exports.getJobById = async (req, res, next) => {
   try {
-    const job = await Job.findById(req.params.id);
+    const job = await Job.findById(req.params.id).populate("workplaceID");
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
     }
-    res.status(200).json(job);
+
+    // check if user has applied for the job
+    const { userId } = req;
+    const jobRequest = await JobRequest.findOne({
+      jobID: req.params.id,
+      userID: userId,
+    });
+
+    res.status(200).json({ ...job._doc, hasApplied: !!jobRequest });
   } catch (error) {
     next(error);
   }
@@ -139,7 +149,21 @@ exports.getJobsOfInfluencer = async (req, res, next) => {
   try {
     const { userId } = req;
 
-    const jobs = await Job.find({ "employee.userID": userId });
+    const jobs = await Job.find({ "employee.userID": userId }).populate(
+      "workplaceID"
+    );
+
+    for (let i = 0; i < jobs.length; i++) {
+      const job = jobs[i];
+      const chatroom = await Chatroom.findOne({
+        workplaceID: job.workplaceID._id,
+      });
+      jobs[i] = {
+        ...job._doc,
+        chatroomID: { ...chatroom._doc },
+      };
+    }
+
     res.status(200).json(jobs);
   } catch (error) {
     next(error);

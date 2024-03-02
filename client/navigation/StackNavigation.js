@@ -198,7 +198,20 @@ export const MarketplaceStack = () => {
       <Stack.Screen
         name="CreateJobRequest"
         component={CreateJobRequest}
-        options={{headerShown: false}}
+        // options={{headerShown: false}}
+        options={{
+          headerLeft: props => {
+            return (
+              <Pressable
+                onPress={props.onPress}
+                style={{paddingHorizontal: 15}}>
+                <Icon name="chevron-back" size={26} color="black" />
+              </Pressable>
+            );
+          },
+          // headerTitleAlign: 'center',
+          title: <Text style={[global.fontBold]}></Text>,
+        }}
       />
     </Stack.Navigator>
   );
