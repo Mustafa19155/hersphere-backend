@@ -7,6 +7,8 @@ const bcrypt = require("bcryptjs");
 const tf = require("@tensorflow/tfjs-node");
 const sharp = require("sharp");
 const fs = require("fs").promises;
+const Job = require("../models/job");
+const mongoose = require("mongoose");
 
 exports.getFacebookPages = async (req, res, next) => {
   try {
@@ -391,6 +393,62 @@ exports.verifyGender = async (req, res, next) => {
       err.status = 401;
       return next(err);
     }
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getUserJobRequestDetails = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    // const jobs = await Job.find({
+    //   "employee.userID": userId,
+    //   review: { $exists: true },
+    // }).populate("workplaceID");
+
+    const jobs = await Job.aggregate([
+      {
+        $match: {
+          "employee.userID": mongoose.Types.ObjectId(userId),
+          review: { $exists: true },
+        },
+      },
+      {
+        $lookup: {
+          from: "workplaces",
+          localField: "workplaceID",
+          foreignField: "_id",
+          as: "workplace",
+        },
+      },
+      {
+        $unwind: "$workplace",
+      },
+      // populate workplace createdBy field
+      {
+        $lookup: {
+          from: "users",
+          localField: "workplace.createdBy",
+          foreignField: "_id",
+          as: "workplace.createdBy",
+        },
+      },
+      {
+        $unwind: "$workplace.createdBy",
+      },
+    ]);
+
+    // get average rating
+    let totalRating = 0;
+    jobs.forEach((job) => {
+      totalRating += job.review.rating;
+    });
+
+    const avgRating = (totalRating / jobs.length).toFixed(1);
+
+    res.json({ ...user._doc, averageRating: avgRating, jobs });
   } catch (err) {
     next(err);
   }

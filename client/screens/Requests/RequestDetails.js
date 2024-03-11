@@ -43,31 +43,31 @@ const RequestDetails = ({route}) => {
 
   const navigation = useNavigation();
 
-  useEffect(() => {
-    navigation.getParent()?.getParent()?.setOptions({headerShown: false});
-    navigation.getParent()?.setOptions({
-      tabBarStyle: {display: 'none'},
-      tabBarVisible: false,
-    });
+  // useEffect(() => {
+  //   navigation.getParent()?.getParent()?.setOptions({headerShown: false});
+  //   navigation.getParent()?.setOptions({
+  //     tabBarStyle: {display: 'none'},
+  //     tabBarVisible: false,
+  //   });
 
-    return () => {
-      navigation.getParent()?.getParent().setOptions({headerShown: true});
-      navigation
-        .getParent()
-        ?.setOptions({
-          tabBarStyle: {
-            backgroundColor: 'white',
-            elevation: 0,
-            borderColor: 'white',
-          },
-          tabBarVisible: true,
-        });
-    };
-  }, [navigation]);
+  //   return () => {
+  //     navigation.getParent()?.getParent().setOptions({headerShown: true});
+  //     navigation
+  //       .getParent()
+  //       ?.setOptions({
+  //         tabBarStyle: {
+  //           backgroundColor: 'white',
+  //           elevation: 0,
+  //           borderColor: 'white',
+  //         },
+  //         tabBarVisible: true,
+  //       });
+  //   };
+  // }, [navigation]);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={{gap: 20}}>
+      <View style={{gap: 20, padding: 20}}>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
             <Image

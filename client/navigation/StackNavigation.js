@@ -106,6 +106,8 @@ import {AuthContext} from '../contexts/userContext';
 import Jobs from '../screens/Marketplace/Jobs';
 import CreateJobRequest from '../screens/Marketplace/CreateJobRequest';
 import Workplace from '../screens/Marketplace/Workplace';
+import ChatroomSetting from '../screens/Chat/ChatroomSetting';
+import InfluencerTeamRequestProfile from '../components/Requests/InfluencerTeamRequestProfile';
 
 export const InfluenceProfileStack = () => {
   return (
@@ -153,11 +155,11 @@ export const RequetsStack = () => {
       screenOptions={{
         title: 'Requests',
       }}>
-      <Stack.Screen
+      {/* <Stack.Screen
         name="Requests"
         component={Requests}
         options={{headerShown: false}}
-      />
+      /> */}
       <Stack.Screen
         name="RequestDetails"
         component={RequestDetails}
@@ -171,6 +173,22 @@ export const RequetsStack = () => {
           },
           headerTitleAlign: 'center',
           title: <Text style={[global.fontBold]}>Request Details</Text>,
+        }}
+      />
+      <Stack.Screen
+        name="Profile"
+        component={InfluencerTeamRequestProfile}
+        options={{
+          headerLeft: props => {
+            return (
+              <Pressable
+                onPress={props.onPress}
+                style={{paddingHorizontal: 15}}>
+                <Icon name="chevron-back" size={26} color="black" />
+              </Pressable>
+            );
+          },
+          title: <Text style={[global.fontBold]}></Text>,
         }}
       />
     </Stack.Navigator>
@@ -242,6 +260,23 @@ export const ChatroomStack = () => {
         name="Workplace"
         component={Workplace}
         options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={ChatroomSetting}
+        options={{
+          headerLeft: props => {
+            return (
+              <Pressable
+                onPress={props.onPress}
+                style={{paddingHorizontal: 15}}>
+                <Icon name="chevron-back" size={26} color="black" />
+              </Pressable>
+            );
+          },
+          headerTitleAlign: 'center',
+          title: <Text style={[global.fontBold]}>Settings</Text>,
+        }}
       />
     </Stack.Navigator>
   );

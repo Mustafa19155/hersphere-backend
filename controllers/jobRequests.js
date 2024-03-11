@@ -68,6 +68,7 @@ exports.getJobRequestsForUser = async (req, res, next) => {
           startDate: 1,
           endDate: 1,
           totalMembers: 1,
+          image: 1,
           categories: 1,
           jobRequests: {
             $map: {
@@ -116,7 +117,7 @@ exports.getJobRequestsForUser = async (req, res, next) => {
         },
       },
     ]);
-
+    console.log(jobRequests);
     res.status(200).json(jobRequests);
   } catch (error) {
     next(error);

@@ -169,3 +169,21 @@ exports.getJobsOfInfluencer = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.addReview = async (req, res, next) => {
+  try {
+    const { userId } = req;
+    const job = await Job.findById(req.params.id).populate("workplaceID");
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+    if (job.workplaceID.createdBy.toString() !== userId) {
+      return res.status(403).json({ message: "You are not authorized" });
+    }
+    job.review = { ...req.body, date: Date.now() };
+    await job.save();
+    res.status(200).json(job);
+  } catch (error) {
+    next(error);
+  }
+};

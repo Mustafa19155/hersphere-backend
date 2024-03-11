@@ -12,7 +12,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {baseURL} from '../../variables';
 import {io} from 'socket.io-client';
-import {getChatroomById} from '../../api/chatroom';
+import {getChatroomById, readMessages} from '../../api/chatroom';
 import {Modal, Portal, TextInput} from 'react-native-paper';
 import SendIcon from '../../assets/icons/send.png';
 import UploadIcon from '../../assets/icons/upload-media.png';
@@ -46,6 +46,11 @@ const Workplace = ({route}) => {
   const handleGetChatroom = () => {
     getChatroomById(id)
       .then(res => {
+        readMessages(res.workplaceID._id)
+          .then(res => {})
+          .catch(err => {
+            console.log(err);
+          });
         setchatroom(res);
         setloadingchatroom(false);
       })
@@ -188,10 +193,17 @@ const Workplace = ({route}) => {
                 </View>
               </View>
             </View>
-
-            <TouchableOpacity>
-              <AntIcons name="setting" size={26} color="black" />
-            </TouchableOpacity>
+            {chatroom.workplaceID.createdBy.toString() ==
+              user._id.toString() && (
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('Settings', {
+                    workplaceID: chatroom.workplaceID._id,
+                  })
+                }>
+                <AntIcons name="setting" size={26} color="black" />
+              </TouchableOpacity>
+            )}
           </View>
           <Messages messages={chatroom} />
           <View style={{margin: 5, flexDirection: 'row', gap: 5}}>
@@ -432,14 +444,6 @@ const Details = ({open, setopen, chatroom}) => {
                                 gap: 10,
                                 alignItems: 'center',
                               }}>
-                              {/* <Image
-                                source={{uri: chat.sentBy.profileImage}}
-                                style={{
-                                  height: 50,
-                                  width: 50,
-                                  borderRadius: 100,
-                                }}
-                              /> */}
                               <AntIcons name="file1" size={20} />
                               <View style={{gap: 4}}>
                                 <View>

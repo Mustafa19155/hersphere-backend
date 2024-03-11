@@ -101,7 +101,7 @@ app.use("/api/socialmediaposts", socialmediaRouter);
 app.use("/api/workplace", worklaceRouter);
 app.use("/api/job", verifyJWT, jobRouter);
 app.use("/api/job-request", verifyJWT, jobRequestRouter);
-app.use("/api/chatroom", chatroomRouter);
+app.use("/api/chatroom", verifyJWT, chatroomRouter);
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public", "index.html"));

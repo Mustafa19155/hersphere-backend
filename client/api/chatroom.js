@@ -19,3 +19,13 @@ export const getChatroomsOfUser = async userId => {
     throw err;
   }
 };
+
+// read messages
+export const readMessages = async id => {
+  try {
+    const res = await axiosClient.put(`/chatroom/${id}/read`);
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};

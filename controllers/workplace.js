@@ -65,7 +65,7 @@ exports.getWorkplaceById = async (req, res, next) => {
 exports.updateWorkplaceById = async (req, res, next) => {
   try {
     const { userId } = req;
-    const workplace = await Workplace.findByOneAndUpdate(
+    const workplace = await Workplace.findOneAndUpdate(
       { _id: req.params.id, createdBy: userId },
       req.body,
       { new: true }

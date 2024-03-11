@@ -167,3 +167,12 @@ export const verifyGender = async ({data}) => {
     throw err;
   }
 };
+
+export const getUserJobRequestDetails = async ({userId}) => {
+  try {
+    const response = await axiosClient.get(`/user/job-request/${userId}`);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};

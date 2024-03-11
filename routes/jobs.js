@@ -22,4 +22,7 @@ router.delete("/:id", jobController.deleteJobById);
 // get jobs of influencer
 router.get("/influencer/:id", jobController.getJobsOfInfluencer);
 
+// add review
+router.post("/:id/review", jobController.addReview);
+
 module.exports = router;

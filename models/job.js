@@ -19,7 +19,11 @@ const JobSchema = new Schema(
     description: { type: String },
     skillset: [{ type: String }],
     price: { type: Number },
-    review: { description: { type: String }, rating: { type: Number } },
+    review: {
+      description: { type: String },
+      rating: { type: Number },
+      date: { type: Date },
+    },
   },
   { timestamps: true }
 );

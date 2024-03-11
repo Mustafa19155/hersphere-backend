@@ -26,7 +26,10 @@ const ActiveRequests = ({requests}) => {
             {requests.map(req => (
               <Pressable
                 onPress={() =>
-                  navigation.navigate('RequestDetails', {status: 'active'})
+                  navigation.navigate('Requests', {
+                    screen: 'RequestDetails',
+                    params: {status: 'active'},
+                  })
                 }
                 style={{
                   padding: 10,

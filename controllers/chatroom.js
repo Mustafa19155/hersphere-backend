@@ -37,7 +37,7 @@ exports.getChatroomById = async (req, res, next) => {
         job: job,
       };
     }
-
+    console.log(chatroom);
     res.send(chatroom);
   } catch (error) {
     next(error);
@@ -67,6 +67,35 @@ exports.getChatroomsOfUser = async (req, res, next) => {
     });
 
     res.send(chatrooms);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.readMessages = async (req, res, next) => {
+  try {
+    const { userId } = req;
+    const chatroom = await Chatroom.findOne({
+      workplaceID: req.params.id,
+    });
+
+    if (!chatroom) {
+      return res.status(404).send({ message: "Chatroom not found" });
+    }
+
+    chatroom.chats.forEach((chat) => {
+      if (
+        chat.sentBy !== userId &&
+        !chat.readBy.includes(userId) &&
+        chat.deliveredTo.includes(userId)
+      ) {
+        chat.readBy.push(userId);
+      }
+    });
+
+    await chatroom.save();
+
+    res.send(chatroom);
   } catch (error) {
     next(error);
   }

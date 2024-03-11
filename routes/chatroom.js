@@ -55,4 +55,7 @@ chatroomRouter.get("/:id", chatroomCOntroller.getChatroomById);
 // get chatrooms of user
 chatroomRouter.get("/user/:userId", chatroomCOntroller.getChatroomsOfUser);
 
+// read messages
+chatroomRouter.put("/:id/read", chatroomCOntroller.readMessages);
+
 module.exports = chatroomRouter;

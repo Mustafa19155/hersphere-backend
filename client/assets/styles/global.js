@@ -54,12 +54,12 @@ export default globalStyles = StyleSheet.create({
     paddingVertical: 3,
   },
   redButton: {
-    backgroundColor: '#C20C0C',
+    backgroundColor: '#F50303',
     borderRadius: 8,
     paddingVertical: 8,
   },
   redBtnSm: {
-    backgroundColor: '#C20C0C',
+    backgroundColor: '#F50303',
     borderRadius: 8,
     paddingVertical: 3,
   },
@@ -91,7 +91,7 @@ export default globalStyles = StyleSheet.create({
     paddingVertical: 8,
   },
   whiteBtnText: {
-    color: 'black',
+    // color: 'black',
     fontSize: 20,
   },
   fontBold: {
@@ -101,33 +101,36 @@ export default globalStyles = StyleSheet.create({
     fontWeight: '600',
   },
   textExtraSmall: {
-    color: 'black',
+    // color: 'black',
     fontSize: 12,
   },
   textSmall: {
-    color: 'black',
+    // color: 'black',
     fontSize: 16,
   },
+  text14: {
+    fontSize: 14,
+  },
   textNormal: {
-    color: 'black',
+    // color: 'black',
     fontSize: 20,
   },
   textMedium: {
-    color: 'black',
+    // color: 'black',
     fontSize: 24,
   },
   textLarge: {
-    color: 'black',
+    // color: 'black',
     fontSize: 30,
   },
   textExtraLarge: {
-    color: 'black',
+    // color: 'black',
     fontSize: 36,
   },
   //headings
   mainHeading: {
     fontSize: 30,
     fontWeight: 'bold',
-    color: 'black',
+    // color: 'black',
   },
 });

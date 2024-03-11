@@ -10,6 +10,8 @@ import {AuthContext} from '../contexts/userContext';
 import InfluencerDashboard from '../screens/InfluencerDashboard';
 import Jobs from '../screens/Marketplace/Jobs';
 import Marketplace from '../screens/Marketplace/Marketplace';
+import Requests from '../screens/Requests/Requests';
+import InfluencerTeamRequestProfile from '../components/Requests/InfluencerTeamRequestProfile';
 
 const Tab = createBottomTabNavigator();
 
@@ -78,7 +80,7 @@ const BottomHomeNavigation = () => {
       />
       <Tab.Screen
         name="RequestsStack"
-        component={RequetsStack}
+        component={Requests}
         options={{
           headerShown: false,
           tabBarLabel: ({focused}) => {

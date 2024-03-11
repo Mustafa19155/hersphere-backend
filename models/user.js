@@ -24,6 +24,7 @@ const ProductSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  skills: [],
   businessDetails: {},
 });
 

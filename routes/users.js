@@ -23,4 +23,9 @@ router.post(
 );
 router.put("/update", verifyJWT, authController.updateProfile);
 router.put("/password", verifyJWT, authController.updatePassword);
+router.get(
+  "/job-request/:userId",
+  verifyJWT,
+  authController.getUserJobRequestDetails
+);
 module.exports = router;

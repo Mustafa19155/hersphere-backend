@@ -21,7 +21,10 @@ const CompletedRequests = ({requests}) => {
         {requests.map(req => (
           <Pressable
             onPress={() =>
-              navigation.navigate('RequestDetails', {status: 'completed'})
+              navigation.navigate('Requests', {
+                screen: 'RequestDetails',
+                params: {status: 'completed'},
+              })
             }
             style={{
               padding: 10,

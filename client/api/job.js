@@ -69,3 +69,13 @@ export const getJobsOfInfluencer = async ({id}) => {
     throw error;
   }
 };
+
+// add review
+export const addReview = async ({id, data}) => {
+  try {
+    const res = await axiosClient.post(`/job/${id}/review`, data);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};
