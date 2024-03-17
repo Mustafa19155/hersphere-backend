@@ -176,3 +176,21 @@ export const getUserJobRequestDetails = async ({userId}) => {
     throw err;
   }
 };
+
+export const getRecommendedInfluencers = async () => {
+  try {
+    const response = await axiosClient.get('/user/recommended');
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getInfluencerProfileForRequest = async ({id}) => {
+  try {
+    const response = await axiosClient.get(`/user/influencer/request/${id}`);
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};

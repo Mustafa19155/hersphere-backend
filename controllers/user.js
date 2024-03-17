@@ -453,3 +453,60 @@ exports.getUserJobRequestDetails = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.recommendedInfluencers = async (req, res, next) => {
+  try {
+    const users = await User.find({ userType: "influencer" }).limit(3);
+    // const recommendedUsers = users.filter((user) => {
+    //   return user.skills.includes(user.skills);
+    // });
+    res.json(
+      users.map((user) => {
+        const platforms = [];
+        if (user._doc.facebookPage) {
+          platforms.push("facebook");
+        }
+        if (user._doc.instagramPage) {
+          platforms.push("instagram");
+        }
+        if (user._doc.youtubeChannel) {
+          platforms.push("youtube");
+        }
+
+        return { ...user._doc, rating: 5, platforms };
+      })
+    );
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getInfluencerProfileForRequest = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const influencer = await User.findById(id);
+
+    const platforms = [];
+
+    if (influencer._doc.facebookPage) {
+      platforms.push("facebook");
+    }
+    if (influencer._doc.instagramPage) {
+      platforms.push("instagram");
+    }
+    if (influencer._doc.youtubeChannel) {
+      platforms.push("youtube");
+    }
+
+    res.json({
+      ...influencer._doc,
+      rating: 5,
+      reviews: [],
+      totalPromotions: 0,
+      platforms,
+    });
+  } catch (err) {
+    next(err);
+  }
+};

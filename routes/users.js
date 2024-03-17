@@ -28,4 +28,10 @@ router.get(
   verifyJWT,
   authController.getUserJobRequestDetails
 );
+router.get("/recommended", verifyJWT, authController.recommendedInfluencers);
+router.get(
+  "/influencer/request/:id",
+  verifyJWT,
+  authController.getInfluencerProfileForRequest
+);
 module.exports = router;

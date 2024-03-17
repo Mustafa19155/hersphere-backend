@@ -78,25 +78,6 @@ const SignupScreen = () => {
       });
   };
 
-  useEffect(() => {
-    const a = async () => {
-      try {
-        const b = await axios.post(
-          'http://192.168.18.55:8000/api/todo/add-task',
-          {
-            text: 'asd',
-            completed: false,
-          },
-        );
-
-        console.log(b.data);
-      } catch (err) {
-        console.log(err.response.data);
-      }
-    };
-    a();
-  }, []);
-
   return (
     <KeyboardAwareScrollView>
       <View style={styles.container}>

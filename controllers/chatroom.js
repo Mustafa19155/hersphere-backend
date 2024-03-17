@@ -37,7 +37,7 @@ exports.getChatroomById = async (req, res, next) => {
         job: job,
       };
     }
-    console.log(chatroom);
+
     res.send(chatroom);
   } catch (error) {
     next(error);
@@ -47,6 +47,7 @@ exports.getChatroomById = async (req, res, next) => {
 exports.getChatroomsOfUser = async (req, res, next) => {
   try {
     let chatrooms = await Chatroom.find({
+      workplaceID: { $exists: true },
       membersID: req.params.userId,
     })
       .populate("workplaceID membersID")
@@ -96,6 +97,41 @@ exports.readMessages = async (req, res, next) => {
     await chatroom.save();
 
     res.send(chatroom);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getUserChat = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const chatroom = await Chatroom.findOne({
+      workplaceID: { $exists: false },
+      membersID: [req.userId, id],
+    })
+      .populate("membersID chats.sentBy")
+      .select("-membersID.password");
+    if (!chatroom) {
+      // create a new chatroom
+      let newChatroom = new Chatroom({
+        membersID: [req.userId, id],
+        messages: [],
+        lastMsg: null,
+      });
+
+      await newChatroom.save();
+
+      newChatroom = await Chatroom.findOne({
+        _id: newChatroom._id,
+      })
+        .populate("membersID chats.sentBy")
+        .select("-membersID.password");
+
+      return res.send(newChatroom);
+    }
+
+    return res.send(chatroom);
   } catch (error) {
     next(error);
   }

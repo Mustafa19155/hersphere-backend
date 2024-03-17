@@ -27,8 +27,15 @@ io.of("/chatroom").on("connection", (socket) => {
       deliveredTo: data.message.deliveredTo,
     };
 
+    let query = {};
+    if (data.type === "single") {
+      query = { _id: data.room };
+    } else {
+      query = { workplaceID: data.room };
+    }
+
     Chatroom.findOneAndUpdate(
-      { workplaceID: data.room },
+      query,
       {
         $push: { chats: newMessage },
         lastMsg: newMessage,
@@ -57,5 +64,8 @@ chatroomRouter.get("/user/:userId", chatroomCOntroller.getChatroomsOfUser);
 
 // read messages
 chatroomRouter.put("/:id/read", chatroomCOntroller.readMessages);
+
+// get user chat
+chatroomRouter.get("/user/single/:id", chatroomCOntroller.getUserChat);
 
 module.exports = chatroomRouter;

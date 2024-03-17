@@ -52,10 +52,6 @@ const TeamRequests = () => {
       .catch(err => {});
   };
 
-  // useEffect(() => {
-  //   handleGetRequests();
-  // }, []);
-
   useFocusEffect(useCallback(() => handleGetRequests(), []));
 
   return (

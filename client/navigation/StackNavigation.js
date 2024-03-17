@@ -7,8 +7,30 @@ import BusinessInfo from '../screens/UserProfiling/BusinessInfo';
 import Search from '../components/Search/Search';
 import UserProfile from '../screens/Search/UserProfile';
 import AntIcons from 'react-native-vector-icons/AntDesign';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {Pressable, View} from 'react-native';
+import SendRequest from '../screens/Search/SendRequest';
+import Chats from '../screens/Chat/Chats';
+import Chat from '../screens/Chat/Chat';
+import Requests from '../screens/Requests/Requests';
+import RequestDetails from '../screens/Requests/RequestDetails';
+import {Text} from 'react-native-paper';
+import global from '../assets/styles/global';
+import {useNavigation} from '@react-navigation/native';
+import Marketplace from '../screens/Marketplace/Marketplace';
+import PostCreator from '../screens/PostCreator/PostCreator';
+import CreateWorkplace from '../screens/Marketplace/CreateWorkplace';
+import CreateJob from '../screens/Marketplace/CreateJob';
+import {useContext} from 'react';
+import {AuthContext} from '../contexts/userContext';
+import Jobs from '../screens/Marketplace/Jobs';
+import CreateJobRequest from '../screens/Marketplace/CreateJobRequest';
+import Workplace from '../screens/Marketplace/Workplace';
+import ChatroomSetting from '../screens/Chat/ChatroomSetting';
+import InfluencerTeamRequestProfile from '../components/Requests/InfluencerTeamRequestProfile';
 
 const Stack = createStackNavigator();
+
 export default function UserProfilingStack() {
   return (
     <Stack.Navigator
@@ -87,47 +109,25 @@ export const SearchStack = () => {
     </Stack.Navigator>
   );
 };
-import Icon from 'react-native-vector-icons/Ionicons';
-import {Pressable, View} from 'react-native';
-import SendRequest from '../screens/Search/SendRequest';
-import Chats from '../screens/Chat/Chats';
-import Chat from '../screens/Chat/Chat';
-import Requests from '../screens/Requests/Requests';
-import RequestDetails from '../screens/Requests/RequestDetails';
-import {Text} from 'react-native-paper';
-import global from '../assets/styles/global';
-import {useNavigation} from '@react-navigation/native';
-import Marketplace from '../screens/Marketplace/Marketplace';
-import PostCreator from '../screens/PostCreator/PostCreator';
-import CreateWorkplace from '../screens/Marketplace/CreateWorkplace';
-import CreateJob from '../screens/Marketplace/CreateJob';
-import {useContext} from 'react';
-import {AuthContext} from '../contexts/userContext';
-import Jobs from '../screens/Marketplace/Jobs';
-import CreateJobRequest from '../screens/Marketplace/CreateJobRequest';
-import Workplace from '../screens/Marketplace/Workplace';
-import ChatroomSetting from '../screens/Chat/ChatroomSetting';
-import InfluencerTeamRequestProfile from '../components/Requests/InfluencerTeamRequestProfile';
-
-export const InfluenceProfileStack = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        cardStyle: {paddingHorizontal: 20},
-        headerLeft: props => {
-          return (
-            <Pressable onPress={props.onPress}>
-              <Icon name="chevron-back" size={20} color="black" />
-            </Pressable>
-          );
-        },
-        title: '',
-      }}>
-      <Stack.Screen name="ProfileMain" component={UserProfile} />
-      <Stack.Screen name="SendRequest" component={SendRequest} />
-    </Stack.Navigator>
-  );
-};
+// export const InfluenceProfileStack = () => {
+//   return (
+//     <Stack.Navigator
+//       screenOptions={{
+//         cardStyle: {paddingHorizontal: 20},
+//         headerLeft: props => {
+//           return (
+//             <Pressable onPress={props.onPress}>
+//               <Icon name="chevron-back" size={20} color="black" />
+//             </Pressable>
+//           );
+//         },
+//         title: '',
+//       }}>
+//       <Stack.Screen name="SendRequest" component={SendRequest} />
+//       <Stack.Screen name="ProfileMain" component={UserProfile} />
+//     </Stack.Navigator>
+//   );
+// };
 
 export const ChatStack = () => {
   return (

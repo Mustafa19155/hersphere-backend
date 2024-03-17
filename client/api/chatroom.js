@@ -29,3 +29,13 @@ export const readMessages = async id => {
     throw err;
   }
 };
+
+// get user chat
+export const getUserChat = async id => {
+  try {
+    const res = await axiosClient.get(`/chatroom/user/single/${id}`);
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};

@@ -38,13 +38,14 @@ const TextBoxWithAdd = ({tags, setTags}) => {
             </TouchableOpacity>
           </View>
         ))}
+
         <TextInput
           placeholder="Skills..."
           value={text}
           onChangeText={setText}
           outlineColor="transparent"
           activeOutlineColor="transparent"
-          style={[global.gray2Back]}
+          style={[{height: 35}]}
           underlineColor="transparent"
           mode="outlined"
           onEndEditing={addTag}
@@ -58,6 +59,8 @@ const styles = StyleSheet.create({
   container: [
     global.gray2Back,
     {
+      overflow: 'hidden',
+      borderRadius: 5,
       flexDirection: 'row',
       flexWrap: 'wrap',
     },

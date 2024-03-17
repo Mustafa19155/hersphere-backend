@@ -11,6 +11,7 @@ import {updateProfile} from '../../api/user';
 import {StackActions, useNavigation} from '@react-navigation/native';
 import global from '../../assets/styles/global';
 import {useToast} from 'react-native-toast-notifications';
+import TextBoxWithAdd from '../TextBoxWithAdd';
 
 export default function BusinessDetails({
   isValidStep,
@@ -51,6 +52,8 @@ export default function BusinessDetails({
 
   const [category, setcategory] = useState(categories[0]);
   const [targetAudience, settargetAudience] = useState([]);
+  const [skills, setskills] = useState([]);
+
   const handleAddBusinessDetails = async () => {
     if (description) {
       const obj = {
@@ -73,6 +76,7 @@ export default function BusinessDetails({
         data: {
           ...user,
           businessDetails: obj,
+          skills: skills,
           profileCompleted: false,
           userType,
         },
@@ -82,6 +86,7 @@ export default function BusinessDetails({
           setuser({
             ...user,
             businessDetails: obj,
+            skills,
             profileCompleted: false,
             userType,
           });
@@ -102,6 +107,7 @@ export default function BusinessDetails({
           ? user.businessDetails.targetAudience.map(tar => tar)
           : [],
       );
+      setskills(user.skills ? user.skills.map(skill => skill) : []);
       setdescription(user.businessDetails.description);
       setisValidStep(true);
     }
@@ -200,6 +206,7 @@ export default function BusinessDetails({
                 tags={targetAudience}
                 setTags={settargetAudience}
               />
+              <TextBoxWithAdd tags={skills} setTags={setskills} />
             </View>
           )}
         </>

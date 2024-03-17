@@ -19,11 +19,11 @@ const SearchCard = ({search}) => {
 
   return (
     <View style={styles.mainWrapper}>
-      <Image source={search.image} style={styles.image} />
+      <Image source={{uri: search.profileImage}} style={styles.image} />
       <View style={{width: '50%'}}>
-        <Text style={[global.textSmall]}>{search.name}</Text>
+        <Text style={[global.textSmall]}>{search.username}</Text>
         <Text style={[global.textExtraSmall, global.grayColor]}>
-          {search.description}
+          {search.businessDetails.description}
         </Text>
         <View style={styles.bottomWrapper}>
           <View style={{flexDirection: 'row', alignItems: 'center', gap: 2}}>
@@ -56,7 +56,11 @@ const SearchCard = ({search}) => {
             alignItems: 'center',
           },
         ]}
-        onPress={() => navigation.navigate('InfluencerProfile')}>
+        onPress={() => {
+          navigation.navigate('InfluencerProfileMain', {
+            id: search._id,
+          });
+        }}>
         <Text style={[global.greenBtnTextSm, {fontWeight: 600}]}>
           View Profile
         </Text>

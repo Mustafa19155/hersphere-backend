@@ -55,7 +55,7 @@ const Marketplace = () => {
               onPress={() =>
                 navigation.navigate('Chatroom', {
                   screen: 'Workplace',
-                  params: {id: place.workplaceID._id},
+                  params: {id: place.workplaceID?._id},
                 })
               }>
               <View
@@ -66,9 +66,9 @@ const Marketplace = () => {
                 }}>
                 <View
                   style={{flexDirection: 'row', gap: 10, alignItems: 'center'}}>
-                  {place.workplaceID.image ? (
+                  {place.workplaceID?.image ? (
                     <Image
-                      source={{uri: place.workplaceID.image}}
+                      source={{uri: place.workplaceID?.image}}
                       style={{height: 40, width: 40, borderRadius: 5}}
                     />
                   ) : (
@@ -76,7 +76,7 @@ const Marketplace = () => {
                   )}
                   <View>
                     <Text style={[global.fontMedium, global.textNormal]}>
-                      {place.workplaceID.name}
+                      {place.workplaceID?.name}
                     </Text>
                     <Text>{place.membersID.length} members</Text>
                   </View>
