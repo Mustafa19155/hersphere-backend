@@ -181,9 +181,9 @@ const Chat = ({route}) => {
                 </View>
               </View>
             </View>
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <Entypo name="dots-three-vertical" size={26} color="black" />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <Messages messages={chat} />
           <View style={{margin: 5, flexDirection: 'row', gap: 5}}>

@@ -75,20 +75,59 @@ function App() {
           <Stack.Screen name="Marketplace" component={MarketplaceStack} />
           <Stack.Screen name="Requests" component={RequetsStack} />
         </Stack.Group>
-        <Stack.Group
-          screenOptions={{
-            cardStyle: {paddingHorizontal: 20},
-            headerLeft: props => {
-              return (
-                <Pressable onPress={props.onPress}>
-                  <Icon name="chevron-back" size={20} color="black" />
-                </Pressable>
-              );
-            },
-            title: '',
-          }}>
-          <Stack.Screen name="SendRequest" component={SendRequest} />
-          <Stack.Screen name="InfluencerProfileMain" component={UserProfile} />
+        <Stack.Group screenOptions={{cardStyle: {paddingHorizontal: 20}}}>
+          <Stack.Screen
+            name="SendRequest"
+            component={SendRequest}
+            // options={{headerShown: false}}
+            options={{
+              header: props => {
+                return (
+                  <View
+                    style={{
+                      justifyContent: 'space-between',
+                      flexDirection: 'row',
+                      marginTop: 20,
+                    }}>
+                    <Pressable onPress={() => props.navigation.goBack()}>
+                      <Icon name="chevron-back" size={20} color="black" />
+                    </Pressable>
+                    <Text
+                      style={[
+                        global.fontBold,
+                        global.textSmall,
+                        global.blackColor,
+                      ]}>
+                      Send Request
+                    </Text>
+                    <View />
+                  </View>
+                );
+              },
+              // headerLeft: props => {
+              //   return (
+              //     <Pressable onPress={props.onPress}>
+              //       <Icon name="chevron-back" size={20} color="black" />
+              //     </Pressable>
+              //   );
+              // },
+              // title: '',
+            }}
+          />
+          <Stack.Screen
+            name="InfluencerProfileMain"
+            component={UserProfile}
+            options={{
+              headerLeft: props => {
+                return (
+                  <Pressable onPress={props.onPress}>
+                    <Icon name="chevron-back" size={20} color="black" />
+                  </Pressable>
+                );
+              },
+              title: '',
+            }}
+          />
         </Stack.Group>
       </Stack.Navigator>
     </>

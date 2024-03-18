@@ -9,11 +9,13 @@ import {
 import React, {useContext, useEffect, useState} from 'react';
 import {Picker} from '@react-native-picker/picker';
 import {RequestContext} from '../../contexts/requestContext';
-import {Checkbox, TextInput} from 'react-native-paper';
+import {Button, Checkbox, TextInput} from 'react-native-paper';
 import global from '../../assets/styles/global';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
-const Step2 = ({isValidStep, setisValidStep}) => {
+const Step2 = () => {
+  const [isValidStep, setisValidStep] = useState(false);
+
   const {
     category,
     setcategory,
@@ -26,6 +28,7 @@ const Step2 = ({isValidStep, setisValidStep}) => {
     days,
     setdays,
     allowInfluencerToAddData,
+    setcurrentStep,
     setallowInfluencerToAddData,
   } = useContext(RequestContext);
 
@@ -67,95 +70,115 @@ const Step2 = ({isValidStep, setisValidStep}) => {
     }
   }, [category, description, allowInfluencerToAddData, likes, comments, days]);
 
+  useEffect(() => {
+    setcategory(categories[0].name);
+  }, []);
+
   return (
-    <View>
-      <Text>Enter the details</Text>
-      <Picker
-        selectedValue={category}
-        style={{
-          height: 50,
-          width: '100%',
-          backgroundColor: '#EEEEEE',
-        }}
-        onValueChange={(itemValue, itemIndex) => setcategory(itemValue)}>
-        {categories.map(cat => (
-          <Picker.Item label={cat.name} value={cat.name} />
-        ))}
-      </Picker>
-      <TextInput
-        placeholder="Description"
-        value={description}
-        onChangeText={setdescription}
-        multiline={true}
-        numberOfLines={5}
-        underlineColor="transparent"
-        activeUnderlineColor="transparent"
-        mode="flat"
-        style={[global.gray2Back, {borderRadius: 10, marginVertical: 10}]}
-      />
-      <View style={styles.likesWrapepr}>
-        <View style={styles.likesSubWrapper}>
-          <Text style={[global.textExtraSmall, {fontWeight: 600}]}>
-            No. of likes
-          </Text>
+    <View style={{flex: 1, justifyContent: 'space-between', gap: 20}}>
+      <View style={{gap: 10}}>
+        <View style={[{gap: 5}]}>
+          <Text style={[{fontWeight: 600}]}>Promotion Category</Text>
+          <Picker
+            selectedValue={category}
+            style={{
+              height: 50,
+              width: '100%',
+              backgroundColor: '#EEEEEE',
+            }}
+            onValueChange={(itemValue, itemIndex) => setcategory(itemValue)}>
+            {categories.map(cat => (
+              <Picker.Item label={cat.name} value={cat.name} />
+            ))}
+          </Picker>
+        </View>
+        <View style={{gap: 5}}>
+          <Text style={[{fontWeight: 600}]}>Promotion Category</Text>
           <TextInput
-            value={likes}
-            onChangeText={text => setlikes(text.replace(/[^0-9]/g, ''))}
-            keyboardType="phone-pad"
+            placeholder="Description"
+            value={description}
+            onChangeText={setdescription}
+            cursorColor="black"
+            multiline={true}
+            numberOfLines={5}
             underlineColor="transparent"
             activeUnderlineColor="transparent"
             mode="flat"
-            style={[global.gray2Back, {borderRadius: 10}]}
+            style={[global.gray2Back, {borderRadius: 10, marginVertical: 10}]}
           />
         </View>
-        <View style={styles.likesSubWrapper}>
-          <Text style={[global.textExtraSmall, {fontWeight: 600}]}>
-            No. of comments
-          </Text>
-          <TextInput
-            value={comments}
-            onChangeText={text => setcomments(text.replace(/[^0-9]/g, ''))}
-            underlineColor="transparent"
-            activeUnderlineColor="transparent"
-            mode="flat"
-            style={[global.gray2Back, {borderRadius: 10}]}
-          />
+        <View style={styles.likesWrapepr}>
+          <View style={styles.likesSubWrapper}>
+            <Text style={[global.textExtraSmall, {fontWeight: 600}]}>
+              No. of likes
+            </Text>
+            <TextInput
+              value={likes}
+              onChangeText={text => setlikes(text.replace(/[^0-9]/g, ''))}
+              keyboardType="phone-pad"
+              underlineColor="transparent"
+              activeUnderlineColor="transparent"
+              mode="flat"
+              style={[global.gray2Back, {borderRadius: 10}]}
+            />
+          </View>
+          <View style={styles.likesSubWrapper}>
+            <Text style={[global.textExtraSmall, {fontWeight: 600}]}>
+              No. of comments
+            </Text>
+            <TextInput
+              value={comments}
+              onChangeText={text => setcomments(text.replace(/[^0-9]/g, ''))}
+              underlineColor="transparent"
+              activeUnderlineColor="transparent"
+              mode="flat"
+              style={[global.gray2Back, {borderRadius: 10}]}
+            />
+          </View>
+          <View style={styles.likesSubWrapper}>
+            <Text style={[global.textExtraSmall, {fontWeight: 600}]}>
+              No. of days
+            </Text>
+            <TextInput
+              value={days}
+              onChangeText={text => setdays(text.replace(/[^0-9]/g, ''))}
+              underlineColor="transparent"
+              activeUnderlineColor="transparent"
+              mode="flat"
+              style={[global.gray2Back, {borderRadius: 10}]}
+            />
+          </View>
         </View>
-        <View style={styles.likesSubWrapper}>
-          <Text style={[global.textExtraSmall, {fontWeight: 600}]}>
-            No. of days
+        <View style={styles.optWrapper}>
+          <Text style={[global.textSmall, global.fontBold]}>
+            Total payment will be
           </Text>
           <TextInput
-            value={days}
-            onChangeText={text => setdays(text.replace(/[^0-9]/g, ''))}
+            disabled
+            value="$ 25"
             underlineColor="transparent"
             activeUnderlineColor="transparent"
             mode="flat"
-            style={[global.gray2Back, {borderRadius: 10}]}
+            style={[
+              global.gray2Back,
+              {
+                height: 45,
+                width: 84,
+                justifyContent: 'center',
+                alignItems: 'center',
+              },
+            ]}
           />
         </View>
       </View>
-      <View style={styles.optWrapper}>
-        <Text style={[global.textSmall, global.fontBold]}>
-          Total payment will be
-        </Text>
-        <TextInput
-          disabled
-          value="$ 25"
-          underlineColor="transparent"
-          activeUnderlineColor="transparent"
-          mode="flat"
-          style={[
-            global.gray2Back,
-            {
-              height: 45,
-              width: 84,
-              justifyContent: 'center',
-              alignItems: 'center',
-            },
-          ]}
-        />
-      </View>
+      <Button
+        disabled={!isValidStep}
+        style={[global.greenBtn]}
+        onPress={() => {
+          setcurrentStep(step => step + 1);
+        }}>
+        <Text style={global.greenBtnText}>Continue</Text>
+      </Button>
     </View>
   );
 };

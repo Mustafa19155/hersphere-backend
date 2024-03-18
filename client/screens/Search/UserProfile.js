@@ -96,7 +96,9 @@ const UserProfile = ({route}) => {
             </Pressable>
             <Pressable
               style={[global.greenBtn, styles.topButtons]}
-              onPress={() => navigation.navigate('SendRequest')}>
+              onPress={() =>
+                navigation.navigate('SendRequest', {id: data._id})
+              }>
               <Image source={SendIcon} style={{height: 16, width: 16}} />
               <Text style={[global.greenBtnTextSm]}>Send Request</Text>
             </Pressable>

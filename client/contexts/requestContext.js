@@ -12,13 +12,21 @@ function RequestProvider({children}) {
   const [allowInfluencerToAddData, setallowInfluencerToAddData] =
     useState(true);
   const [data, setdata] = useState({
-    facebookData: {},
-    instagramData: {},
-    youtubeData: {},
+    facebook: {
+      content: '',
+      caption: '',
+    },
+    youtube: {
+      content: '',
+      caption: '',
+      type: 'image',
+    },
   });
   const [platforms, setplatforms] = useState([]);
   const [payment, setpayment] = useState(0);
   const [paymentMethod, setpaymentMethod] = useState('wallet');
+  const [influencerData, setinfluencerData] = useState(null);
+  const [currentStep, setcurrentStep] = useState(1);
 
   const value = {
     category,
@@ -41,6 +49,10 @@ function RequestProvider({children}) {
     setpayment,
     paymentMethod,
     setpaymentMethod,
+    influencerData,
+    setinfluencerData,
+    currentStep,
+    setcurrentStep,
   };
 
   return (
