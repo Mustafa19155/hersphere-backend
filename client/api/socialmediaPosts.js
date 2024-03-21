@@ -31,3 +31,12 @@ export const postOnInstagram = async ({
     throw err;
   }
 };
+
+export const getPostDetails = async postID => {
+  try {
+    const res = await axiosClient.post(`/socialmediaposts/details/${postID}`);
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};

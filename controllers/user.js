@@ -510,3 +510,50 @@ exports.getInfluencerProfileForRequest = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.searchInfluencers = async (req, res, next) => {
+  try {
+    const { name, platforms, categories } = req.query;
+
+    const query = {
+      userType: "influencer",
+    };
+    if (name) {
+      query["username"] = { $regex: name, $options: "i" };
+    }
+    if (platforms) {
+      query["$or"] = [
+        { facebookPage: { $exists: true } },
+        { instagramPage: { $exists: true } },
+        { youtubeChannel: { $exists: true } },
+      ];
+      // query["$or"] = [
+      //   platforms.includes("facebook") && { facebookPage: { $exists: true } },
+      //   platforms.includes("instagram") && { instagramPage: { $exists: true } },
+      //   platforms.includes("youtube") && { youtubeChannel: { $exists: true } },
+      // ];
+    }
+    if (categories) {
+      query["businessDetails.targetAudience"] = { $in: categories };
+    }
+    const users = await User.find(query);
+    res.json(
+      users.map((user) => {
+        const platforms = [];
+        if (user._doc.facebookPage) {
+          platforms.push("facebook");
+        }
+        if (user._doc.instagramPage) {
+          platforms.push("instagram");
+        }
+        if (user._doc.youtubeChannel) {
+          platforms.push("youtube");
+        }
+
+        return { ...user._doc, rating: 5, platforms };
+      })
+    );
+  } catch (err) {
+    next(err);
+  }
+};

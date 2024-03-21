@@ -34,4 +34,5 @@ router.get(
   verifyJWT,
   authController.getInfluencerProfileForRequest
 );
+router.get("/influencer/search", verifyJWT, authController.searchInfluencers);
 module.exports = router;

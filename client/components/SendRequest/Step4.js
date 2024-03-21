@@ -5,7 +5,7 @@ import {Button, Checkbox, TextInput} from 'react-native-paper';
 import {RequestContext} from '../../contexts/requestContext';
 
 const Step4 = ({handleSubmit, apiCalled}) => {
-  const {paymentMethod, setpaymentMethod} = useContext(RequestContext);
+  const {paymentMethod, setpaymentMethod, payment} = useContext(RequestContext);
 
   const [cards, setcards] = useState([
     {
@@ -35,7 +35,7 @@ const Step4 = ({handleSubmit, apiCalled}) => {
             </Text>
             <TextInput
               disabled
-              value="$ 25"
+              value={`$ ${payment}`}
               underlineColor="transparent"
               activeUnderlineColor="transparent"
               mode="flat"

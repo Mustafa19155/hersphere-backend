@@ -6,193 +6,226 @@ import {
   Text,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import Avatar from '../../assets/images/avatar.png';
 import CapitalizeFirst from '../../utils/CapitalizeFirst';
 import moment from 'moment';
 import global from '../../assets/styles/global';
+import {
+  acceptPromotion,
+  getPromotion,
+  rejectPromotion,
+} from '../../api/promotion';
+import {AuthContext} from '../../contexts/userContext';
+import {Button} from 'react-native-paper';
 
 const RequestDetails = ({route}) => {
-  const {status} = route.params;
+  const {id} = route.params;
+  const [loading, setloading] = useState(false);
+  const [apiCalled, setapiCalled] = useState(false);
 
-  const [request, setrequest] = useState({
-    category: 'Fashion Desgining',
-    startDate: new Date(),
-    endDate: new Date(),
-    completedOn: new Date(),
-    status: 'completed',
-    startupID: {
-      name: 'ClosetDoor',
-      image: Avatar,
-    },
-    title: 'New Launch Promotion',
-    influencerID: {
-      name: 'ClosetDoor',
-      image: Avatar,
-    },
-    description:
-      'Lorem ipsum dolor sit amet, consectetur ipiscingelit. Etiam venenatis sit',
-    platforms: ['facebook', 'youtube', 'instagram'],
-    transactionID: {
-      amount: 25,
-    },
-    likes: 100,
-    comments: 100,
-  });
+  const [request, setrequest] = useState(null);
 
   const navigation = useNavigation();
 
-  // useEffect(() => {
-  //   navigation.getParent()?.getParent()?.setOptions({headerShown: false});
-  //   navigation.getParent()?.setOptions({
-  //     tabBarStyle: {display: 'none'},
-  //     tabBarVisible: false,
-  //   });
+  const {user} = useContext(AuthContext);
 
-  //   return () => {
-  //     navigation.getParent()?.getParent().setOptions({headerShown: true});
-  //     navigation
-  //       .getParent()
-  //       ?.setOptions({
-  //         tabBarStyle: {
-  //           backgroundColor: 'white',
-  //           elevation: 0,
-  //           borderColor: 'white',
-  //         },
-  //         tabBarVisible: true,
-  //       });
-  //   };
-  // }, [navigation]);
+  const handleGet = () => {
+    getPromotion({id})
+      .then(res => {
+        setrequest(res);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  const handleAccept = () => {
+    setapiCalled(true);
+    acceptPromotion({id: request._id})
+      .then(res => {
+        setapiCalled(false);
+        navigation.goBack();
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  const handleReject = () => {
+    setapiCalled(true);
+    rejectPromotion({id: request._id})
+      .then(res => {
+        setapiCalled(false);
+        navigation.goBack();
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    handleGet();
+  }, []);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={{gap: 20, padding: 20}}>
-        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-          <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
-            <Image
-              source={request.influencerID.image}
-              style={{width: 45, height: 45, borderRadius: 100}}
-            />
-            <Text style={[{fontSize: 16}, global.fontMedium]}>
-              {request.influencerID.name}
-            </Text>
-          </View>
-          <Text style={[global.textNormal, global.fontMedium]}>
-            ${request.transactionID.amount}
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <Text style={[global.textNormal, global.fontBold]}>Status</Text>
-          <Text style={[global.gray3Color, {fontSize: 16}]}>
-            {status == 'new' ? '---' : status}
-          </Text>
-        </View>
-        <View>
-          <Text style={[global.textNormal, global.fontBold]}>
-            Promotion Category
-          </Text>
-          <Text style={[global.gray3Color, {fontSize: 16}]}>
-            {request.category}
-          </Text>
-        </View>
-        <View>
-          <Text style={[global.textNormal, global.fontBold]}>Description</Text>
-          <Text style={[global.gray3Color, {fontSize: 16}]}>
-            {request.description}
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <Text style={[global.textNormal, global.fontBold]}>No. of likes</Text>
-          <Text style={[global.gray3Color, {fontSize: 16}]}>
-            {request.likes}
-          </Text>
-        </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <Text style={[global.textNormal, global.fontBold]}>
-            No. of comments
-          </Text>
-          <Text style={[global.gray3Color, {fontSize: 16}]}>
-            {request.comments}
-          </Text>
-        </View>
-        <View style={{gap: 10}}>
-          <Text style={[global.textNormal, global.fontBold]}>Platforms</Text>
-          <View>
-            {request.platforms.map(pl => (
-              <Text style={[global.gray3Color, {fontSize: 16}]}>
-                {CapitalizeFirst(pl)}
-              </Text>
-            ))}
-          </View>
-        </View>
-        <View style={{flexDirection: 'row', gap: 20}}>
-          <View style={{gap: 5}}>
-            <Text style={[global.textNormal, global.fontBold]}>Due Date</Text>
-            <Text style={[global.gray3Color, {fontSize: 20}]}>
-              {moment(request.endDate).format('DD MMM YYYY')}
-            </Text>
-          </View>
-          {status == 'completed' && (
-            <View style={{gap: 5}}>
-              <Text style={[global.textNormal, global.fontBold]}>
-                Delivered On
-              </Text>
-              <Text style={[global.gray3Color, {fontSize: 20}]}>
-                {moment(request.completedOn).format('DD MMM YYYY')}
+      {request != null && (
+        <View style={{gap: 20, padding: 20}}>
+          <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+              <Image
+                source={{
+                  uri:
+                    user.userType == 'influencer'
+                      ? request.userID.profileImage
+                      : request.influencerID.profileImage,
+                }}
+                style={{width: 45, height: 45, borderRadius: 100}}
+              />
+              <Text style={[{fontSize: 16}, global.fontMedium]}>
+                {user.userType == 'influencer'
+                  ? request.userID.username
+                  : request.influencerID.username}
               </Text>
             </View>
-          )}
-        </View>
-        {status == 'new' && (
+            <Text style={[global.textNormal, global.fontMedium]}>
+              ${request.transactionID.amount}
+            </Text>
+          </View>
           <View
             style={{
               flexDirection: 'row',
-              gap: 10,
-              marginTop: 20,
+              justifyContent: 'space-between',
+              alignItems: 'center',
             }}>
-            <Pressable
-              style={[
-                global.greenBtnSm,
-                {
-                  paddingVertical: 6,
-                  width: '25%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                },
-              ]}>
-              <Text style={{color: 'white'}}>Accept</Text>
-            </Pressable>
-            <Pressable
-              style={[
-                global.redBtnSm,
-                {
-                  paddingVertical: 6,
-                  width: '25%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                },
-              ]}>
-              <Text style={{color: 'white'}}>Reject</Text>
-            </Pressable>
+            <Text style={[global.textNormal, global.fontBold]}>Status</Text>
+            <Text style={[global.gray3Color, {fontSize: 16}]}>
+              {CapitalizeFirst(request.status)}
+            </Text>
           </View>
-        )}
-      </View>
+          <View>
+            <Text style={[global.textNormal, global.fontBold]}>
+              Promotion Category
+            </Text>
+            <Text style={[global.gray3Color, {fontSize: 16}]}>
+              {request.category}
+            </Text>
+          </View>
+          <View>
+            <Text style={[global.textNormal, global.fontBold]}>
+              Description
+            </Text>
+            <Text style={[global.gray3Color, {fontSize: 16}]}>
+              {request.description}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Text style={[global.textNormal, global.fontBold]}>
+              No. of likes
+            </Text>
+            <Text style={[global.gray3Color, {fontSize: 16}]}>
+              {request.requirements.likes}
+            </Text>
+          </View>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Text style={[global.textNormal, global.fontBold]}>
+              No. of comments
+            </Text>
+            <Text style={[global.gray3Color, {fontSize: 16}]}>
+              {request.requirements.comments}
+            </Text>
+          </View>
+          <View style={{gap: 10}}>
+            <Text style={[global.textNormal, global.fontBold]}>Platforms</Text>
+            <View>
+              {request.platforms.map(pl => (
+                <Text style={[global.gray3Color, {fontSize: 16}]}>
+                  {CapitalizeFirst(pl)}
+                </Text>
+              ))}
+            </View>
+          </View>
+          <View style={{flexDirection: 'row', gap: 20}}>
+            <View style={{gap: 5}}>
+              <Text style={[global.textNormal, global.fontBold]}>Due Date</Text>
+              <Text style={[global.gray3Color, {fontSize: 20}]}>
+                {moment(request.deadline).format('DD MMM YYYY')}
+              </Text>
+            </View>
+            {request.status == 'completed' && (
+              <View style={{gap: 5}}>
+                <Text style={[global.textNormal, global.fontBold]}>
+                  Delivered On
+                </Text>
+                <Text style={[global.gray3Color, {fontSize: 20}]}>
+                  {moment(request.completedOn).format('DD MMM YYYY')}
+                </Text>
+              </View>
+            )}
+          </View>
+          {request.status == 'pending' && (
+            <View
+              style={{
+                flexDirection: 'row',
+                gap: 10,
+                marginTop: 20,
+              }}>
+              <Pressable
+                onPress={handleAccept}
+                style={[
+                  global.greenBtnSm,
+                  {
+                    paddingVertical: 6,
+                    width: '25%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                ]}>
+                <Text style={{color: 'white'}}>Accept</Text>
+              </Pressable>
+              <Pressable
+                onPress={handleReject}
+                style={[
+                  global.redBtnSm,
+                  {
+                    paddingVertical: 6,
+                    width: '25%',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                ]}>
+                <Text style={{color: 'white'}}>Reject</Text>
+              </Pressable>
+            </View>
+          )}
+          {request.status == 'not-started' && (
+            <Button
+              onPress={() =>
+                navigation.navigate('SelectMedia', {id: request._id})
+              }
+              style={{
+                backgroundColor: '#FFB33E',
+                width: 137,
+                borderRadius: 5,
+                alignSelf: 'flex-end',
+              }}>
+              <Text style={{color: 'white'}}>Get Started</Text>
+            </Button>
+          )}
+        </View>
+      )}
     </ScrollView>
   );
 };

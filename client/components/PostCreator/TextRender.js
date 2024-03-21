@@ -38,15 +38,6 @@ const TextRender = ({
     },
   });
 
-  const handleDelete = () => {
-    setselectedIndex(-2);
-    // settemplate({...template, images: template.images.filter(i => i != img)});
-    const templateCopy = {...template};
-    templateCopy.images[index].zIndex = -1;
-    templateCopy.images[index].opacity = 0;
-    settemplate(templateCopy);
-  };
-
   useEffect(() => {
     if (selectedIndex != index) {
       setcontentEditable(false);
@@ -87,16 +78,13 @@ const TextRender = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 gap: 20,
-                minWidth: 75,
+                minWidth: 40,
                 backgroundColor: 'white',
                 elevation: 5,
                 borderRadius: 15,
               }}>
               <Pressable onPress={() => setcontentEditable(true)}>
                 <SimpleLineIcons name="pencil" color="black" size={16} />
-              </Pressable>
-              <Pressable onPress={handleDelete}>
-                <AntIcons name="delete" color="black" size={16} />
               </Pressable>
             </View>
           )}

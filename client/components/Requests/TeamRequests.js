@@ -130,7 +130,14 @@ const TeamRequests = () => {
                                 </View>
                               </View>
                             </View>
-                            <TouchableWithoutFeedback>
+                            <TouchableWithoutFeedback
+                              onPress={e => {
+                                e.preventDefault();
+                                navigation.navigate('Chats', {
+                                  screen: 'Chat',
+                                  params: {id: jobReq.userID._id},
+                                });
+                              }}>
                               <Image source={MessageIcon} />
                             </TouchableWithoutFeedback>
                           </View>

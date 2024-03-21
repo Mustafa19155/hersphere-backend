@@ -23,7 +23,7 @@ function RequestProvider({children}) {
     },
   });
   const [platforms, setplatforms] = useState([]);
-  const [payment, setpayment] = useState(0);
+  const [payment, setpayment] = useState('25');
   const [paymentMethod, setpaymentMethod] = useState('wallet');
   const [influencerData, setinfluencerData] = useState(null);
   const [currentStep, setcurrentStep] = useState(1);

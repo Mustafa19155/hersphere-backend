@@ -1,18 +1,21 @@
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import React, {useContext, useState} from 'react';
-import {TextInput} from 'react-native-paper';
+import {Button, TextInput} from 'react-native-paper';
 import {PostCreatorContext} from '../../contexts/postCreatorContext';
 import global from '../../assets/styles/global';
 import {useToast} from 'react-native-toast-notifications';
 import {useNavigation} from '@react-navigation/native';
 import {AuthContext} from '../../contexts/userContext';
 import {postOnFacebook, postOnInstagram} from '../../api/socialmediaPosts';
+import {captureRef} from 'react-native-view-shot';
+import {ref, uploadBytes} from 'firebase/storage';
+import {storage} from '../../firebase';
 
 const AddCaption = () => {
   const {user} = useContext(AuthContext);
   const navigation = useNavigation();
   const toast = useToast();
-  const {description, setdescription, imageUrl} =
+  const {description, setdescription, imageUrl, requestData} =
     useContext(PostCreatorContext);
   const [apiCalled, setapiCalled] = useState(false);
 
@@ -20,7 +23,7 @@ const AddCaption = () => {
     try {
       if (description) {
         setapiCalled(true);
-        if (user.facebookPage) {
+        if (requestData.platforms.includes('facebook')) {
           await postOnFacebook({
             pageId: user.facebookPage.id,
             accessToken: user.facebookPage.access_token,
@@ -28,7 +31,7 @@ const AddCaption = () => {
             url: imageUrl,
           });
         }
-        if (user.instagramPage) {
+        if (requestData.platforms.includes('instagram')) {
           await postOnInstagram({
             facebookAccessToken: user.instagramPage.token,
             caption: description,
@@ -38,18 +41,17 @@ const AddCaption = () => {
         }
         setapiCalled(false);
         toast.show('Posts have been uploaded', {type: 'success'});
-        navigation.goBack();
+        navigation.navigate('Main');
       } else {
         toast.show('Caption cannot be empty', {type: 'danger'});
       }
     } catch (err) {
       setapiCalled(false);
-      console.log(err);
     }
   };
 
   return (
-    <View style={{flex: 1, padding: 20, justifyContent: 'space-between'}}>
+    <View style={{flex: 1, justifyContent: 'space-between'}}>
       <View style={{gap: 10}}>
         <Text style={[global.textSmall, global.fontBold, global.blackColor]}>
           Add Caption
@@ -67,18 +69,25 @@ const AddCaption = () => {
           mode="outlined"
         />
       </View>
-      <Pressable
+      <Button
+        disabled={apiCalled}
+        onPress={postOnSocialMedia}
+        style={[global.greenBtn, {alignItems: 'center'}]}>
+        <Text style={[global.greenBtnText]}>
+          {!apiCalled ? 'Post on social media' : 'Loading...'}
+        </Text>
+      </Button>
+      {/* <Pressable
         onPress={postOnSocialMedia}
         style={[
           global.greenBtn,
-          global.greenBtnText,
           {justifyContent: 'center', alignItems: 'center'},
         ]}
         disabled={apiCalled}>
         <Text style={[global.greenBtnText]}>
           {!apiCalled ? 'Post on social media' : 'Loading...'}
         </Text>
-      </Pressable>
+      </Pressable> */}
     </View>
   );
 };

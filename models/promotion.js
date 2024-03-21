@@ -13,9 +13,8 @@ const PromotionSchema = new Schema(
       comments: { type: Number },
       days: { type: Number },
     },
+    transactionID: { type: mongoose.Types.ObjectId, ref: "Transaction" },
     allowInfluencerToAddData: { type: Boolean, default: true },
-    amount: { type: Number },
-    paymentMethod: { type: String, enum: ["wallet", "card"] },
     influencerID: { type: mongoose.Types.ObjectId, ref: "User" },
     status: {
       type: String,
@@ -26,6 +25,10 @@ const PromotionSchema = new Schema(
       facebook: {},
       youtube: {},
     },
+    startedOn: { type: Date },
+    completedOn: { type: Date },
+    deadline: { type: Date },
+    reviewID: { type: mongoose.Types.ObjectId, ref: "Review" },
   },
   { timestamps: true }
 );

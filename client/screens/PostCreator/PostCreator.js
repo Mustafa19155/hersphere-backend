@@ -5,6 +5,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import React, {useContext, useEffect, useRef, useState} from 'react';
@@ -21,20 +22,27 @@ import {getDownloadURL, ref, uploadBytes, uploadString} from 'firebase/storage';
 import {storage} from '../../firebase';
 import {PostCreatorContext} from '../../contexts/postCreatorContext';
 import AddCaption from '../../components/PostCreator/AddCaption';
+import {Button} from 'react-native-paper';
+import Templates from '../../components/PostCreator/Templates';
+import AddImage from '../../components/PostCreator/AddImage';
+import {getPromotion} from '../../api/promotion';
 
-const PostCreator = () => {
+const PostCreator = ({route}) => {
   const templateHeight = Dimensions.get('screen').height / 1.7;
   const templateWidth = Dimensions.get('screen').width / 1.2;
 
   const [activeTab, setactiveTab] = useState('templates');
 
-  const {imageUrl, setimageUrl} = useContext(PostCreatorContext);
+  const {imageUrl, setimageUrl, setrequestData} =
+    useContext(PostCreatorContext);
 
   const postRef = useRef();
 
   const [templates, settemplates] = useState([
     {
       id: 1,
+      name: 'Beige Forest Design',
+      type: 'instagram',
       height: templateHeight,
       width: templateWidth,
       background: require('../../assets/templates/template1/back.png'),
@@ -96,6 +104,74 @@ const PostCreator = () => {
     },
     {
       id: 2,
+      name: 'Beige Forest Design',
+      type: 'instagram',
+      height: templateHeight,
+      width: templateWidth,
+      background: require('../../assets/templates/template2/back.png'),
+      // 'https://images.unsplash.com/photo-1701989927884-ad1005d0eeb7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw1fHx8ZW58MHx8fHx8',
+      images: [
+        {
+          x: 20,
+          y: 25,
+          height: Dimensions.get('screen').height / 9,
+          width: Dimensions.get('screen').width / 1.6,
+          zIndex: 2,
+          source: require('../../assets/templates/template2/img1.png'),
+          // 'https://images.unsplash.com/photo-1682687220199-d0124f48f95b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHw2fHx8ZW58MHx8fHx8',
+          type: 'image',
+        },
+        {
+          x: 30,
+          y: 20,
+          height: Dimensions.get('screen').height / 8,
+          width: Dimensions.get('screen').width / 1.4,
+          zIndex: 1,
+          source: require('../../assets/templates/template2/img2.png'),
+          // 'https://plus.unsplash.com/premium_photo-1698057772115-954a2e4ffec0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8',
+          type: 'image',
+        },
+        {
+          x: 30,
+          y: 40,
+          zIndex: 999,
+          height: Dimensions.get('screen').height / 7,
+          width: Dimensions.get('screen').width / 3,
+          text: 'FLAT 20% OFF',
+          fontSize: 32,
+          color: 'black',
+          type: 'text',
+        },
+        {
+          x: 10,
+          y: 170,
+          zIndex: 999,
+          height: Dimensions.get('screen').height / 7,
+          width: Dimensions.get('screen').width / 3,
+          text: 'Special',
+          fontSize: 45,
+          fontFamily: 'Whisper',
+          color: 'black',
+          type: 'text',
+        },
+        {
+          x: 210,
+          y: 170,
+          zIndex: 999,
+          height: Dimensions.get('screen').height / 7,
+          width: Dimensions.get('screen').width / 3,
+          text: 'Offer',
+          fontSize: 45,
+          fontFamily: 'Whisper',
+          color: 'black',
+          type: 'text',
+        },
+      ],
+    },
+    {
+      id: 3,
+      name: 'Beige Forest Design',
+      type: 'instagram',
       height: templateHeight,
       width: templateWidth,
       background: require('../../assets/templates/template2/back.png'),
@@ -169,6 +245,8 @@ const PostCreator = () => {
   const [apiCalled, setapiCalled] = useState(false);
   const [currStep, setcurrStep] = useState(1);
 
+  const [currentShow, setcurrentShow] = useState(null);
+
   const handleContinue = async () => {
     try {
       if (postRef.current) {
@@ -189,14 +267,36 @@ const PostCreator = () => {
     } catch (error) {}
   };
 
+  const handleDelete = () => {
+    setselectedIndex(-2);
+    const templateCopy = {...activeTemplate};
+    templateCopy.images[selectedIndex].zIndex = -999;
+    templateCopy.images[selectedIndex].opacity = 0;
+    setactiveTemplate(templateCopy);
+  };
+
   useEffect(() => {
     if (activeTemplate?.id != prevActiveTemplateRef.current?.id) {
       setkey(Math.random() * 10);
     }
   }, [activeTemplate]);
 
+  const handleGetRequest = () => {
+    getPromotion({id: route.params.id})
+      .then(res => {
+        setrequestData(res);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
+  useEffect(() => {
+    handleGetRequest();
+  }, []);
+
   return (
-    <View style={{flex: 1, padding: 10, justifyContent: 'space-between'}}>
+    <View style={{flex: 1, padding: 15, justifyContent: 'space-between'}}>
       <>
         {currStep == 1 ? (
           <>
@@ -206,6 +306,14 @@ const PostCreator = () => {
                 width: templateWidth,
                 alignSelf: 'center',
               }}>
+              {currentShow == 'templates' && (
+                <Templates
+                  open={currentShow == 'templates'}
+                  setopen={setcurrentShow}
+                  templates={templates}
+                  setactiveTemplate={setactiveTemplate}
+                />
+              )}
               {activeTemplate && (
                 <>
                   <Pressable
@@ -253,7 +361,11 @@ const PostCreator = () => {
                         </View>
                       ))}
                       <ImageBackground
-                        source={activeTemplate.background}
+                        source={
+                          typeof activeTemplate.background == 'string'
+                            ? {uri: activeTemplate.background}
+                            : activeTemplate.background
+                        }
                         style={{width: '100%', height: '100%', zIndex: -1}}>
                         <Pressable
                           style={{width: '100%', height: '100%'}}
@@ -264,7 +376,83 @@ const PostCreator = () => {
                 </>
               )}
             </View>
-            <View>
+            {currentShow == 'texts' ? (
+              <>
+                <TextsPreview
+                  setcurrentShow={setcurrentShow}
+                  activeTemplate={activeTemplate}
+                  setactiveTemplate={setactiveTemplate}
+                  templates={templates}
+                  template={activeTemplate}
+                  settemplate={setactiveTemplate}
+                />
+              </>
+            ) : currentShow == 'images' ? (
+              <>
+                <AddImage
+                  template={activeTemplate}
+                  settemplate={setactiveTemplate}
+                  setcurrentShow={setcurrentShow}
+                />
+              </>
+            ) : (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                }}>
+                <TouchableWithoutFeedback
+                  onPress={() => setcurrentShow('templates')}>
+                  <View
+                    style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={{height: 30}}>
+                      <Image
+                        source={require('../../assets/icons/post-creator/template.png')}
+                      />
+                    </View>
+                    <Text>Templates</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+                <TouchableWithoutFeedback
+                  onPress={() => setcurrentShow('texts')}>
+                  <View
+                    style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={{height: 30}}>
+                      <Image
+                        source={require('../../assets/icons/post-creator/text.png')}
+                      />
+                    </View>
+                    <Text>Text</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+                <TouchableWithoutFeedback
+                  onPress={() => setcurrentShow('images')}>
+                  <View
+                    style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={{height: 30}}>
+                      <Image
+                        source={require('../../assets/icons/post-creator/back.png')}
+                      />
+                    </View>
+                    <Text>Image</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+                <TouchableWithoutFeedback
+                  disabled={selectedIndex == -2}
+                  onPress={handleDelete}>
+                  <View
+                    style={{justifyContent: 'center', alignItems: 'center'}}>
+                    <View style={{height: 30}}>
+                      <Image
+                        source={require('../../assets/icons/post-creator/delete.png')}
+                      />
+                    </View>
+                    <Text>Delete</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            )}
+            {/* <View>
               <View
                 style={{
                   flexDirection: 'row',
@@ -334,15 +522,15 @@ const PostCreator = () => {
                   />
                 )}
               </View>
-            </View>
-            <Pressable
+            </View> */}
+            <Button
               disabled={apiCalled}
               onPress={handleContinue}
               style={[global.greenBtn, {alignItems: 'center'}]}>
               <Text style={[global.greenBtnText]}>
                 {apiCalled ? 'Loading...' : 'Continue'}
               </Text>
-            </Pressable>
+            </Button>
           </>
         ) : (
           <AddCaption />

@@ -194,3 +194,14 @@ export const getInfluencerProfileForRequest = async ({id}) => {
     throw err;
   }
 };
+
+export const searchInfluencers = async ({name, platforms, categories}) => {
+  try {
+    const response = await axiosClient.get('/user/influencer/search', {
+      params: {name, platforms, categories},
+    });
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};

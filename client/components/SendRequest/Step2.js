@@ -29,7 +29,7 @@ const Step2 = () => {
     setdays,
     allowInfluencerToAddData,
     setcurrentStep,
-    setallowInfluencerToAddData,
+    payment,
   } = useContext(RequestContext);
 
   const categories = [
@@ -155,7 +155,7 @@ const Step2 = () => {
           </Text>
           <TextInput
             disabled
-            value="$ 25"
+            value={`$ ${payment}`}
             underlineColor="transparent"
             activeUnderlineColor="transparent"
             mode="flat"

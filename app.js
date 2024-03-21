@@ -97,12 +97,12 @@ app.get(
   }
 );
 app.use("/api/user", userRouter);
-app.use("/api/socialmediaposts", socialmediaRouter);
+app.use("/api/socialmediaposts", verifyJWT, socialmediaRouter);
 app.use("/api/workplace", worklaceRouter);
 app.use("/api/job", verifyJWT, jobRouter);
 app.use("/api/job-request", verifyJWT, jobRequestRouter);
 app.use("/api/chatroom", verifyJWT, chatroomRouter);
-app.use("/api/promotion", require("./routes/promotion"));
+app.use("/api/promotion", verifyJWT, require("./routes/promotion"));
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public", "index.html"));

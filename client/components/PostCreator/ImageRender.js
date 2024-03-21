@@ -37,15 +37,6 @@ const ImageRender = ({
     }
   };
 
-  const handleDelete = () => {
-    setselectedIndex(-2);
-    const templateCopy = {...template};
-    templateCopy.images[index].zIndex = -999;
-    templateCopy.images[index].opacity = 0;
-    settemplate(templateCopy);
-    // settemplate({...template, images: template.images.filter(i => i != img)});
-  };
-
   const handleZIndex = async () => {
     const templateCopy = {...template};
     templateCopy.images[index].zIndex = templateCopy.images[index].zIndex + 1;
@@ -78,7 +69,7 @@ const ImageRender = ({
             setshowUpperBar(false);
           }}
           onLongPress={handleShowUpperBar}>
-          {selectedIndex == index && (
+          {/* {selectedIndex == index && (
             <View
               style={{
                 position: 'absolute',
@@ -95,11 +86,8 @@ const ImageRender = ({
               <Pressable onPress={selectImage}>
                 <AntIcons name="plus" color="black" size={16} />
               </Pressable>
-              <Pressable onPress={handleDelete}>
-                <AntIcons name="delete" color="black" size={16} />
-              </Pressable>
             </View>
-          )}
+          )} */}
           <Image
             {...(selectedIndex == index ? panResponder.panHandlers : {})}
             source={

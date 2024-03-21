@@ -13,7 +13,7 @@ import Draggable from 'react-native-draggable';
 
 const TemplatesPreview = ({templates, activeTemplate, setactiveTemplate}) => {
   const height = 70;
-  const width = 70;
+  const width = 300;
   return (
     <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
       <View style={{flexDirection: 'row', gap: 10}}>

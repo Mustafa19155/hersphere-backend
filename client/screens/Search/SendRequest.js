@@ -69,54 +69,55 @@ const SendRequest = ({route}) => {
       amount: payment,
       paymentMethod,
       influencerID: influencerData._id,
-      content: {
-        facebook:
-          platforms.includes('facebook') || platforms.includes('instagram')
-            ? data.facebook
-            : undefined,
-        youtube: platforms.includes('youtube') ? data.youtube : undefined,
-      },
+      content: allowInfluencerToAddData
+        ? null
+        : {
+            facebook:
+              platforms.includes('facebook') || platforms.includes('instagram')
+                ? data.facebook
+                : undefined,
+            youtube: platforms.includes('youtube') ? data.youtube : undefined,
+          },
     };
-
     try {
-      if (platforms.includes('facebook') || platforms.includes('instagram')) {
-        const res = await fetch(data.facebook.content);
-        const blob = await res.blob();
+      if (!allowInfluencerToAddData) {
+        if (platforms.includes('facebook') || platforms.includes('instagram')) {
+          const res = await fetch(data.facebook.content);
+          const blob = await res.blob();
 
-        const filename = data.facebook.content.substring(
-          data.facebook.content.lastIndexOf('/') + 1,
-        );
+          const filename = data.facebook.content.substring(
+            data.facebook.content.lastIndexOf('/') + 1,
+          );
 
-        const mainRef = ref(storage, `requests/${filename}`);
+          const mainRef = ref(storage, `requests/${filename}`);
 
-        await uploadBytes(mainRef, blob);
-        console.log(await getDownloadURL(mainRef));
-        finalData.content.facebook.content = await getDownloadURL(mainRef);
+          await uploadBytes(mainRef, blob);
+          console.log(await getDownloadURL(mainRef));
+          finalData.content.facebook.content = await getDownloadURL(mainRef);
+        }
+
+        if (platforms.includes('youtube')) {
+          const res = await fetch(data.youtube.content);
+          const blob = await res.blob();
+
+          const filename = data.youtube.content.substring(
+            data.youtube.content.lastIndexOf('/') + 1,
+          );
+
+          const mainRef = ref(storage, `requests/${filename}`);
+
+          await uploadBytes(mainRef, blob);
+          finalData.content.youtube.content = await getDownloadURL(mainRef);
+        }
       }
-
-      if (platforms.includes('youtube')) {
-        const res = await fetch(data.youtube.content);
-        const blob = await res.blob();
-
-        const filename = data.youtube.content.substring(
-          data.youtube.content.lastIndexOf('/') + 1,
-        );
-
-        const mainRef = ref(storage, `requests/${filename}`);
-
-        await uploadBytes(mainRef, blob);
-        finalData.content.youtube.content = await getDownloadURL(mainRef);
-      }
-
       const res = await createPromotion({
         data: finalData,
       });
       setrequestSentModalOpen(true);
       setapiCalled(false);
-      console.log(res);
     } catch (err) {
-      setapiCalled(false);
       console.log(err);
+      setapiCalled(false);
     }
   };
 

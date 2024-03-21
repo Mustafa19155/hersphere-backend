@@ -7,11 +7,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import MessageIcon from '../../assets/icons/message.png';
 import global from '../../assets/styles/global';
 import {useNavigation} from '@react-navigation/native';
 import ConfirmModal from '../modals/ConfirmModal';
+import {AuthContext} from '../../contexts/userContext';
+import {acceptPromotion, rejectPromotion} from '../../api/promotion';
 
 const NewRequests = ({requests, setrequests, mainRequests}) => {
   const navigation = useNavigation();
@@ -19,22 +21,43 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
   const [activeReq, setactiveReq] = useState(null);
   const [currentAction, setcurrentAction] = useState('accept');
 
-  const handleConfirm = () => {
-    setrequests(mainRequests.filter(r => r.id != activeReq.id));
+  const handleReject = () => {
     setshowConfirmModal(false);
+    rejectPromotion({id: activeReq._id})
+      .then(res => {
+        const foundIndex = mainRequests.findIndex(r => r._id == activeReq._id);
+        const newRequests = [...mainRequests];
+        newRequests[foundIndex].status = 'rejected';
+        setrequests(newRequests);
+      })
+      .catch(err => {});
+
     setactiveReq(null);
   };
 
   const handleAccept = () => {
-    navigation.navigate('PostCreator');
     setshowConfirmModal(false);
+    acceptPromotion({id: activeReq._id})
+      .then(res => {
+        const foundIndex = mainRequests.findIndex(r => r._id == activeReq._id);
+        const newRequests = [...mainRequests];
+        newRequests[foundIndex].status = 'not-started';
+        setrequests(newRequests);
+
+        // navigation.navigate('PostCreator');
+      })
+      .catch(err => {
+        console.log(err);
+      });
   };
+
+  const {user} = useContext(AuthContext);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{height: '80%'}}>
       <ConfirmModal
-        text={'Are you sure you want to reject this request?'}
-        onconfirm={currentAction == 'accept' ? handleAccept : handleConfirm}
+        text={`Are you sure you want to ${currentAction} this request?`}
+        onconfirm={currentAction == 'accept' ? handleAccept : handleReject}
         open={showConfirmModal}
         setopen={setshowConfirmModal}
       />
@@ -42,7 +65,12 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
         {requests.map((req, index) => (
           <Pressable
             onPress={() =>
-              navigation.navigate('RequestDetails', {status: 'new'})
+              // navigation.navigate('RequestDetails', {status: 'new'})
+
+              navigation.navigate('Requests', {
+                screen: 'RequestDetails',
+                params: {id: req._id},
+              })
             }
             style={{
               padding: 10,
@@ -53,25 +81,45 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
             }}>
             <View style={{flexDirection: 'row', gap: 8}}>
               <Image
-                source={req.influencerID.image}
+                source={{
+                  uri:
+                    user.userType == 'influencer'
+                      ? req.userID?.profileImage
+                      : req.influencerID.profileImage,
+                }}
                 style={{height: 45, width: 45, borderRadius: 100}}
               />
-              <View>
+              <View style={{width: '100%'}}>
                 <View
-                  style={{flexDirection: 'row', gap: 12, alignItems: 'center'}}>
+                  style={{
+                    flexDirection: 'row',
+                    gap: 12,
+                    alignItems: 'center',
+                    width: '100%',
+                  }}>
                   <Text style={[global.textSmall, global.fontMedium]}>
-                    {req.influencerID.name}
+                    {user.userType == 'influencer'
+                      ? req.userID.username
+                      : req.influencerID.username}
                   </Text>
                   <Pressable
                     onPress={e => {
                       e.stopPropagation();
-                      navigation.navigate('Chats', {screen: 'Chat'});
+                      navigation.navigate('Chats', {
+                        screen: 'Chat',
+                        params: {
+                          id:
+                            user.userType == 'influencer'
+                              ? req.userID._id
+                              : req.influencerID._id,
+                        },
+                      });
                     }}>
                     <Image source={MessageIcon} />
                   </Pressable>
                 </View>
                 <Text style={[global.gray3Color, {fontSize: 12}]}>
-                  {req.title}
+                  {req.category}
                 </Text>
               </View>
             </View>
@@ -87,8 +135,8 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
               }}>
               <Pressable
                 onPress={e => {
-                  setcurrentAction('accept');
                   e.stopPropagation();
+                  setcurrentAction('accept');
                   setshowConfirmModal(true);
                   setactiveReq(req);
                 }}

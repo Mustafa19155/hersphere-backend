@@ -28,7 +28,7 @@ const ChatroomSchema = new Schema(
       messageType: {
         type: String,
       },
-      text: { type: String },
+      message: { type: String },
       file: {},
     },
   },

@@ -60,12 +60,18 @@ chatroomRouter.get("/", chatroomCOntroller.getChatrooms);
 chatroomRouter.get("/:id", chatroomCOntroller.getChatroomById);
 
 // get chatrooms of user
-chatroomRouter.get("/user/:userId", chatroomCOntroller.getChatroomsOfUser);
+chatroomRouter.get(
+  "/user/teams/:userId",
+  chatroomCOntroller.getChatroomsOfUser
+);
 
 // read messages
 chatroomRouter.put("/:id/read", chatroomCOntroller.readMessages);
 
 // get user chat
 chatroomRouter.get("/user/single/:id", chatroomCOntroller.getUserChat);
+
+// get user chats
+chatroomRouter.get("/user/one-to-one", chatroomCOntroller.getUserChats);
 
 module.exports = chatroomRouter;

@@ -21,25 +21,25 @@ const FilterModal = ({open, setopen}) => {
 
   const categories = [
     {
-      name: 'category 1',
+      name: 'Category 1',
     },
     {
-      name: 'category 2',
+      name: 'Category 2',
     },
     {
-      name: 'category 3',
+      name: 'Category 3',
     },
     {
-      name: 'category 4',
+      name: 'Category 4',
     },
     {
-      name: 'category 5',
+      name: 'Category 5',
     },
     {
-      name: 'category 6',
+      name: 'Category 6',
     },
     {
-      name: 'category 7',
+      name: 'Category 7',
     },
   ];
 

@@ -23,6 +23,9 @@ import global from './assets/styles/global';
 import SendRequest from './screens/Search/SendRequest';
 import UserProfile from './screens/Search/UserProfile';
 import Icon from 'react-native-vector-icons/Ionicons';
+import RequestProvider from './contexts/requestContext';
+import SelectMedia from './screens/Requests/SelectMedia';
+import UploadMediaAndPost from './screens/Requests/UploadMediaAndPost';
 
 const Stack = createStackNavigator();
 
@@ -50,6 +53,14 @@ function App() {
     }
   }, [user]);
 
+  const SendRequestComp = ({route}) => {
+    return (
+      <RequestProvider>
+        <SendRequest route={route} />
+      </RequestProvider>
+    );
+  };
+
   return (
     <>
       {showBlockedPopup && <BlockedModal />}
@@ -65,21 +76,57 @@ function App() {
           <Stack.Screen name="profileSetup" component={ProfileSetup} />
           <Stack.Screen name="Authentication" component={Authentication} />
           <Stack.Screen name="Main" component={DashboardDrawer} />
-          {/* <Stack.Screen
-          name="InfluencerProfile"
-          component={InfluenceProfileStack}
-        /> */}
           <Stack.Screen name="Chats" component={ChatStack} />
-          <Stack.Screen name="PostCreator" component={PostCreatorStack} />
           <Stack.Screen name="Chatroom" component={ChatroomStack} />
           <Stack.Screen name="Marketplace" component={MarketplaceStack} />
           <Stack.Screen name="Requests" component={RequetsStack} />
         </Stack.Group>
+        <Stack.Screen
+          name="PostCreator"
+          component={PostCreator}
+          options={{
+            title: 'Post Creator',
+            headerTitleAlign: 'center',
+            headerTitle: () => (
+              <Text style={[global.fontBold, global.textNormal]}>
+                Post Creator System
+              </Text>
+            ),
+            // headerShown: false,
+          }}
+        />
         <Stack.Group screenOptions={{cardStyle: {paddingHorizontal: 20}}}>
           <Stack.Screen
+            name="SelectMedia"
+            component={SelectMedia}
+            options={{
+              headerLeft: props => {
+                return (
+                  <Pressable onPress={props.onPress}>
+                    <Icon name="chevron-back" size={20} color="black" />
+                  </Pressable>
+                );
+              },
+              title: 'Media Type',
+            }}
+          />
+          <Stack.Screen
+            name="UploadAndPost"
+            component={UploadMediaAndPost}
+            options={{
+              headerLeft: props => {
+                return (
+                  <Pressable onPress={props.onPress}>
+                    <Icon name="chevron-back" size={20} color="black" />
+                  </Pressable>
+                );
+              },
+              title: 'Upload Media',
+            }}
+          />
+          <Stack.Screen
             name="SendRequest"
-            component={SendRequest}
-            // options={{headerShown: false}}
+            component={SendRequestComp}
             options={{
               header: props => {
                 return (
@@ -104,14 +151,6 @@ function App() {
                   </View>
                 );
               },
-              // headerLeft: props => {
-              //   return (
-              //     <Pressable onPress={props.onPress}>
-              //       <Icon name="chevron-back" size={20} color="black" />
-              //     </Pressable>
-              //   );
-              // },
-              // title: '',
             }}
           />
           <Stack.Screen

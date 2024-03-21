@@ -49,3 +49,33 @@ export const deletePromotion = async ({id}) => {
     throw err;
   }
 };
+
+export const getPromotionRequests = async () => {
+  try {
+    const res = await axiosClient.get('/promotion');
+
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getPromotion = async ({id}) => {
+  try {
+    const res = await axiosClient.get(`/promotion/single/${id}`);
+
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const getPromotions = async () => {
+  try {
+    const res = await axiosClient.get('/promotion/all');
+
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};

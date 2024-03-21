@@ -13,7 +13,7 @@ export const getChatroomById = async id => {
 // get chatrooms of user
 export const getChatroomsOfUser = async userId => {
   try {
-    const res = await axiosClient.get(`/chatroom/user/${userId}`);
+    const res = await axiosClient.get(`/chatroom/user/teams/${userId}`);
     return res.data;
   } catch (err) {
     throw err;
@@ -34,6 +34,16 @@ export const readMessages = async id => {
 export const getUserChat = async id => {
   try {
     const res = await axiosClient.get(`/chatroom/user/single/${id}`);
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// get user chats
+export const getUserChats = async () => {
+  try {
+    const res = await axiosClient.get(`/chatroom/user/one-to-one`);
     return res.data;
   } catch (err) {
     throw err;

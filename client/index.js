@@ -37,58 +37,56 @@ export default function Main() {
       <PostCreatorProvider>
         <AuthProvider>
           <SearchProvider>
-            <RequestProvider>
-              <PaperProvider>
-                <ToastProvider
-                  type={'normal'}
-                  placement={'bottom'}
-                  duration={4000}
-                  offset={30}
-                  normalColor="white"
-                  dangerColor="white"
-                  animationType={'zoom-in'}
-                  textStyle={{color: 'green', fontSize: 16}}
-                  style={{elevation: 5}}
-                  swipeEnabled={true}
-                  renderToast={toastOptions => (
-                    <View
-                      style={{
-                        backgroundColor: '#EEEEEE',
-                        elevation: 5,
-                        paddingVertical: 17,
-                        paddingHorizontal: 15,
-                        borderRadius: 10,
-                        borderLeftWidth: 5,
-                        borderLeftColor:
-                          toastOptions.type == 'success'
-                            ? '#13B887'
-                            : '#cc0000',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 5,
-                        maxWidth: '80%',
-                      }}>
-                      <Icon
-                        name={
-                          toastOptions.type == 'success'
-                            ? 'check-circle'
-                            : 'error'
-                        }
-                        size={20}
-                        color={
-                          toastOptions.type == 'success' ? '#13B887' : '#cc0000'
-                        }
-                      />
-                      <Text style={{fontSize: 16, fontWeight: 'bold'}}>
-                        {toastOptions.message}
-                      </Text>
-                    </View>
-                  )}>
-                  <App />
-                </ToastProvider>
-              </PaperProvider>
-            </RequestProvider>
+            {/* <RequestProvider> */}
+            <PaperProvider>
+              <ToastProvider
+                type={'normal'}
+                placement={'bottom'}
+                duration={4000}
+                offset={30}
+                normalColor="white"
+                dangerColor="white"
+                animationType={'zoom-in'}
+                textStyle={{color: 'green', fontSize: 16}}
+                style={{elevation: 5}}
+                swipeEnabled={true}
+                renderToast={toastOptions => (
+                  <View
+                    style={{
+                      backgroundColor: '#EEEEEE',
+                      elevation: 5,
+                      paddingVertical: 17,
+                      paddingHorizontal: 15,
+                      borderRadius: 10,
+                      borderLeftWidth: 5,
+                      borderLeftColor:
+                        toastOptions.type == 'success' ? '#13B887' : '#cc0000',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 5,
+                      maxWidth: '80%',
+                    }}>
+                    <Icon
+                      name={
+                        toastOptions.type == 'success'
+                          ? 'check-circle'
+                          : 'error'
+                      }
+                      size={20}
+                      color={
+                        toastOptions.type == 'success' ? '#13B887' : '#cc0000'
+                      }
+                    />
+                    <Text style={{fontSize: 16, fontWeight: 'bold'}}>
+                      {toastOptions.message}
+                    </Text>
+                  </View>
+                )}>
+                <App />
+              </ToastProvider>
+            </PaperProvider>
+            {/* </RequestProvider> */}
           </SearchProvider>
         </AuthProvider>
       </PostCreatorProvider>

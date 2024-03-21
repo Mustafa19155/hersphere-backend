@@ -6,14 +6,17 @@ import {
   Text,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 import moment from 'moment';
 import global from '../../assets/styles/global';
 import Stars from '../Dashboard/Stars';
 import {useNavigation} from '@react-navigation/native';
+import {AuthContext} from '../../contexts/userContext';
 
 const CompletedRequests = ({requests}) => {
   const navigation = useNavigation();
+
+  const {user} = useContext(AuthContext);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{height: '80%'}}>
@@ -38,15 +41,22 @@ const CompletedRequests = ({requests}) => {
               <View
                 style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
                 <Image
-                  source={req.influencerID.image}
+                  source={{
+                    uri:
+                      user == 'influencer'
+                        ? req.userID.profileImage
+                        : req.influencerID.profileImage,
+                  }}
                   style={{height: 45, width: 45, borderRadius: 100}}
                 />
                 <View>
                   <Text style={[global.textSmall, global.fontMedium]}>
-                    {req.influencerID.name}
+                    {user == 'influencer'
+                      ? req.userID.username
+                      : req.influencerID.username}
                   </Text>
                   <Text style={[global.grayColor, global.textExtraSmall]}>
-                    {req.title}
+                    {req.category}
                   </Text>
                 </View>
               </View>
@@ -54,7 +64,7 @@ const CompletedRequests = ({requests}) => {
                 <Text style={[global.fontBold, global.textSmall]}>
                   ${req.transactionID.amount}
                 </Text>
-                <Stars value={4} />
+                <Stars value={req.reviewID?.rating} />
               </View>
             </View>
             <View
