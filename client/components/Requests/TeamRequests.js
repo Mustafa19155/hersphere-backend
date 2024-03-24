@@ -58,6 +58,13 @@ const TeamRequests = () => {
     <ScrollView
       showsVerticalScrollIndicator={false}
       style={{height: Dimensions.get('screen').height - 250}}>
+      {requests.filter(req => req.jobRequests?.length > 0) == 0 && (
+        <View style={{marginTop: 10}}>
+          <Text style={[{textAlign: 'center'}, global.fontMedium]}>
+            No Requests found
+          </Text>
+        </View>
+      )}
       <View style={{gap: 10}}>
         {requests.map(req => (
           <>

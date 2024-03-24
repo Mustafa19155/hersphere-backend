@@ -289,7 +289,7 @@ const Details = ({open, setopen, chatroom}) => {
         visible={open}
         onDismiss={() => setopen(false)}
         contentContainerStyle={containerStyle}>
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View style={{gap: 15}}>
             <View
               style={{justifyContent: 'center', alignItems: 'center', gap: 10}}>

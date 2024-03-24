@@ -20,6 +20,11 @@ const CompletedRequests = ({requests}) => {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={{height: '80%'}}>
+      {requests.filter(req => req.status == 'completed').length == 0 && (
+        <Text style={[{textAlign: 'center'}, global.fontMedium]}>
+          No completed promotions
+        </Text>
+      )}
       <View style={{gap: 20, marginVertical: 10}}>
         {requests.map(req => (
           <Pressable

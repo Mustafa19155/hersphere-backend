@@ -187,3 +187,16 @@ exports.addReview = async (req, res, next) => {
     next(error);
   }
 };
+
+// get open jobs of workplace
+exports.getOpenJobsOfWorkplace = async (req, res, next) => {
+  try {
+    const jobs = await Job.find({
+      workplaceID: req.params.id,
+      "employee.userID": null,
+    });
+    res.status(200).json(jobs);
+  } catch (error) {
+    next(error);
+  }
+};

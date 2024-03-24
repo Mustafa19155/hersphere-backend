@@ -74,4 +74,7 @@ chatroomRouter.get("/user/single/:id", chatroomCOntroller.getUserChat);
 // get user chats
 chatroomRouter.get("/user/one-to-one", chatroomCOntroller.getUserChats);
 
+// delete chatroom
+chatroomRouter.delete("/:id", chatroomCOntroller.deleteChatroom);
+
 module.exports = chatroomRouter;

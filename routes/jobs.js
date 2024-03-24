@@ -25,4 +25,7 @@ router.get("/influencer/:id", jobController.getJobsOfInfluencer);
 // add review
 router.post("/:id/review", jobController.addReview);
 
+// get open jobs of workplace
+router.get("/workplace/:id/open", jobController.getOpenJobsOfWorkplace);
+
 module.exports = router;

@@ -42,51 +42,53 @@ const CreateWorkplace = () => {
   };
 
   const handleContinue = async () => {
-    if (currentStep == 1) {
-      //   if (name && description && noOfEmployees && noOfDays) {
-      setcurrentStep(currentStep + 1);
-      //   } else {
-      //   toast.show('Fill all fields');
-      //   }
-    } else {
-      if (
-        categories.reduce((acc, cur) => acc + cur.membersCount, 0) !=
-        noOfEmployees
-      ) {
-        toast.show('All employees must be in atleast one category');
+    try {
+      if (currentStep == 1) {
+        if (teamName && description && noOfEmployees && noOfDays && imageUri) {
+          setcurrentStep(currentStep + 1);
+        } else {
+          toast.show('Fill all fields');
+        }
       } else {
-        setapiCalled(true);
+        if (
+          categories.reduce((acc, cur) => acc + cur.membersCount, 0) !=
+          noOfEmployees
+        ) {
+          toast.show('All employees must be in atleast one category');
+        } else {
+          setapiCalled(true);
 
-        const res = await fetch(imageUri);
-        const blob = await res.blob();
+          const res = await fetch(imageUri);
+          const blob = await res.blob();
 
-        const filename = imageUri.substring(imageUri.lastIndexOf('/') + 1);
+          const filename = imageUri.substring(imageUri.lastIndexOf('/') + 1);
 
-        const mainRef = ref(storage, `workplace-images/${filename}`);
+          const mainRef = ref(storage, `workplace-images/${filename}`);
 
-        await uploadBytes(mainRef, blob);
+          await uploadBytes(mainRef, blob);
 
-        const downloadimg = await getDownloadURL(mainRef);
+          const downloadimg = await getDownloadURL(mainRef);
 
-        createWorkplace({
-          name: teamName,
-          description,
-          endDate: moment().add(noOfDays, 'days').toDate(),
-          totalMembers: noOfEmployees,
-          categories,
-          image: downloadimg,
-        })
-          .then(res => {
-            toast.show('Workplace created', {type: 'success'});
-            navigation.goBack();
-            setapiCalled(false);
+          createWorkplace({
+            name: teamName,
+            description,
+            endDate: moment().add(noOfDays, 'days').toDate(),
+            totalMembers: noOfEmployees,
+            categories,
+            image: downloadimg,
           })
-          .catch(err => {
-            toast.show(err.response.data);
-            setapiCalled(false);
-          });
+            .then(res => {
+              toast.show('Workplace created', {type: 'success'});
+              navigation.goBack();
+              setapiCalled(false);
+            })
+            .catch(err => {
+              toast.show(err.response.data);
+              setapiCalled(false);
+            });
+        }
       }
-    }
+    } catch (err) {}
   };
 
   //   useEffect(() => {

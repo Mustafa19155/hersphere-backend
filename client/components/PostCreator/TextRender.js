@@ -11,14 +11,14 @@ import Draggable from 'react-native-draggable';
 import {TextInput} from 'react-native-paper';
 import AntIcons from 'react-native-vector-icons/AntDesign';
 import SimpleLineIcons from 'react-native-vector-icons/SimpleLineIcons';
+import FontAweIcons from 'react-native-vector-icons/FontAwesome';
 
 const TextRender = ({
   selectedIndex,
   setselectedIndex,
   img,
   index,
-  template,
-  settemplate,
+  setcurrentShow,
 }) => {
   const textInputRef = useRef();
   const [text, settext] = useState('');
@@ -64,6 +64,7 @@ const TextRender = ({
             borderWidth: selectedIndex == index ? 2 : 0,
             borderColor: 'red',
             position: 'relative',
+            zIndex: img.zIndex,
           }}
           onPress={() => {
             setselectedIndex(index);
@@ -85,6 +86,9 @@ const TextRender = ({
               }}>
               <Pressable onPress={() => setcontentEditable(true)}>
                 <SimpleLineIcons name="pencil" color="black" size={16} />
+              </Pressable>
+              <Pressable onPress={() => setcurrentShow('colors')}>
+                <FontAweIcons name="circle" color={img.color} size={16} />
               </Pressable>
             </View>
           )}

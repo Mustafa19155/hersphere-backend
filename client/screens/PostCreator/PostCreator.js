@@ -26,6 +26,8 @@ import {Button} from 'react-native-paper';
 import Templates from '../../components/PostCreator/Templates';
 import AddImage from '../../components/PostCreator/AddImage';
 import {getPromotion} from '../../api/promotion';
+import ColorPicker from '../../components/ColorPicker';
+import FontAweIcons from 'react-native-vector-icons/FontAwesome';
 
 const PostCreator = ({route}) => {
   const templateHeight = Dimensions.get('screen').height / 1.7;
@@ -81,7 +83,7 @@ const PostCreator = ({route}) => {
         {
           x: 130,
           y: 240,
-          zIndex: 999,
+          zIndex: 1,
           height: Dimensions.get('screen').height / 7,
           width: 170,
           text: 'ALL ITEM DISCOUNTED 50% OR MORE !! SHOP NOW',
@@ -92,7 +94,7 @@ const PostCreator = ({route}) => {
         {
           x: 27,
           y: 170,
-          zIndex: 999,
+          zIndex: 1,
           height: Dimensions.get('screen').height / 7,
           width: 200,
           text: 'WINTER SEASON\nOFFERS',
@@ -134,7 +136,7 @@ const PostCreator = ({route}) => {
         {
           x: 30,
           y: 40,
-          zIndex: 999,
+          zIndex: 1,
           height: Dimensions.get('screen').height / 7,
           width: Dimensions.get('screen').width / 3,
           text: 'FLAT 20% OFF',
@@ -145,7 +147,7 @@ const PostCreator = ({route}) => {
         {
           x: 10,
           y: 170,
-          zIndex: 999,
+          zIndex: 1,
           height: Dimensions.get('screen').height / 7,
           width: Dimensions.get('screen').width / 3,
           text: 'Special',
@@ -157,7 +159,7 @@ const PostCreator = ({route}) => {
         {
           x: 210,
           y: 170,
-          zIndex: 999,
+          zIndex: 1,
           height: Dimensions.get('screen').height / 7,
           width: Dimensions.get('screen').width / 3,
           text: 'Offer',
@@ -200,7 +202,7 @@ const PostCreator = ({route}) => {
         {
           x: 30,
           y: 40,
-          zIndex: 999,
+          zIndex: 1,
           height: Dimensions.get('screen').height / 7,
           width: Dimensions.get('screen').width / 3,
           text: 'FLAT 20% OFF',
@@ -211,7 +213,7 @@ const PostCreator = ({route}) => {
         {
           x: 10,
           y: 170,
-          zIndex: 999,
+          zIndex: 1,
           height: Dimensions.get('screen').height / 7,
           width: Dimensions.get('screen').width / 3,
           text: 'Special',
@@ -223,7 +225,7 @@ const PostCreator = ({route}) => {
         {
           x: 210,
           y: 170,
-          zIndex: 999,
+          zIndex: 1,
           height: Dimensions.get('screen').height / 7,
           width: Dimensions.get('screen').width / 3,
           text: 'Offer',
@@ -291,6 +293,23 @@ const PostCreator = ({route}) => {
       });
   };
 
+  const handleChangeColor = color => {
+    setcurrentShow(null);
+
+    setactiveTemplate({
+      ...activeTemplate,
+      images: activeTemplate.images.map((img, index) => {
+        if (index == selectedIndex) {
+          return {
+            ...img,
+            color,
+          };
+        }
+        return img;
+      }),
+    });
+  };
+
   useEffect(() => {
     handleGetRequest();
   }, []);
@@ -306,14 +325,17 @@ const PostCreator = ({route}) => {
                 width: templateWidth,
                 alignSelf: 'center',
               }}>
-              {currentShow == 'templates' && (
-                <Templates
-                  open={currentShow == 'templates'}
-                  setopen={setcurrentShow}
-                  templates={templates}
-                  setactiveTemplate={setactiveTemplate}
-                />
-              )}
+              <Templates
+                open={currentShow == 'templates'}
+                setopen={setcurrentShow}
+                templates={templates}
+                setactiveTemplate={setactiveTemplate}
+              />
+              <ColorPicker
+                open={currentShow == 'colors'}
+                setopen={setcurrentShow}
+                onPress={handleChangeColor}
+              />
               {activeTemplate && (
                 <>
                   <Pressable
@@ -350,6 +372,7 @@ const PostCreator = ({route}) => {
                             />
                           ) : (
                             <TextRender
+                              setcurrentShow={setcurrentShow}
                               img={img}
                               index={index}
                               selectedIndex={selectedIndex}
@@ -376,6 +399,42 @@ const PostCreator = ({route}) => {
                 </>
               )}
             </View>
+            {selectedIndex >= 0 && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  gap: 20,
+                }}>
+                <Pressable
+                  onPress={() => {
+                    const templateCopy = {...activeTemplate};
+                    templateCopy.images[selectedIndex].zIndex =
+                      templateCopy.images[selectedIndex].zIndex + 1;
+                    setactiveTemplate(templateCopy);
+                  }}>
+                  <FontAweIcons
+                    name="angle-double-up"
+                    color="black"
+                    size={20}
+                  />
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    const templateCopy = {...activeTemplate};
+                    templateCopy.images[selectedIndex].zIndex =
+                      templateCopy.images[selectedIndex].zIndex - 1;
+                    setactiveTemplate(templateCopy);
+                  }}>
+                  <FontAweIcons
+                    name="angle-double-down"
+                    color="black"
+                    size={20}
+                  />
+                </Pressable>
+              </View>
+            )}
+
             {currentShow == 'texts' ? (
               <>
                 <TextsPreview

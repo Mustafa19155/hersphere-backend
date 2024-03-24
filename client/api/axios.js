@@ -12,7 +12,7 @@ axiosClient.defaults.headers = {
   common: {},
 };
 
-axiosClient.defaults.withCredentials = true;
+// axiosClient.defaults.withCredentials = true;
 
 axiosClient.interceptors.request.use(
   async config => {

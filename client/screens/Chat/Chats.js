@@ -44,6 +44,13 @@ const Chats = () => {
           marginBottom: 10,
         }}>
         <Text style={[global.fontBold, global.textLarge]}>Chats</Text>
+        {filterData().length == 0 && (
+          <View style={{marginTop: 20}}>
+            <Text style={[{textAlign: 'center'}, global.fontMedium]}>
+              No Chats found
+            </Text>
+          </View>
+        )}
         <View style={{gap: 15, marginTop: 20}}>
           {filterData().map((chat, index) => (
             <ChatsCard chat={chat} index={index} />

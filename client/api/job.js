@@ -79,3 +79,13 @@ export const addReview = async ({id, data}) => {
     throw error;
   }
 };
+
+// get open jobs of workplace
+export const getOpenJobsOfWorkplace = async id => {
+  try {
+    const res = await axiosClient.get(`/job/workplace/${id}/open`);
+    return res.data;
+  } catch (error) {
+    throw error;
+  }
+};

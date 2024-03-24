@@ -1,5 +1,6 @@
 const Chatroom = require("../models/chatroom");
 const Job = require("../models/job");
+const Workplace = require("../models/workplace");
 
 exports.getChatrooms = async (req, res, next) => {
   try {
@@ -12,6 +13,8 @@ exports.getChatrooms = async (req, res, next) => {
 
 exports.getChatroomById = async (req, res, next) => {
   try {
+    let canDelete = true;
+
     const chatroom = await Chatroom.findOne({
       workplaceID: req.params.id,
     })
@@ -20,6 +23,15 @@ exports.getChatroomById = async (req, res, next) => {
 
     if (!chatroom) {
       return res.status(404).send({ message: "Chatroom not found" });
+    }
+
+    const job = await Job.findOne({
+      workplaceID: req.params.id,
+      employee: { $exists: true },
+    });
+
+    if (job) {
+      canDelete = false;
     }
 
     for (let i = 0; i < chatroom.membersID.length; i++) {
@@ -38,7 +50,7 @@ exports.getChatroomById = async (req, res, next) => {
       };
     }
 
-    res.send(chatroom);
+    res.send({ ...chatroom._doc, canDelete });
   } catch (error) {
     next(error);
   }
@@ -163,6 +175,27 @@ exports.getUserChats = async (req, res, next) => {
         };
       })
     );
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteChatroom = async (req, res, next) => {
+  try {
+    const chatroom = await Chatroom.findOne({
+      workplaceID: req.params.id,
+    });
+
+    if (!chatroom) {
+      return res.status(404).send({ message: "Chatroom not found" });
+    }
+
+    // delete workplace
+    await Workplace.findByIdAndDelete(req.params.id);
+
+    await chatroom.remove();
+
+    res.send({ message: "Chatroom deleted successfully" });
   } catch (error) {
     next(error);
   }

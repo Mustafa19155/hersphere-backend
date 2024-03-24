@@ -69,6 +69,13 @@ const Jobs = () => {
           <View></View>
         ) : (
           <View style={{gap: 10}}>
+            {jobs.length == 0 && (
+              <View style={{marginTop: 10}}>
+                <Text style={[{textAlign: 'center'}, global.fontMedium]}>
+                  No Jobs found
+                </Text>
+              </View>
+            )}
             {jobs.map(job => (
               <TouchableWithoutFeedback
                 onPress={() => handleCreateReqeuest(job)}>

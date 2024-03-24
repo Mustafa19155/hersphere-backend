@@ -1,5 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {Button, Modal, Portal} from 'react-native-paper';
 import global from '../../assets/styles/global';
 
@@ -11,6 +11,13 @@ const ConfirmModal = ({open, setopen, text, onconfirm}) => {
     borderRadius: 10,
     width: '90%',
     alignSelf: 'center',
+  };
+
+  const [apiCalled, setapiCalled] = useState(false);
+
+  const handleConfirm = () => {
+    setapiCalled(true);
+    onconfirm();
   };
 
   return (
@@ -39,6 +46,7 @@ const ConfirmModal = ({open, setopen, text, onconfirm}) => {
             marginTop: 20,
           }}>
           <TouchableOpacity
+            disabled={apiCalled}
             onPress={() => setopen(false)}
             style={[
               {
@@ -54,12 +62,15 @@ const ConfirmModal = ({open, setopen, text, onconfirm}) => {
             <Text>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={onconfirm}
+            disabled={apiCalled}
+            onPress={handleConfirm}
             style={[
               global.greenBtn,
               {width: '50%', justifyContent: 'center', alignItems: 'center'},
             ]}>
-            <Text style={[global.greenBtnText]}>Continue</Text>
+            <Text style={[global.greenBtnText]}>
+              {apiCalled ? 'Loading...' : 'Continue'}
+            </Text>
           </TouchableOpacity>
         </View>
       </Modal>

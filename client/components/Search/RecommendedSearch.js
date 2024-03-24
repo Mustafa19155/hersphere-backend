@@ -4,6 +4,8 @@ import Avatar from '../../assets/images/avatar.png';
 import global from '../../assets/styles/global';
 import SearchCard from './SearchCard';
 import {getRecommendedInfluencers} from '../../api/user';
+import {ActivityIndicator} from 'react-native-paper';
+import Loader from '../Loader';
 
 const RecommendedSearch = () => {
   const [loading, setloading] = useState(false);
@@ -52,11 +54,25 @@ const RecommendedSearch = () => {
       <Text style={[global.textSmall, global.fontBold]}>
         Recommended Influencers
       </Text>
-      <View style={{marginTop: 20}}>
-        {data.map(d => (
-          <SearchCard search={d} />
-        ))}
-      </View>
+      {loading ? (
+        <View style={{marginTop: 50}}>
+          <Loader size={24} color={'black'} />
+        </View>
+      ) : (
+        <>
+          {data.length === 0 && (
+            <Text
+              style={[{textAlign: 'center', marginTop: 50}, global.fontMedium]}>
+              No results found
+            </Text>
+          )}
+          <View style={{marginTop: 20}}>
+            {data.map(d => (
+              <SearchCard search={d} />
+            ))}
+          </View>
+        </>
+      )}
     </View>
   );
 };

@@ -95,6 +95,7 @@ const Templates = ({open, setopen, templates, setactiveTemplate}) => {
                               style={{
                                 fontSize: (img.fontSize / temp.height) * height,
                                 color: img.color,
+                                fontFamily: img.fontFamily,
                               }}>
                               {img.text}
                             </Text>

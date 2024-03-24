@@ -14,12 +14,14 @@ import MemberIcon from '../../assets/icons/member.png';
 import EditIcon from '../../assets/icons/edit.png';
 import PlusIcon from '../../assets/icons/plus.png';
 import global from '../../assets/styles/global';
-import {getChatroomById} from '../../api/chatroom';
+import {deleteChatroom, getChatroomById} from '../../api/chatroom';
 import moment from 'moment';
 import {Button, Modal, Portal, TextInput} from 'react-native-paper';
 import SuccessModal from '../../components/SuccessModal';
+import ConfirmModal from '../../components/modals/ConfirmModal';
 
 const ChatroomSetting = ({route}) => {
+  const navigation = useNavigation();
   const [chatroom, setchatroom] = useState(null);
   const [loading, setloading] = useState(true);
   const [name, setname] = useState('');
@@ -30,11 +32,18 @@ const ChatroomSetting = ({route}) => {
   const [showReviewModal, setshowReviewModal] = useState(false);
   const [activeReviewUser, setactiveReviewUser] = useState(null);
   const [apiCalled, setapiCalled] = useState(false);
+  const [jobs, setjobs] = useState([]);
+  const [showConfirmDeleteModal, setshowConfirmDeleteModal] = useState(false);
+  const [activeDeleteId, setactiveDeleteId] = useState(null);
+
+  const toast = useToast();
 
   const handleGetChatroom = async () => {
     setloading(true);
     try {
       const chatroom = await getChatroomById(route.params.workplaceID);
+      setjobs(await getOpenJobsOfWorkplace(chatroom.workplaceID._id));
+
       setname(chatroom.workplaceID.name);
       setdescription(chatroom.workplaceID.description);
       setchatroom(chatroom);
@@ -59,6 +68,35 @@ const ChatroomSetting = ({route}) => {
       });
   };
 
+  const handleDeletJob = () => {
+    deleteJobById(activeDeleteId)
+      .then(res => {
+        toast.show('Job Deleted Successfully', {
+          type: 'success',
+        });
+        setshowConfirmDeleteModal(false);
+        setactiveDeleteId(null);
+        handleGetChatroom();
+      })
+      .catch(err => {
+        setshowConfirmDeleteModal(false);
+      });
+  };
+
+  const handleDeleteWorkplace = () => {
+    deleteChatroom(chatroom.workplaceID._id)
+      .then(res => {
+        navigation.navigate('Main');
+        toast.show('Workplace Deleted Successfully', {
+          type: 'success',
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        setshowConfirmDeleteModal(false);
+      });
+  };
+
   useEffect(() => {
     handleGetChatroom();
   }, []);
@@ -76,230 +114,381 @@ const ChatroomSetting = ({route}) => {
         setopen={setshowReviewModal}
         user={activeReviewUser}
       />
-      <View style={{padding: 20}}>
-        {chatroom && (
-          <View style={{gap: 30}}>
-            <View
-              style={{
-                borderBottomColor: 'rgba(0,0,0,0.1)',
-                borderBottomWidth: 1,
-                paddingBottom: 30,
-                gap: 20,
-              }}>
-              <View
-                style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-                <Image source={TeamIcon} />
-                <Text style={[global.fontBold]}>Team Settings</Text>
-              </View>
+      {showConfirmDeleteModal && (
+        <ConfirmModal
+          open={showConfirmDeleteModal}
+          setopen={setshowConfirmDeleteModal}
+          onconfirm={activeDeleteId ? handleDeletJob : handleDeleteWorkplace}
+          text={`Are you sure you want to delete this ${
+            activeDeleteId ? 'Job' : 'Workplace'
+          }?`}
+        />
+      )}
+      {loading ? (
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: Dimensions.get('window').height - 100,
+          }}>
+          <Loader color={'black'} size={20} />
+        </View>
+      ) : (
+        <View style={{padding: 20}}>
+          {chatroom && (
+            <View style={{gap: 30}}>
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
+                  borderBottomColor: 'rgba(0,0,0,0.1)',
+                  borderBottomWidth: 1,
+                  paddingBottom: 30,
+                  gap: 20,
                 }}>
-                <Text style={[global.fontBold]}>Team Name</Text>
                 <View
-                  style={{flexDirection: 'row', gap: 5, alignItems: 'center'}}>
-                  <TextInput
-                    disabled={!editTitle}
-                    placeholder="Team Name"
-                    value={name}
-                    onChangeText={setname}
-                    outlineColor="transparent"
-                    activeOutlineColor="transparent"
-                    style={[global.gray2Back, {borderRadius: 5, height: 40}]}
-                    underlineColor="transparent"
-                    mode="outlined"
-                  />
-                  <TouchableWithoutFeedback onPress={() => seteditTitle(true)}>
-                    <Image source={EditIcon} />
-                  </TouchableWithoutFeedback>
+                  style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+                  <Image source={TeamIcon} />
+                  <Text style={[global.fontBold]}>Team Settings</Text>
                 </View>
-              </View>
-              <View>
                 <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}>
-                  <Text style={[global.fontBold]}>Description</Text>
-                  <TouchableWithoutFeedback
-                    onPress={() => seteditDescription(true)}>
-                    <Image source={EditIcon} />
-                  </TouchableWithoutFeedback>
+                  <Text style={[global.fontBold]}>Team Name</Text>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      gap: 5,
+                      alignItems: 'center',
+                    }}>
+                    <TextInput
+                      disabled={!editTitle}
+                      placeholder="Team Name"
+                      value={name}
+                      onChangeText={setname}
+                      outlineColor="transparent"
+                      activeOutlineColor="transparent"
+                      style={[global.gray2Back, {borderRadius: 5, height: 40}]}
+                      underlineColor="transparent"
+                      mode="outlined"
+                    />
+                    <TouchableWithoutFeedback
+                      onPress={() => seteditTitle(true)}>
+                      <Image source={EditIcon} />
+                    </TouchableWithoutFeedback>
+                  </View>
                 </View>
-                <TextInput
-                  disabled={!editDescription}
-                  placeholder="Description"
-                  value={description}
-                  onChangeText={setdescription}
-                  multiline={true}
-                  outlineColor="transparent"
-                  activeOutlineColor="transparent"
-                  style={[global.gray2Back, {borderRadius: 5}]}
-                  numberOfLines={5}
-                  underlineColor="transparent"
-                  mode="outlined"
-                />
+                <View>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}>
+                    <Text style={[global.fontBold]}>Description</Text>
+                    <TouchableWithoutFeedback
+                      onPress={() => seteditDescription(true)}>
+                      <Image source={EditIcon} />
+                    </TouchableWithoutFeedback>
+                  </View>
+                  <TextInput
+                    disabled={!editDescription}
+                    placeholder="Description"
+                    value={description}
+                    onChangeText={setdescription}
+                    multiline={true}
+                    outlineColor="transparent"
+                    activeOutlineColor="transparent"
+                    style={[global.gray2Back, {borderRadius: 5}]}
+                    numberOfLines={5}
+                    underlineColor="transparent"
+                    mode="outlined"
+                  />
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '90%',
+                  }}>
+                  <Text style={[global.fontBold]}>Start Date</Text>
+                  <TextInput
+                    value={moment(chatroom.workplaceID.createdAt).format(
+                      'DD/MM/YYYY',
+                    )}
+                    disabled
+                    outlineColor="transparent"
+                    activeOutlineColor="transparent"
+                    style={[global.gray2Back, {borderRadius: 5, height: 40}]}
+                    underlineColor="transparent"
+                    mode="outlined"
+                  />
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    width: '90%',
+                  }}>
+                  <Text style={[global.fontBold]}>End Date</Text>
+                  <TextInput
+                    value={moment(chatroom.workplaceID.endDate).format(
+                      'DD/MM/YYYY',
+                    )}
+                    disabled
+                    outlineColor="transparent"
+                    activeOutlineColor="transparent"
+                    style={[global.gray2Back, {borderRadius: 5, height: 40}]}
+                    underlineColor="transparent"
+                    mode="outlined"
+                  />
+                </View>
               </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  width: '90%',
-                }}>
-                <Text style={[global.fontBold]}>Start Date</Text>
-                <TextInput
-                  value={moment(chatroom.workplaceID.createdAt).format(
-                    'DD/MM/YYYY',
-                  )}
-                  disabled
-                  outlineColor="transparent"
-                  activeOutlineColor="transparent"
-                  style={[global.gray2Back, {borderRadius: 5, height: 40}]}
-                  underlineColor="transparent"
-                  mode="outlined"
-                />
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  width: '90%',
-                }}>
-                <Text style={[global.fontBold]}>End Date</Text>
-                <TextInput
-                  value={moment(chatroom.workplaceID.endDate).format(
-                    'DD/MM/YYYY',
-                  )}
-                  disabled
-                  outlineColor="transparent"
-                  activeOutlineColor="transparent"
-                  style={[global.gray2Back, {borderRadius: 5, height: 40}]}
-                  underlineColor="transparent"
-                  mode="outlined"
-                />
-              </View>
-            </View>
-            <View style={{gap: 10}}>
-              <View
-                style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
-                <Image source={MemberIcon} />
-                <Text style={[global.fontBold]}>Team Members</Text>
-              </View>
-              <View>
-                <View style={{gap: 15, margin: 2}}>
-                  {chatroom.membersID.map(member => (
-                    <>
-                      {member.job && (
-                        <View
-                          key={member._id}
-                          style={{
-                            position: 'relative',
-                            overflow: 'hidden',
-                            padding: 10,
-                            gap: 5,
-                            elevation: 3,
-                            backgroundColor: 'white',
-                            borderRadius: 5,
-                            justifyContent: 'space-between',
-                            flexDirection: 'row',
-                          }}>
+              <View style={{gap: 10}}>
+                <View
+                  style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+                  <Image source={MemberIcon} />
+                  <Text style={[global.fontBold]}>Team Members</Text>
+                </View>
+                <View>
+                  <View style={{gap: 15, margin: 2}}>
+                    {chatroom.membersID.map(member => (
+                      <>
+                        {member.job && (
                           <View
+                            key={member._id}
                             style={{
+                              position: 'relative',
+                              overflow: 'hidden',
+                              padding: 10,
+                              gap: 5,
+                              elevation: 3,
+                              backgroundColor: 'white',
+                              borderRadius: 5,
+                              justifyContent: 'space-between',
                               flexDirection: 'row',
-                              gap: 10,
-                              flex: 1,
                             }}>
-                            <Image
-                              source={{uri: member.profileImage}}
-                              style={{height: 50, width: 50, borderRadius: 100}}
-                            />
                             <View
                               style={{
+                                flexDirection: 'row',
+                                gap: 10,
                                 flex: 1,
                               }}>
+                              <Image
+                                source={{uri: member.profileImage}}
+                                style={{
+                                  height: 50,
+                                  width: 50,
+                                  borderRadius: 100,
+                                }}
+                              />
                               <View
                                 style={{
-                                  gap: 3,
+                                  flex: 1,
                                 }}>
-                                <Text
-                                  numberOfLines={1}
-                                  ellipsizeMode="tail"
-                                  style={[global.textSmall, global.fontMedium]}>
-                                  {member.username}
-                                </Text>
                                 <View
                                   style={{
-                                    flexDirection: 'row',
-                                    justifyContent: 'space-between',
-                                    width: Dimensions.get('window').width - 120,
+                                    gap: 3,
                                   }}>
                                   <Text
+                                    numberOfLines={1}
+                                    ellipsizeMode="tail"
                                     style={[
-                                      global.textExtraSmall,
-                                      global.grayColor,
-                                      global.fontBold,
+                                      global.textSmall,
+                                      global.fontMedium,
                                     ]}>
-                                    {member.job
-                                      ? member.job?.workplaceCategoryID
-                                      : 'Admin'}
+                                    {member.username}
                                   </Text>
+                                  <View
+                                    style={{
+                                      flexDirection: 'row',
+                                      justifyContent: 'space-between',
+                                      width:
+                                        Dimensions.get('window').width - 120,
+                                    }}>
+                                    <Text
+                                      style={[
+                                        global.textExtraSmall,
+                                        global.grayColor,
+                                        global.fontBold,
+                                      ]}>
+                                      {member.job
+                                        ? member.job?.workplaceCategoryID
+                                        : 'Admin'}
+                                    </Text>
+                                  </View>
                                 </View>
                               </View>
                             </View>
+                            <View>
+                              <TouchableOpacity
+                                style={[
+                                  global.greenBtnSm,
+                                  {
+                                    paddingVertical: 10,
+                                    paddingHorizontal: 8,
+                                    flexDirection: 'row',
+                                    alignItems: 'center',
+                                    gap: 5,
+                                  },
+                                ]}
+                                onPress={() => {
+                                  setactiveReviewUser(member);
+                                  setshowReviewModal(true);
+                                }}>
+                                {member.job && member.job?.review?.rating ? (
+                                  <>
+                                    <Text style={[global.greenBtnTextSm]}>
+                                      View Review
+                                    </Text>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Image source={PlusIcon} />
+                                    <Text style={[global.greenBtnTextSm]}>
+                                      Add Review
+                                    </Text>
+                                  </>
+                                )}
+                              </TouchableOpacity>
+                            </View>
                           </View>
-                          <View>
-                            <TouchableOpacity
-                              style={[
-                                global.greenBtnSm,
-                                {
-                                  paddingVertical: 10,
-                                  paddingHorizontal: 8,
-                                  flexDirection: 'row',
-                                  alignItems: 'center',
-                                  gap: 5,
-                                },
-                              ]}
-                              onPress={() => {
-                                setactiveReviewUser(member);
-                                setshowReviewModal(true);
-                              }}>
-                              {member.job && member.job?.review?.rating ? (
-                                <>
-                                  <Text style={[global.greenBtnTextSm]}>
-                                    View Review
-                                  </Text>
-                                </>
-                              ) : (
-                                <>
-                                  <Image source={PlusIcon} />
-                                  <Text style={[global.greenBtnTextSm]}>
-                                    Add Review
-                                  </Text>
-                                </>
-                              )}
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                      )}
-                    </>
-                  ))}
+                        )}
+                      </>
+                    ))}
+                  </View>
                 </View>
               </View>
+              <View style={{gap: 10}}>
+                <View
+                  style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+                  <Image source={MemberIcon} />
+                  <Text style={[global.fontBold]}>Open Jobs</Text>
+                </View>
+                {jobs.length === 0 && (
+                  <Text
+                    style={[
+                      global.textExtraSmall,
+                      global.grayColor,
+                      {textAlign: 'center'},
+                    ]}>
+                    No Jobs Available
+                  </Text>
+                )}
+                {jobs.map(job => (
+                  // option to delete job
+                  <View
+                    key={job._id}
+                    style={{
+                      position: 'relative',
+                      overflow: 'hidden',
+                      padding: 10,
+                      gap: 5,
+                      elevation: 3,
+                      backgroundColor: 'white',
+                      borderRadius: 5,
+                      justifyContent: 'space-between',
+                      flexDirection: 'row',
+                    }}>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        gap: 10,
+                        flex: 1,
+                      }}>
+                      <View
+                        style={{
+                          flex: 1,
+                        }}>
+                        <View
+                          style={{
+                            gap: 3,
+                          }}>
+                          <Text
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                            style={[global.textSmall, global.fontMedium]}>
+                            {job.title}
+                          </Text>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              justifyContent: 'space-between',
+                              width: Dimensions.get('window').width - 120,
+                            }}>
+                            <Text
+                              style={[
+                                global.textExtraSmall,
+                                global.grayColor,
+                                global.fontBold,
+                              ]}>
+                              {job.description}
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
+                    <View>
+                      <TouchableOpacity
+                        style={[
+                          global.redBtnSm,
+                          {
+                            paddingVertical: 10,
+                            paddingHorizontal: 8,
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 5,
+                          },
+                        ]}
+                        onPress={() => {
+                          setactiveDeleteId(job._id);
+                          setshowConfirmDeleteModal(true);
+                          // navigation.navigate('Marketplace', {
+                          //   screen: 'JobDetails',
+                          //   params: {id: job._id},
+                          // });
+                        }}>
+                        <Text style={[global.greenBtnTextSm]}>Delete Job</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  gap: 20,
+                  justifyContent: 'flex-end',
+                }}>
+                {chatroom.canDelete && (
+                  <Button
+                    style={[
+                      global.redBtnSm,
+                      {width: 150, alignSelf: 'flex-end'},
+                    ]}
+                    onPress={() => setshowConfirmDeleteModal(true)}
+                    disabled={apiCalled}>
+                    <Text style={[global.redBtnTextSm]}>Delete Workplace</Text>
+                  </Button>
+                )}
+                <Button
+                  style={[
+                    global.greenBtnSm,
+                    {width: 110, alignSelf: 'flex-end'},
+                  ]}
+                  onPress={handleSaveChanges}
+                  disabled={apiCalled}>
+                  <Text style={[global.greenBtnTextSm]}>Save Changes</Text>
+                </Button>
+              </View>
             </View>
-            <Button
-              style={[global.greenBtn]}
-              onPress={handleSaveChanges}
-              disabled={apiCalled}>
-              <Text style={[global.greenBtnText]}>Save</Text>
-            </Button>
-          </View>
-        )}
-      </View>
+          )}
+        </View>
+      )}
     </ScrollView>
   );
 };
@@ -311,8 +500,15 @@ import ReviewPenIcon from '../../assets/icons/review-pen.png';
 import ReviewHandIcon from '../../assets/icons/review-hand.png';
 import AntDesigns from 'react-native-vector-icons/AntDesign';
 import {updateWorkplaceById} from '../../api/workplace';
-import {addReview} from '../../api/job';
+import {
+  addReview,
+  deleteJobById,
+  getAllJobsOfWorkplace,
+  getOpenJobsOfWorkplace,
+} from '../../api/job';
 import {useToast} from 'react-native-toast-notifications';
+import {useNavigation} from '@react-navigation/native';
+import Loader from '../../components/Loader';
 
 const AddReviewModal = ({open, setopen, user, handleGetChatroom}) => {
   const containerStyle = {

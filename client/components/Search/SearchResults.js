@@ -5,9 +5,11 @@ import global from '../../assets/styles/global';
 import SearchCard from './SearchCard';
 import {SearchContext} from '../../contexts/searchContext';
 import {searchInfluencers} from '../../api/user';
+import Loader from '../Loader';
 
 const SearchResults = () => {
   const {name, platforms, categories} = useContext(SearchContext);
+  const [loading, setloading] = useState(false);
 
   const [data, setdata] = useState([]);
 
@@ -16,23 +18,38 @@ const SearchResults = () => {
   };
 
   useEffect(() => {
+    setloading(true);
     searchInfluencers({name, platforms, categories})
       .then(res => {
-        console.log(res);
+        setloading(false);
         setdata(res);
       })
       .catch(err => {
-        console.log(err);
+        setloading(false);
       });
   }, [name, platforms, categories]);
 
   return (
     <View>
-      <View style={{marginTop: 20}}>
-        {filterData({data}).map(d => (
-          <SearchCard search={d} />
-        ))}
-      </View>
+      {loading ? (
+        <View style={{marginTop: 50}}>
+          <Loader size={20} color={'black'} />
+        </View>
+      ) : (
+        <>
+          {data.length === 0 && (
+            <Text
+              style={[{textAlign: 'center', marginTop: 50}, global.fontMedium]}>
+              No results found
+            </Text>
+          )}
+          <View style={{marginTop: 20}}>
+            {filterData({data}).map(d => (
+              <SearchCard search={d} />
+            ))}
+          </View>
+        </>
+      )}
     </View>
   );
 };

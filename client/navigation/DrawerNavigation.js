@@ -278,6 +278,16 @@ const TeamsDrawer = props => {
       </Pressable>
       {showTeams && (
         <View style={{gap: 20, paddingTop: 10, paddingLeft: 50}}>
+          {jobs.length == 0 && (
+            <Text
+              style={[
+                global.textExtraSmall,
+                global.grayColor,
+                {paddingLeft: 30},
+              ]}>
+              No Teams Available
+            </Text>
+          )}
           {jobs.map(job => (
             <TouchableWithoutFeedback
               onPress={() => {

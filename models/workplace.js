@@ -26,6 +26,11 @@ const WorkplaceSchema = new Schema(
         membersCount: { type: Number },
       },
     ],
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
   },
   { timestamps: true }
 );

@@ -28,6 +28,7 @@ import CreateJobRequest from '../screens/Marketplace/CreateJobRequest';
 import Workplace from '../screens/Marketplace/Workplace';
 import ChatroomSetting from '../screens/Chat/ChatroomSetting';
 import InfluencerTeamRequestProfile from '../components/Requests/InfluencerTeamRequestProfile';
+import JobDetails from '../screens/Marketplace/JobDetails';
 
 const Stack = createStackNavigator();
 
@@ -217,6 +218,23 @@ export const MarketplaceStack = () => {
         name="CreateJobRequest"
         component={CreateJobRequest}
         // options={{headerShown: false}}
+        options={{
+          headerLeft: props => {
+            return (
+              <Pressable
+                onPress={props.onPress}
+                style={{paddingHorizontal: 15}}>
+                <Icon name="chevron-back" size={26} color="black" />
+              </Pressable>
+            );
+          },
+          // headerTitleAlign: 'center',
+          title: <Text style={[global.fontBold]}></Text>,
+        }}
+      />
+      <Stack.Screen
+        name="JobDetails"
+        component={JobDetails}
         options={{
           headerLeft: props => {
             return (

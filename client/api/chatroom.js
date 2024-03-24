@@ -49,3 +49,13 @@ export const getUserChats = async () => {
     throw err;
   }
 };
+
+// delete chatroom
+export const deleteChatroom = async id => {
+  try {
+    const res = await axiosClient.delete(`/chatroom/${id}`);
+    return res.data;
+  } catch (err) {
+    throw err;
+  }
+};

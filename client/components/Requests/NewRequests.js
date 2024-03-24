@@ -61,6 +61,11 @@ const NewRequests = ({requests, setrequests, mainRequests}) => {
         open={showConfirmModal}
         setopen={setshowConfirmModal}
       />
+      {requests.filter(req => req.status == 'new').length == 0 && (
+        <Text style={[{textAlign: 'center'}, global.fontMedium]}>
+          No new requests
+        </Text>
+      )}
       <View style={{gap: 20, marginVertical: 10}}>
         {requests.map((req, index) => (
           <Pressable
