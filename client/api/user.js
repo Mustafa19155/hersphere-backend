@@ -40,11 +40,14 @@ export const loginWithGoogle = async () => {
 
     const userInfo = await GoogleSignin.signIn();
 
+    const tokens = await GoogleSignin.getTokens();
+
     const res = await axiosClient.post('/user/google-login', {
       source: 'google',
       username: userInfo.user.name,
       email: userInfo.user.email,
       profileCompleted: false,
+      youtubeToken: tokens.accessToken,
     });
     return res.data;
   } catch (err) {
@@ -77,6 +80,7 @@ export const youtubeSignin = async () => {
     const res = await axiosClient.get(
       `/user/youtube-details?access_token=${tokens.accessToken}`,
     );
+    res.data = {...res.data, token: tokens.accessToken};
     return res;
   } catch (error) {
     throw error;
@@ -200,6 +204,15 @@ export const searchInfluencers = async ({name, platforms, categories}) => {
     const response = await axiosClient.get('/user/influencer/search', {
       params: {name, platforms, categories},
     });
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const checkLogin = async () => {
+  try {
+    const response = await axiosClient.get('/user/check-login');
     return response.data;
   } catch (err) {
     throw err;

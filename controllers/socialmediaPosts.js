@@ -1,5 +1,7 @@
 const axios = require("axios");
 const Post = require("../models/Post");
+const { google } = require("googleapis");
+const { Readable } = require("stream");
 
 exports.uploadToFacebook = async (req, res, next) => {
   try {
@@ -101,4 +103,92 @@ exports.getPostDetails = async (req, res, next) => {
   }
 };
 
-exports.uploadToYoutube = (req, res, next) => {};
+exports.uploadToYoutube = async (req, res, next) => {
+  // upload post to youtube
+  try {
+    // const { accessToken } = req.body;
+
+    // const response = await axios.post(
+    //   `https://www.googleapis.com/upload/youtube/v3/videos?part=snippet,status`,
+    //   {
+    //     snippet: {
+    //       title: "asd",
+    //       description: "sad",
+    //     },
+    //     status: {
+    //       privacyStatus: "public",
+    //     },
+    //   },
+    //   {
+    //     headers: {
+    //       Authorization: `Bearer ${accessToken}`,
+    //     },
+    //   }
+    // );
+
+    // const post = new Post({
+    //   platform: "youtube",
+    //   postID: response.data.id,
+    //   userID: req.userId,
+    // });
+
+    // await post.save();
+
+    // res.send(response.data);
+
+    // Create a new YouTube Data API client
+
+    const { accessToken, title, description } = req.body;
+
+    const { originalname, buffer } = req.file;
+    console.log(accessToken);
+    const oauth2Client = new google.auth.OAuth2();
+    oauth2Client.setCredentials({
+      access_token: accessToken,
+    });
+
+    const youtube = google.youtube({
+      version: "v3",
+      auth: oauth2Client,
+    });
+
+    const metadata = {
+      snippet: {
+        title,
+        description,
+      },
+      status: {
+        privacyStatus: "public",
+      },
+    };
+
+    const params = {
+      part: "snippet,status",
+      media: {
+        mimeType: "video/*",
+        body: Readable.from(buffer),
+      },
+      notifySubscribers: false,
+      resource: metadata,
+    };
+
+    youtube.videos.insert(params, async (err, data) => {
+      if (err) {
+        console.error(`Error uploading video: ${err}`);
+        res.status(500).send(`Error uploading video: ${err}`);
+      } else {
+        const post = new Post({
+          platform: "youtube",
+          postID: data.data.id,
+          userID: req.userId,
+        });
+        console.log(data.data);
+        await post.save();
+        res.send("Video uploaded successfully!");
+      }
+    });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+};

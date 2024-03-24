@@ -76,7 +76,7 @@ export default function BusinessDetails({
         data: {
           ...user,
           businessDetails: obj,
-          skills: skills,
+          skills: skills.map(skill => skill.toLowerCase()),
           profileCompleted: false,
           userType,
         },
@@ -86,7 +86,7 @@ export default function BusinessDetails({
           setuser({
             ...user,
             businessDetails: obj,
-            skills,
+            skills: skills.map(skill => skill.toLowerCase()),
             profileCompleted: false,
             userType,
           });

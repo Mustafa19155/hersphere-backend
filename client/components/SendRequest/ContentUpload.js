@@ -29,7 +29,7 @@ const ContentUpload = () => {
   const handleSelectYoutubeImage = async () => {
     try {
       const result = await launchImageLibrary({
-        mediaType: data.youtube.type == 'video' ? 'video' : 'photo',
+        mediaType: data.youtube.type == 'video' ? 'video' : 'video',
       });
       if (!result.didCancel) {
         setdata({
@@ -103,7 +103,7 @@ const ContentUpload = () => {
               alignItems: 'center',
             }}>
             <Text style={[global.fontBold]}>Youtube Content</Text>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+            {/* <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <Checkbox
                 color="#13B887"
                 status={data.youtube.type == 'video' ? 'checked' : 'unchecked'}
@@ -121,7 +121,7 @@ const ContentUpload = () => {
               <Text style={[global.textExtraSmall, global.gray3Color]}>
                 Upload Video
               </Text>
-            </View>
+            </View> */}
           </View>
           <TextInput
             placeholder="Caption"

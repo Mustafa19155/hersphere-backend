@@ -422,9 +422,11 @@ const PostCreator = ({route}) => {
                 <Pressable
                   onPress={() => {
                     const templateCopy = {...activeTemplate};
-                    templateCopy.images[selectedIndex].zIndex =
-                      templateCopy.images[selectedIndex].zIndex - 1;
-                    setactiveTemplate(templateCopy);
+                    if (templateCopy.images[selectedIndex].zIndex > 0) {
+                      templateCopy.images[selectedIndex].zIndex =
+                        templateCopy.images[selectedIndex].zIndex - 1;
+                      setactiveTemplate(templateCopy);
+                    }
                   }}>
                   <FontAweIcons
                     name="angle-double-down"
@@ -585,7 +587,7 @@ const PostCreator = ({route}) => {
             <Button
               disabled={apiCalled}
               onPress={handleContinue}
-              style={[global.greenBtn, {alignItems: 'center'}]}>
+              style={[global.greenBtn]}>
               <Text style={[global.greenBtnText]}>
                 {apiCalled ? 'Loading...' : 'Continue'}
               </Text>

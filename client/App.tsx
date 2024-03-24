@@ -26,6 +26,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import RequestProvider from './contexts/requestContext';
 import SelectMedia from './screens/Requests/SelectMedia';
 import UploadMediaAndPost from './screens/Requests/UploadMediaAndPost';
+import {checkLogin} from './api/user';
 
 const Stack = createStackNavigator();
 
@@ -35,15 +36,23 @@ function App() {
 
   const {user, setuser} = useContext(AuthContext);
 
-  // useEffect(() => {
-  //   if (user == null) {
-  //     navigation.navigate('login');
-  //   } else {
-  //     user.profileCompleted
-  //       ? navigation.navigate('Main')
-  //       : navigation.navigate('Authentication');
-  //   }
-  // }, []);
+  useEffect(() => {
+    // checkLogin()
+    //   .then(res => {
+    //     setuser(res);
+    //     res.profileCompleted
+    //       ? navigation.navigate('Main')
+    //       : navigation.navigate('Authentication');
+    //   })
+    //   .catch(err => {});
+    // if (user == null) {
+    //   navigation.navigate('login');
+    // } else {
+    //   user.profileCompleted
+    //     ? navigation.navigate('Main')
+    //     : navigation.navigate('Authentication');
+    // }
+  }, []);
 
   useEffect(() => {
     if (user) {

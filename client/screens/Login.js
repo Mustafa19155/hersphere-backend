@@ -40,9 +40,9 @@ const LoginScreen = () => {
           setapiCalled(false);
           setuser(res);
           if (res.profileCompleted) {
-            navigation.navigate('Main');
+            navigation.replace('Main');
           } else {
-            navigation.navigate('Authentication');
+            navigation.replace('Authentication');
           }
         })
         .catch(err => {

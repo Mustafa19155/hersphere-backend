@@ -57,7 +57,7 @@ const Step4 = () => {
               onPress={() => {
                 setdata({
                   facebook: {content: '', caption: ''},
-                  youtube: {content: '', caption: '', type: 'image'},
+                  youtube: {content: '', caption: '', type: 'video'},
                 });
                 setallowInfluencerToAddData(true);
               }}
@@ -73,7 +73,7 @@ const Step4 = () => {
               onPress={() => {
                 setdata({
                   facebook: {content: '', caption: ''},
-                  youtube: {content: '', caption: '', type: 'image'},
+                  youtube: {content: '', caption: '', type: 'video'},
                 });
                 setallowInfluencerToAddData(false);
               }}

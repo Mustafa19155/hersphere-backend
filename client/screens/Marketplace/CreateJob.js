@@ -91,7 +91,7 @@ const CreateJob = () => {
         workplaceCategoryID: activeCategory.name,
         title,
         description,
-        skillset,
+        skillset: skillset.map(skill => skill.toLowerCase()),
         price: Number(price),
       })
         .then(res => {

@@ -323,6 +323,20 @@ exports.loginWithGoogle = async (req, res, next) => {
       );
 
       const user = { ...foundUser._doc };
+      if (foundUser.youtubeChannel) {
+        await User.findByIdAndUpdate(foundUser._id, {
+          $set: {
+            youtubeChannel: {
+              ...foundUser.youtubeChannel,
+              token: data.youtubeToken,
+            },
+          },
+        });
+
+        // foundUser.youtubeChannel.token = data.youtubeToken;
+        // await foundUser.save();
+        user.youtubeChannel.token = data.youtubeToken;
+      }
       user["token"] = token;
       return res.send(user);
     } else {
@@ -553,6 +567,20 @@ exports.searchInfluencers = async (req, res, next) => {
         return { ...user._doc, rating: 5, platforms };
       })
     );
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.checkLogin = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (user) {
+      res.send(user);
+    } else {
+      res.status(404).send("User not found");
+    }
   } catch (err) {
     next(err);
   }

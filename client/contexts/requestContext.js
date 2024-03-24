@@ -19,7 +19,7 @@ function RequestProvider({children}) {
     youtube: {
       content: '',
       caption: '',
-      type: 'image',
+      type: 'video',
     },
   });
   const [platforms, setplatforms] = useState([]);
