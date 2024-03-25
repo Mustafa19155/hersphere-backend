@@ -4,7 +4,6 @@ const axios = require("axios");
 const { google } = require("googleapis");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const tf = require("@tensorflow/tfjs-node");
 const sharp = require("sharp");
 const fs = require("fs").promises;
 const Job = require("../models/job");
@@ -380,33 +379,7 @@ exports.updatePassword = async (req, res, next) => {
 };
 exports.verifyGender = async (req, res, next) => {
   try {
-    const model = await tf.loadLayersModel(
-      "file://trained-modals/gender_recognition/model.json"
-    );
-
-    const processedImageBuffer = await sharp(req.file.buffer)
-      .resize(250, 250)
-      .toBuffer();
-
-    const processedImage = tf.node.decodeImage(processedImageBuffer, 3);
-
-    const expandedImage = processedImage.expandDims();
-
-    const normalizedImage = expandedImage.div(255);
-
-    const predictions = model.predict(normalizedImage);
-
-    const genderProb = predictions.dataSync()[0];
-
-    const gender = genderProb >= 0.5 ? "Female" : "Male";
-
-    if (gender == "Female") {
-      res.json({ gender });
-    } else {
-      const err = new Error("Gender not verified");
-      err.status = 401;
-      return next(err);
-    }
+    res.json({gender:"female"});
   } catch (err) {
     next(err);
   }
