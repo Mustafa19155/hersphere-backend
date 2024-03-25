@@ -1,5 +1,7 @@
 import {
+  Dimensions,
   Image,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,18 +14,25 @@ import {useNavigation} from '@react-navigation/native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import global from '../../assets/styles/global';
 import {Button, Checkbox, TextInput} from 'react-native-paper';
-import {postOnFacebook, postOnInstagram} from '../../api/socialmediaPosts';
+import {
+  postOnFacebook,
+  postOnInstagram,
+  postOnYoutube,
+} from '../../api/socialmediaPosts';
 import {AuthContext} from '../../contexts/userContext';
 import {useToast} from 'react-native-toast-notifications';
+import {getDownloadURL, ref, uploadBytes} from 'firebase/storage';
+import {storage} from '../../firebase';
 
 const UploadMediaAndPost = ({route}) => {
   const [loading, setloading] = useState(false);
   const [request, setrequest] = useState(null);
   const [facebookImage, setfacebookImage] = useState(null);
   const [facebookCaption, setfacebookCaption] = useState('');
+  const [youtubeTitle, setyoutubeTitle] = useState('');
   const [youtubeImage, setyoutubeImage] = useState(null);
   const [youtubeCaption, setyoutubeCaption] = useState('');
-  const [youtubeType, setyoutubeType] = useState('image');
+  const [youtubeType, setyoutubeType] = useState('video');
   const [readOnly, setreadOnly] = useState(false);
   const [apiCalled, setapiCalled] = useState(false);
 
@@ -38,7 +47,7 @@ const UploadMediaAndPost = ({route}) => {
     setloading(true);
     getPromotion({id})
       .then(res => {
-        if (res.allowerInfluencerToAddData) {
+        if (res.allowInfluencerToAddData) {
           setreadOnly(false);
         } else {
           if (res.content.facebook) {
@@ -55,6 +64,7 @@ const UploadMediaAndPost = ({route}) => {
         setloading(false);
       })
       .catch(err => {
+        console.log(err);
         setloading(false);
       });
   };
@@ -71,7 +81,7 @@ const UploadMediaAndPost = ({route}) => {
   const handleSelectYoutubeImage = async () => {
     try {
       const result = await launchImageLibrary({
-        mediaType: youtubeType == 'video' ? 'video' : 'photo',
+        mediaType: youtubeType == 'video' ? 'video' : 'video',
       });
       if (!result.didCancel) {
         setyoutubeImage(result.assets[0].uri);
@@ -80,33 +90,63 @@ const UploadMediaAndPost = ({route}) => {
   };
 
   const handlePost = async () => {
-    setapiCalled(true);
-    if (request.platforms.includes('facebook')) {
-      if (facebookImage && facebookCaption) {
+    try {
+      setapiCalled(true);
+      if (
+        request.platforms.includes('facebook') ||
+        request.platforms.includes('instagram')
+      ) {
+        if (!facebookCaption || !facebookImage) {
+          setapiCalled(false);
+          return toast.show('Please fill all fields for facebook/instagram', {
+            type: 'danger',
+          });
+        }
+      }
+
+      // upload image to firebase and get url
+
+      const response = await fetch(facebookImage);
+      const blob = await response.blob();
+      const storageRef = ref(storage, `postImages/${Date.now()}.png`);
+      await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(storageRef);
+
+      if (request.platforms.includes('facebook')) {
         await postOnFacebook({
           pageId: user.facebookPage.id,
           accessToken: user.facebookPage.access_token,
           message: facebookCaption,
-          url: facebookImage,
+          url,
         });
       }
-    }
-    if (request.platforms.includes('instagram')) {
-      await postOnInstagram({
-        facebookAccessToken: user.instagramPage.token,
-        instagramAccountId: user.instagramPage.id,
-        caption: facebookCaption,
-        imageUrl: facebookImage,
-      });
-    }
-    if (request.platforms.includes('youtube')) {
-    }
+      if (request.platforms.includes('instagram')) {
+        await postOnInstagram({
+          facebookAccessToken: user.instagramPage.token,
+          instagramAccountId: user.instagramPage.id,
+          caption: facebookCaption,
+          imageUrl: url,
+        });
+      }
+      if (request.platforms.includes('youtube')) {
+        if (youtubeCaption && youtubeImage) {
+          await postOnYoutube({
+            file: youtubeImage,
+            title: youtubeCaption,
+            description: youtubeCaption,
+            accessToken: user.youtubeChannel.token,
+          });
+        }
+      }
 
-    await startPromotion({id: request._id});
+      await startPromotion({id: request._id});
 
-    toast.show('Posts have been uploaded', {type: 'success'});
-    navigation.navigate('Main');
-    setapiCalled(false);
+      toast.show('Posts have been uploaded', {type: 'success'});
+      navigation.navigate('Main');
+      setapiCalled(false);
+    } catch (err) {
+      setapiCalled(false);
+    }
   };
 
   useEffect(() => {
@@ -114,11 +154,15 @@ const UploadMediaAndPost = ({route}) => {
   }, []);
 
   return (
-    <ScrollView>
-      {request && (
-        <View>
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View
+        style={{
+          justifyContent: 'space-between',
+          gap: 30,
+        }}>
+        {request && (
           <>
-            <View style={{width: '100%', gap: 25, marginBottom: 20}}>
+            <View style={{width: '100%', gap: 25}}>
               {(request.platforms.includes('instagram') ||
                 request.platforms.includes('facebook')) && (
                 <View>
@@ -166,73 +210,68 @@ const UploadMediaAndPost = ({route}) => {
                       </TouchableWithoutFeedback>
                     )}
                     {!readOnly && (
-                      <Button
+                      <Pressable
                         onPress={selectFacebookImage}
-                        style={[global.greenBtnSm]}>
+                        style={[
+                          global.greenBtn,
+                          {alignItems: 'center', width: 100},
+                        ]}>
                         <Text style={[global.greenBtnTextSm]}>
                           Upload Content
                         </Text>
-                      </Button>
+                      </Pressable>
+
+                      // <Button
+                      //   onPress={selectFacebookImage}
+                      //   style={[global.greenBtnSm]}>
+                      //   <Text style={[global.greenBtnTextSm]}>
+                      //     Upload Content
+                      //   </Text>
+                      // </Button>
                     )}
                   </View>
                 </View>
               )}
+
               {request.platforms.includes('youtube') && (
                 <View style={{gap: 10}}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                    }}>
-                    <Text style={[global.fontBold]}>Youtube Content</Text>
-                    {!readOnly && (
-                      <View
-                        style={{flexDirection: 'row', alignItems: 'center'}}>
-                        <Checkbox
-                          color="#13B887"
-                          status={
-                            youtubeType == 'video' ? 'checked' : 'unchecked'
-                          }
-                          onPress={() => {
-                            setyoutubeImage(null);
-                            setyoutubeType(
-                              youtubeType == 'video' ? 'image' : 'video',
-                            );
-                          }}
-                        />
-                        <Text
-                          style={[global.textExtraSmall, global.gray3Color]}>
-                          Upload Video
-                        </Text>
-                      </View>
-                    )}
-                  </View>
+                  <Text
+                    style={[
+                      global.textSmall,
+                      global.fontBold,
+                      global.blackColor,
+                    ]}>
+                    Add Youtube Video
+                  </Text>
                   <TextInput
-                    placeholder="Caption"
-                    value={youtubeCaption}
-                    disabled={readOnly}
-                    textColor="black"
-                    onChangeText={text => {
-                      setyoutubeCaption(text);
-                    }}
-                    multiline={true}
+                    placeholder="Title"
+                    value={youtubeTitle}
+                    onChangeText={setyoutubeTitle}
                     outlineColor="transparent"
-                    cursorColor="black"
                     activeOutlineColor="transparent"
-                    style={[global.gray2Back, {width: '100%'}]}
-                    numberOfLines={4}
+                    style={[global.gray2Back]}
+                    underlineColor="transparent"
+                    mode="outlined"
+                  />
+                  <TextInput
+                    placeholder="Description"
+                    value={youtubeCaption}
+                    onChangeText={setyoutubeCaption}
+                    outlineColor="transparent"
+                    activeOutlineColor="transparent"
+                    style={[global.gray2Back]}
+                    numberOfLines={5}
+                    multiline={true}
                     underlineColor="transparent"
                     mode="outlined"
                   />
                   {youtubeImage && (
                     <TouchableWithoutFeedback
-                      disabled={readOnly}
                       onPress={() => {
                         setyoutubeImage(null);
                       }}>
                       <Image
-                        source={{uri: youtubeImage}}
+                        source={{uri: youtubeImage.uri}}
                         style={{
                           height: 100,
                           width: 100,
@@ -242,29 +281,28 @@ const UploadMediaAndPost = ({route}) => {
                       />
                     </TouchableWithoutFeedback>
                   )}
-                  {!readOnly && (
-                    <Button
-                      onPress={handleSelectYoutubeImage}
-                      style={[global.greenBtnSm]}>
-                      <Text style={[global.greenBtnTextSm]}>
-                        Upload Content
-                      </Text>
-                    </Button>
-                  )}
+                  <Pressable
+                    onPress={handleSelectYoutubeImage}
+                    style={[
+                      global.greenBtn,
+                      {alignItems: 'center', width: 100},
+                    ]}>
+                    <Text style={[global.greenBtnTextSm]}>Select Video</Text>
+                  </Pressable>
                 </View>
               )}
             </View>
+            <Button
+              style={[global.greenBtn]}
+              disabled={apiCalled}
+              onPress={handlePost}>
+              <Text style={[global.greenBtnText]}>
+                {apiCalled ? 'Loading...' : 'Post'}
+              </Text>
+            </Button>
           </>
-          <Button
-            style={[global.greenBtn]}
-            disabled={apiCalled}
-            onPress={handlePost}>
-            <Text style={[global.greenBtnText]}>
-              {apiCalled ? 'Loading...' : 'Post'}
-            </Text>
-          </Button>
-        </View>
-      )}
+        )}
+      </View>
     </ScrollView>
   );
 };

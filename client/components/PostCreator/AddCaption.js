@@ -78,7 +78,6 @@ const AddCaption = () => {
         toast.show('Caption cannot be empty', {type: 'danger'});
       }
     } catch (err) {
-      console.log(err);
       setapiCalled(false);
     }
   };
@@ -100,78 +99,80 @@ const AddCaption = () => {
         style={{
           flex: 1,
           justifyContent: 'space-between',
-          gap: 20,
-          minHeight: Dimensions.get('window').height - 140,
+          gap: 30,
         }}>
-        <View style={{gap: 10}}>
-          <Text style={[global.textSmall, global.fontBold, global.blackColor]}>
-            Add Caption
-          </Text>
-          <TextInput
-            placeholder="Caption"
-            value={description}
-            onChangeText={setdescription}
-            multiline={true}
-            outlineColor="transparent"
-            activeOutlineColor="transparent"
-            style={[global.gray2Back]}
-            numberOfLines={5}
-            underlineColor="transparent"
-            mode="outlined"
-          />
-        </View>
-
-        {requestData.platforms.includes('youtube') && (
+        <View style={{gap: 20}}>
           <View style={{gap: 10}}>
             <Text
               style={[global.textSmall, global.fontBold, global.blackColor]}>
-              Add Youtube Video
+              Add Caption
             </Text>
             <TextInput
-              placeholder="Title"
-              value={youtubeTitle}
-              onChangeText={setyoutubeTitle}
-              outlineColor="transparent"
-              activeOutlineColor="transparent"
-              style={[global.gray2Back]}
-              underlineColor="transparent"
-              mode="outlined"
-            />
-            <TextInput
-              placeholder="Description"
-              value={youtubeDescription}
-              onChangeText={setyoutubeDescription}
+              placeholder="Caption"
+              value={description}
+              onChangeText={setdescription}
+              multiline={true}
               outlineColor="transparent"
               activeOutlineColor="transparent"
               style={[global.gray2Back]}
               numberOfLines={5}
-              multiline={true}
               underlineColor="transparent"
               mode="outlined"
             />
-            {youtubeVideo && (
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setyoutubeVideo(null);
-                }}>
-                <Image
-                  source={{uri: youtubeVideo.uri}}
-                  style={{
-                    height: 100,
-                    width: 100,
-                    borderRadius: 10,
-                    marginTop: 10,
-                  }}
-                />
-              </TouchableWithoutFeedback>
-            )}
-            <Pressable
-              onPress={handleSelectYoutubeImage}
-              style={[global.greenBtn, {alignItems: 'center', width: 100}]}>
-              <Text style={[global.greenBtnTextSm]}>Select Video</Text>
-            </Pressable>
           </View>
-        )}
+
+          {requestData.platforms.includes('youtube') && (
+            <View style={{gap: 10}}>
+              <Text
+                style={[global.textSmall, global.fontBold, global.blackColor]}>
+                Add Youtube Video
+              </Text>
+              <TextInput
+                placeholder="Title"
+                value={youtubeTitle}
+                onChangeText={setyoutubeTitle}
+                outlineColor="transparent"
+                activeOutlineColor="transparent"
+                style={[global.gray2Back]}
+                underlineColor="transparent"
+                mode="outlined"
+              />
+              <TextInput
+                placeholder="Description"
+                value={youtubeDescription}
+                onChangeText={setyoutubeDescription}
+                outlineColor="transparent"
+                activeOutlineColor="transparent"
+                style={[global.gray2Back]}
+                numberOfLines={5}
+                multiline={true}
+                underlineColor="transparent"
+                mode="outlined"
+              />
+              {youtubeVideo && (
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    setyoutubeVideo(null);
+                  }}>
+                  <Image
+                    source={{uri: youtubeVideo.uri}}
+                    style={{
+                      height: 100,
+                      width: 100,
+                      borderRadius: 10,
+                      marginTop: 10,
+                    }}
+                  />
+                </TouchableWithoutFeedback>
+              )}
+              <Pressable
+                onPress={handleSelectYoutubeImage}
+                style={[global.greenBtn, {alignItems: 'center', width: 100}]}>
+                <Text style={[global.greenBtnTextSm]}>Select Video</Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
         <Button
           // disabled={apiCalled}
           onPress={postOnSocialMedia}

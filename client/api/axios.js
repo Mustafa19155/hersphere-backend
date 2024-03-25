@@ -19,7 +19,6 @@ axiosClient.interceptors.request.use(
     try {
       const user = await AsyncStorage.getItem('user');
       const token = JSON.parse(user).token;
-      console.log(token);
       axiosClient.defaults.headers = {Authorization: `${token}`};
     } catch (err) {}
     return config;

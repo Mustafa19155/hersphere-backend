@@ -45,14 +45,14 @@ function App() {
     //       : navigation.navigate('Authentication');
     //   })
     //   .catch(err => {});
-    // if (user == null) {
-    //   navigation.navigate('login');
-    // } else {
-    //   user.profileCompleted
-    //     ? navigation.navigate('Main')
-    //     : navigation.navigate('Authentication');
-    // }
-  }, []);
+    if (user == null) {
+      navigation.navigate('login');
+    } else {
+      user.profileCompleted
+        ? navigation.navigate('Main')
+        : navigation.navigate('Authentication');
+    }
+  }, [user]);
 
   useEffect(() => {
     if (user) {

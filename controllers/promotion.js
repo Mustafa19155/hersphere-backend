@@ -103,9 +103,15 @@ exports.getPromotion = async (req, res, next) => {
 exports.getPromotions = async (req, res, next) => {
   try {
     const promotions = await Promotion.find({
-      influencerID: req.userId,
+      $or: [{ userID: req.userId }, { influencerID: req.userId }],
     }).populate("userID influencerID transactionID");
-    res.send(promotions);
+
+    res.send(
+      promotions.filter(
+        (promotion) =>
+          promotion.status !== "rejected" && promotion.influencerID != null
+      )
+    );
   } catch (err) {
     next(err);
   }

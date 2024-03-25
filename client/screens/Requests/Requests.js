@@ -28,9 +28,7 @@ const Requests = () => {
       .then(res => {
         setrequests(res);
       })
-      .catch(err => {
-        console.log(err);
-      });
+      .catch(err => {});
   };
 
   useFocusEffect(

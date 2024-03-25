@@ -210,7 +210,7 @@ const RequestDetails = ({route}) => {
               </Pressable>
             </View>
           )}
-          {request.status == 'not-started' && (
+          {request.status == 'not-started' && user.userType != 'startup' && (
             <Button
               onPress={() =>
                 navigation.navigate('SelectMedia', {id: request._id})

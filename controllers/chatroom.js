@@ -158,22 +158,23 @@ exports.getUserChats = async (req, res, next) => {
       .populate("membersID chats.sentBy")
       .select("-membersID.password")
       .sort({ "lastMsg.date": -1 });
-
     res.send(
-      chatrooms.map((chatroom) => {
-        return {
-          ...chatroom._doc,
-          name: chatroom.membersID.find(
-            (member) => member._id.toString() !== req.userId
-          ).username,
-          unreadMessages: chatroom.chats.filter(
-            (chat) =>
-              chat.sentBy !== req.userId &&
-              !chat.readBy.includes(req.userId) &&
-              chat.deliveredTo.includes(req.userId)
-          ).length,
-        };
-      })
+      chatrooms
+        .filter((chat) => chat.membersID.length > 1)
+        .map((chatroom) => {
+          return {
+            ...chatroom._doc,
+            name: chatroom.membersID.find(
+              (member) => member._id.toString() !== req.userId
+            ).username,
+            unreadMessages: chatroom.chats.filter(
+              (chat) =>
+                chat.sentBy !== req.userId &&
+                !chat.readBy.includes(req.userId) &&
+                chat.deliveredTo.includes(req.userId)
+            ).length,
+          };
+        })
     );
   } catch (error) {
     next(error);

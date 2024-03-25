@@ -39,11 +39,11 @@ const LoginScreen = () => {
         .then(res => {
           setapiCalled(false);
           setuser(res);
-          if (res.profileCompleted) {
-            navigation.replace('Main');
-          } else {
-            navigation.replace('Authentication');
-          }
+          // if (res.profileCompleted) {
+          //   navigation.replace('Main');
+          // } else {
+          //   navigation.replace('Authentication');
+          // }
         })
         .catch(err => {
           toast.show('Invalid username or email', {type: 'danger'});
@@ -51,30 +51,6 @@ const LoginScreen = () => {
         });
     }
   };
-
-  useEffect(() => {
-    const a = async () => {
-      try {
-        const a = await axios.post('http://192.168.18.55:8000/api/user/login', {
-          email: 'mustafa4@gmail.com',
-          password: '123',
-        });
-        console.log(a.headers);
-        // const b = await axios.post(
-        //   'http://192.168.18.55:8000/api/todo/add-task',
-        //   {
-        //     text: 'asd',
-        //     completed: false,
-        //   },
-        // );
-
-        // console.log(b.data);
-      } catch (err) {
-        console.log(err.response.data);
-      }
-    };
-    // a();
-  }, []);
 
   const handleGoogleLogin = () => {
     loginWithGoogle()
