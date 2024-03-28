@@ -59,7 +59,7 @@ exports.startPromotion = async (req, res, next) => {
   try {
     const promotion = await Promotion.findByIdAndUpdate(
       req.params.id,
-      { status: "started" },
+      { status: "started", startedOn: Date.now() },
       { new: true }
     );
     res.send(promotion);

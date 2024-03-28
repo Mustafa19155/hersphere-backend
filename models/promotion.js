@@ -18,7 +18,7 @@ const PromotionSchema = new Schema(
     influencerID: { type: mongoose.Types.ObjectId, ref: "User" },
     status: {
       type: String,
-      enum: ["started", "not-started", "rejected", "pending"],
+      enum: ["started", "not-started", "rejected", "pending", "failed"],
       default: "pending",
     },
     content: {

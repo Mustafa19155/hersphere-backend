@@ -8,6 +8,7 @@ const TransactionSchema = new Schema(
     amount: { type: Number },
     type: { type: String, enum: ["card", "wallet"] },
     reason: { type: String },
+    direction: { type: String, enum: ["in", "out"], default: "in" },
   },
   { timestamps: true }
 );

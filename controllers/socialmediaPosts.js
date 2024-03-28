@@ -1,5 +1,5 @@
 const axios = require("axios");
-const Post = require("../models/Post");
+const Post = require("../models/post");
 const { google } = require("googleapis");
 const { Readable } = require("stream");
 

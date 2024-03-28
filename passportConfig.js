@@ -2,6 +2,7 @@ const LocalStrategy = require("passport-local").Strategy;
 var GoogleStrategy = require("passport-google-oauth2").Strategy;
 
 const User = require("./models/user");
+const Admin = require("./models/admin");
 const bcrypt = require("bcryptjs");
 
 exports.initializingPassport = (passport) => {
@@ -13,16 +14,10 @@ exports.initializingPassport = (passport) => {
       },
       async (email, password, done) => {
         try {
-          const foundUser = await User.findOne({ email: email });
+          const foundUser = await Admin.findOne({ email: email });
           if (!foundUser) {
             return done(null, false, { message: "User does not exist" });
           } else {
-            if (foundUser.googleId) {
-              return done(null, false, {
-                message:
-                  "This account is linked with google. Try logging in with google",
-              });
-            }
             const validPass = await bcrypt.compare(
               password,
               foundUser.password
@@ -35,38 +30,6 @@ exports.initializingPassport = (passport) => {
           }
         } catch (err) {
           return done(err, false);
-        }
-      }
-    )
-  );
-
-  passport.use(
-    new GoogleStrategy(
-      {
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL,
-        passReqToCallback: true,
-      },
-      async function (request, accessToken, refreshToken, profile, cb) {
-        let foundUser = await User.findOne({ email: profile.email });
-        if (foundUser) {
-          return cb(null, foundUser);
-        } else {
-          const data = {
-            username: profile.displayName,
-            isVerified: profile.email_verified,
-            email: profile.email,
-            googleId: profile.id,
-          };
-          const user = new User(data);
-          user.save((error, registeredUser) => {
-            if (error) {
-              return cb(error, null);
-            } else {
-              return cb(null, registeredUser);
-            }
-          });
         }
       }
     )

@@ -45,20 +45,19 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    credentials: true,
+    // credentials: true,
     // origin: ["http://localhost:3000",],
-    origin: [
-      "*",
-      // "http://localhost:19000",
-      // "http://192.168.18.60:19000",
-      // "http://192.168.18.64:19000",
-      // "http://192.168.18.12:19000",
-      // "http://172.20.10.2:19000",
-      // process.env.CLIENT_BASE_URL,
-    ],
-
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    // origin: [
+    // "*",
+    // "http://localhost:19000",
+    // "http://192.168.18.60:19000",
+    // "http://192.168.18.64:19000",
+    // "http://192.168.18.12:19000",
+    // "http://172.20.10.2:19000",
+    // process.env.CLIENT_BASE_URL,
+    // ],
+    // methods: ["GET", "POST", "PUT", "DELETE"],
+    // allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -104,6 +103,7 @@ app.use("/api/job", verifyJWT, jobRouter);
 app.use("/api/job-request", verifyJWT, jobRequestRouter);
 app.use("/api/chatroom", verifyJWT, chatroomRouter);
 app.use("/api/promotion", verifyJWT, require("./routes/promotion"));
+app.use("/api/admin", require("./routes/admin"));
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public", "index.html"));
