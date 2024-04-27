@@ -1,5 +1,7 @@
 const Promotion = require("../models/promotion");
 const Transaction = require("../models/transaction");
+const Post = require("../models/post");
+const User = require("../models/user");
 
 exports.createPromotion = async (req, res, next) => {
   try {
@@ -124,6 +126,60 @@ exports.getPendingRequests = async (req, res, next) => {
       influencerID: req.userId,
     }).populate("userID influencerID transactionID");
     res.send(promotions);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.completePromotion = async (req, res, next) => {
+  try {
+    // check if post likes and counts are equal or greater than the requirements
+    const promotion = await Promotion.findById(req.params.id);
+    const posts = await Post.find({ promotionID: req.params.id });
+    const user = await User.findById(req.userId);
+
+    let isCompleted = false;
+
+    for (let post of posts) {
+      if (post.platform === "facebook") {
+        const facebookPost = await axios.get(
+          `https://graph.facebook.com/v12.0/${post.postID}?fields=likes.limit(10).summary(true),comments.limit(10).summary(true)&access_token=${user.facebookPage.access_token}`
+        );
+        facebookPost.data.likes.summary.total_count >=
+          promotion.requirements.likes &&
+        facebookPost.data.comments.summary.total_count >=
+          promotion.requirements.comments
+          ? (isCompleted = true)
+          : (isCompleted = false);
+      } else if (post.platform === "instagram") {
+        const instagramPost = await axios.get(
+          `https://graph.facebook.com/v12.0/${post.postID}?fields=like_count,comments_count&access_token=${user.instagramPage.token}`
+        );
+
+        instagramPost.data.like_count >= promotion.requirements.likes &&
+        instagramPost.data.comments_count >= promotion.requirements.comments
+          ? (isCompleted = true)
+          : (isCompleted = false);
+      } else if (post.platform === "youtube") {
+        const youtubePost = await axios.get(
+          `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${post.postID}&key=${process.env.YOUTUBE_API_KEY}`
+        );
+
+        youtubePost.data.items[0].statistics.likeCount >=
+          promotion.requirements.likes &&
+        youtubePost.data.items[0].statistics.commentCount >=
+          promotion.requirements.comments
+          ? (isCompleted = true)
+          : (isCompleted = false);
+      }
+
+      if (isCompleted) {
+        promotion.status = "completed";
+        await promotion.save();
+      }
+
+      res.send(promotion);
+    }
   } catch (err) {
     next(err);
   }

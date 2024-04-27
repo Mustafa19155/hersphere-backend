@@ -1,5 +1,6 @@
 const axios = require("axios");
 const Post = require("../models/post");
+const Promotion = require("../models/promotion");
 const User = require("../models/user");
 const { google } = require("googleapis");
 const { Readable } = require("stream");
@@ -173,6 +174,9 @@ exports.uploadToYoutube = async (req, res, next) => {
 exports.getPostsDetailsByRequest = async (req, res, next) => {
   try {
     const { promotionId } = req.params;
+    const promotion = await Promotion.findById(promotionId).populate(
+      "userID influencerID transactionID"
+    );
     const posts = await Post.find({ promotionID: promotionId });
     const user = await User.findById(req.userId);
 
@@ -187,23 +191,33 @@ exports.getPostsDetailsByRequest = async (req, res, next) => {
         const facebookPost = await axios.get(
           `https://graph.facebook.com/v12.0/${post.postID}?fields=likes.limit(10).summary(true),comments.limit(10).summary(true)&access_token=${user.facebookPage.access_token}`
         );
-        postDetails.push({ facebookPost: facebookPost.data });
+        console.log(facebookPost.data);
+        postDetails.push({
+          facebook: {
+            likes: facebookPost.data.likes.summary.total_count,
+            comments: facebookPost.data.comments.summary.total_count,
+          },
+        });
       } else if (post.platform === "instagram") {
         const instagramPost = await axios.get(
           `https://graph.facebook.com/v12.0/${post.postID}?fields=like_count,comments_count&access_token=${user.instagramPage.token}`
         );
 
-        postDetails.push({ instagramPost: instagramPost.data });
+        postDetails.push({
+          instagram: {
+            likes: instagramPost.data.like_count,
+            comments: instagramPost.data.comments_count,
+          },
+        });
       } else {
         const youtubePost = await axios.get(
           `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${post.postID}&key=${process.env.YOUTUBE_API_KEY}`
         );
 
-        postDetails.push({ youtubePost: youtubePost.data });
+        postDetails.push({ youtube: youtubePost.data });
       }
     }
-
-    return res.send(postDetails);
+    return res.send({ promotion, postDetails });
   } catch (err) {
     next(err);
   }
