@@ -1,4 +1,3 @@
-const express = require("express");
 const User = require("../models/user");
 const axios = require("axios");
 const { google } = require("googleapis");
@@ -9,6 +8,8 @@ const sharp = require("sharp");
 const fs = require("fs").promises;
 const Job = require("../models/job");
 const mongoose = require("mongoose");
+const Promotion = require("../models/promotion");
+const Review = require("../models/review");
 
 exports.getFacebookPages = async (req, res, next) => {
   try {
@@ -29,10 +30,10 @@ exports.getFacebookPages = async (req, res, next) => {
 
     await Promise.all(
       pages.map(async (page) => {
-        const found = await User.findOne({ "facebookPage.id": page.id });
-        if (!found) {
-          finalPages.push(page);
-        }
+        // const found = await User.findOne({ "facebookPage.id": page.id });
+        // if (!found) {
+        finalPages.push(page);
+        // }
       })
     );
 
@@ -82,10 +83,10 @@ exports.getInstagramPages = async (req, res, next) => {
 
     await Promise.all(
       pages.map(async (page) => {
-        const found = await User.findOne({ "instagramPage.id": page.id });
-        if (!found) {
-          finalPages.push(page);
-        }
+        // const found = await User.findOne({ "instagramPage.id": page.id });
+        // if (!found) {
+        finalPages.push(page);
+        // }
       })
     );
 
@@ -234,7 +235,7 @@ exports.register = async (req, res, next) => {
 
     data["password"] = bcrypt.hashSync(data.password, 8);
 
-    const user = new User(req.body);
+    const user = new User({ ...req.body, porfileCompleted: false });
 
     await user.save();
 
@@ -412,68 +413,32 @@ exports.verifyGender = async (req, res, next) => {
   }
 };
 
-exports.getUserJobRequestDetails = async (req, res, next) => {
+exports.recommendedInfluencers = async (req, res, next) => {
   try {
-    const { userId } = req.params;
-    const user = await User.findById(userId);
+    const category = req.query.category;
 
-    // const jobs = await Job.find({
-    //   "employee.userID": userId,
-    //   review: { $exists: true },
-    // }).populate("workplaceID");
-
-    const jobs = await Job.aggregate([
+    const highestRating = await Review.aggregate([
       {
         $match: {
-          "employee.userID": mongoose.Types.ObjectId(userId),
-          review: { $exists: true },
+          requestID: { $exists: true }, // Filter documents with requestID field
+          "requestID.category": { $regex: /Category 1/i }, // Match documents with requestID containing the specified category
         },
       },
       {
-        $lookup: {
-          from: "workplaces",
-          localField: "workplaceID",
-          foreignField: "_id",
-          as: "workplace",
+        $group: {
+          _id: "$givenTo", // Group by the givenTo field
+          averageRating: { $avg: "$rating" }, // Calculate the average rating for each user
         },
       },
       {
-        $unwind: "$workplace",
-      },
-      // populate workplace createdBy field
-      {
-        $lookup: {
-          from: "users",
-          localField: "workplace.createdBy",
-          foreignField: "_id",
-          as: "workplace.createdBy",
-        },
+        $sort: { averageRating: -1 }, // Sort by average rating in descending order
       },
       {
-        $unwind: "$workplace.createdBy",
+        $limit: 3, // Limit the results to the top 5 users
       },
     ]);
 
-    // get average rating
-    let totalRating = 0;
-    jobs.forEach((job) => {
-      totalRating += job.review.rating;
-    });
-
-    const avgRating = (totalRating / jobs.length).toFixed(1);
-
-    res.json({ ...user._doc, averageRating: avgRating, jobs });
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.recommendedInfluencers = async (req, res, next) => {
-  try {
     const users = await User.find({ userType: "influencer" }).limit(3);
-    // const recommendedUsers = users.filter((user) => {
-    //   return user.skills.includes(user.skills);
-    // });
     res.json(
       users.map((user) => {
         const platforms = [];
@@ -513,11 +478,22 @@ exports.getInfluencerProfileForRequest = async (req, res, next) => {
       platforms.push("youtube");
     }
 
+    const reviews = await Review.find({
+      givenTo: id,
+      requestID: { $exists: true },
+    }).populate("givenBy");
+    const totalPromotions = await Promotion.find({
+      influencerID: id,
+    }).countDocuments();
+
     res.json({
       ...influencer._doc,
-      rating: 5,
-      reviews: [],
-      totalPromotions: 0,
+      rating:
+        reviews.length > 0
+          ? reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length
+          : 0,
+      reviews,
+      totalPromotions,
       platforms,
     });
   } catch (err) {
@@ -535,12 +511,23 @@ exports.searchInfluencers = async (req, res, next) => {
     if (name) {
       query["username"] = { $regex: name, $options: "i" };
     }
+
     if (platforms) {
-      query["$or"] = [
-        { facebookPage: { $exists: true } },
-        { instagramPage: { $exists: true } },
-        { youtubeChannel: { $exists: true } },
-      ];
+      // check if all platforms are included in user's profile
+
+      query["$and"] = platforms.map((platform) => {
+        return platform == "facebook"
+          ? { facebookPage: { $exists: true } }
+          : platform == "instagram"
+          ? { instagramPage: { $exists: true } }
+          : { youtubeChannel: { $exists: true } };
+      });
+
+      // query["$or"] = [
+      //   { facebookPage: platforms.includes("facebook") && { $exists: true } },
+      //   { instagramPage: platforms.includes("instagram") && { $exists: true } },
+      //   { youtubeChannel: platforms.includes("youtube") && { $exists: true } },
+      // ];
       // query["$or"] = [
       //   platforms.includes("facebook") && { facebookPage: { $exists: true } },
       //   platforms.includes("instagram") && { instagramPage: { $exists: true } },
@@ -581,6 +568,83 @@ exports.checkLogin = async (req, res, next) => {
     } else {
       res.status(404).send("User not found");
     }
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.influencerDashboard = async (req, res, next) => {
+  try {
+    const highestSuccess = await Promotion.aggregate([
+      {
+        $group: {
+          _id: "$influencerID", // Group by influencerID
+          all: { $sum: 1 }, // Count all promotions for each influencer
+          completed: {
+            // Count completed promotions for each influencer
+            $sum: {
+              $cond: [{ $eq: ["$status", "completed"] }, 1, 0],
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "users", // Name of the collection to perform the lookup
+          localField: "_id", // Field from the current collection (promotions) to match with foreignField
+          foreignField: "_id", // Field from the foreign collection (influencers) to match with localField
+          as: "influencer", // Name of the field to store the result of the lookup
+        },
+      },
+      {
+        $unwind: { path: "$influencer" },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id field from the output
+          influencerID: "$_id", // Rename _id as influencerID
+          all: 1, // Include all promotions count in the output
+          completed: 1, // Include completed promotions count in the output
+          influencer: 1, // Include influencer details in the output
+          successScore: {
+            $divide: ["$completed", "$all"], // Calculate success score by dividing completed promotions by all promotions
+          },
+        },
+      },
+      {
+        $sort: { successScore: -1 }, // Sort by successScore in descending order
+      },
+      {
+        $limit: 5, // Limit the results to 5 users
+      },
+    ]);
+
+    const highestRating = await Review.aggregate([
+      {
+        $match: {
+          requestID: { $exists: true }, // Filter documents with requestID field
+        },
+      },
+      {
+        $group: {
+          _id: "$givenTo", // Group by the givenTo field
+          averageRating: { $avg: "$rating" }, // Calculate the average rating for each user
+        },
+      },
+      {
+        $sort: { averageRating: -1 }, // Sort by average rating in descending order
+      },
+      {
+        $limit: 5, // Limit the results to the top 5 users
+      },
+    ]);
+
+    res.send({
+      highestSuccess: highestSuccess.map((suc) => {
+        return { ...suc, badge: suc.successScore > 0.5 ? "gold" : "silver" };
+      }),
+      highestRating,
+    });
   } catch (err) {
     next(err);
   }

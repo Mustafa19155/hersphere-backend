@@ -3,6 +3,7 @@ const Job = require("../models/job");
 const Workplace = require("../models/workplace");
 const JobRequest = require("../models/jobRequest");
 const Chatroom = require("../models/chatroom");
+const Review = require("../models/review");
 
 // Create a new job
 exports.createJob = async (req, res, next) => {
@@ -27,6 +28,7 @@ exports.getAllJobs = async (req, res, next) => {
         $match: {
           // employee.userID is null, meaning the job is not taken
           "employee.userID": null,
+          skillset: { $in: req.query.skills.split(",") },
         },
       },
       // populate workplace
@@ -38,6 +40,7 @@ exports.getAllJobs = async (req, res, next) => {
           as: "workplaceID",
         },
       },
+      // find review from review collection based on jobID
       {
         $unwind: "$workplaceID", // Deconstruct the array from the previous lookup stage
       },
@@ -80,7 +83,31 @@ exports.getAllJobs = async (req, res, next) => {
 // Get all jobs of workplace
 exports.getAllWorkplaceJobs = async (req, res, next) => {
   try {
-    const jobs = await Job.find({ workplaceID: req.params.id });
+    // const jobs = await Job.find({ workplaceID: req.params.id });
+
+    // populate jobs with review
+    const jobs = await Job.aggregate([
+      {
+        $match: {
+          workplaceID: mongoose.Types.ObjectId(req.params.id),
+        },
+      },
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "jobID",
+          as: "review",
+        },
+      },
+      {
+        $unwind: {
+          path: "$review",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ]);
+
     res.status(200).json(jobs);
   } catch (error) {
     next(error);
@@ -95,6 +122,8 @@ exports.getJobById = async (req, res, next) => {
       return res.status(404).json({ message: "Job not found" });
     }
 
+    const review = await Review.findOne({ jobID: req.params.id });
+
     // check if user has applied for the job
     const { userId } = req;
     const jobRequest = await JobRequest.findOne({
@@ -102,7 +131,7 @@ exports.getJobById = async (req, res, next) => {
       userID: userId,
     });
 
-    res.status(200).json({ ...job._doc, hasApplied: !!jobRequest });
+    res.status(200).json({ ...job._doc, review, hasApplied: !!jobRequest });
   } catch (error) {
     next(error);
   }
@@ -155,11 +184,13 @@ exports.getJobsOfInfluencer = async (req, res, next) => {
 
     for (let i = 0; i < jobs.length; i++) {
       const job = jobs[i];
+      const review = await Review.findOne({ jobID: job._id });
       const chatroom = await Chatroom.findOne({
         workplaceID: job.workplaceID._id,
       });
       jobs[i] = {
         ...job._doc,
+        review,
         chatroomID: { ...chatroom._doc },
       };
     }
@@ -181,7 +212,7 @@ exports.addReview = async (req, res, next) => {
       return res.status(403).json({ message: "You are not authorized" });
     }
     job.review = { ...req.body, date: Date.now() };
-    await job.save();
+    // await job.save();
     res.status(200).json(job);
   } catch (error) {
     next(error);

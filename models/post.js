@@ -10,6 +10,11 @@ const postSchema = new Schema(
     },
     postID: String,
     platform: String,
+    promotionID: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Promotion",
+      required: true,
+    },
   },
   { timestamps: true }
 );

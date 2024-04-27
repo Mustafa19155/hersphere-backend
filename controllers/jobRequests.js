@@ -3,6 +3,7 @@ const JobRequest = require("../models/jobRequest");
 const Workplace = require("../models/workplace");
 const Job = require("../models/job");
 const Chatroom = require("../models/chatroom");
+const User = require("../models/user");
 
 // Create a new job request
 exports.createJobRequest = async (req, res, next) => {
@@ -217,5 +218,78 @@ exports.deleteJobRequest = async (req, res, next) => {
     res.status(204).json();
   } catch (error) {
     next(error);
+  }
+};
+
+exports.getUserJobRequestDetails = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+
+    const jobs = await Job.aggregate([
+      {
+        $match: {
+          "employee.userID": mongoose.Types.ObjectId(userId),
+        },
+      },
+      {
+        $lookup: {
+          from: "workplaces",
+          localField: "workplaceID",
+          foreignField: "_id",
+          as: "workplace",
+        },
+      },
+      {
+        $unwind: "$workplace",
+      },
+      // populate workplace createdBy field
+      {
+        $lookup: {
+          from: "users",
+          localField: "workplace.createdBy",
+          foreignField: "_id",
+          as: "workplace.createdBy",
+        },
+      },
+      {
+        $unwind: "$workplace.createdBy",
+      },
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "jobID",
+          as: "review",
+        },
+      },
+      {
+        $unwind: {
+          path: "$review",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+    ]);
+
+    //    // get average rating
+    let totalRating = 0;
+    let totalJobsWithRatings = 0;
+    jobs.forEach((job) => {
+      totalJobsWithRatings = job.review
+        ? totalJobsWithRatings + 1
+        : totalJobsWithRatings;
+      totalRating = job.review
+        ? totalRating + Number(job.review.rating)
+        : totalRating;
+    });
+    const avgRating = (totalRating / totalJobsWithRatings).toFixed(1);
+
+    res.json({
+      ...user._doc,
+      averageRating: avgRating,
+      jobs: jobs.filter((job) => job.review),
+    });
+  } catch (err) {
+    next(err);
   }
 };

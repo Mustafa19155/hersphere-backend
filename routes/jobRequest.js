@@ -8,6 +8,8 @@ router.post("/", jobRequestController.createJobRequest);
 // Get all job requests for a specific user
 router.get("/user", jobRequestController.getJobRequestsByUser);
 
+router.get("/details/:userId", jobRequestController.getUserJobRequestDetails);
+
 // Get all jobs of all workplaces of user
 router.get("/:status", jobRequestController.getJobRequestsForUser);
 

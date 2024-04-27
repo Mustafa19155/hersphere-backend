@@ -11,5 +11,6 @@ router.delete("/:id", promotionController.deletePromotion);
 router.get("/", promotionController.getPromotionRequests);
 router.get("/all", promotionController.getPromotions);
 router.get("/single/:id", promotionController.getPromotion);
+router.get("/pending", promotionController.getPendingRequests);
 
 module.exports = router;

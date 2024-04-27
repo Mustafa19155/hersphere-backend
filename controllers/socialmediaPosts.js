@@ -1,11 +1,12 @@
 const axios = require("axios");
 const Post = require("../models/post");
+const User = require("../models/user");
 const { google } = require("googleapis");
 const { Readable } = require("stream");
 
 exports.uploadToFacebook = async (req, res, next) => {
   try {
-    const { accessToken, pageId, url, message } = req.body;
+    const { accessToken, pageId, url, message, promotionId } = req.body;
 
     axios
       .post(`https://graph.facebook.com/v18.0/${pageId}/photos`, {
@@ -18,6 +19,7 @@ exports.uploadToFacebook = async (req, res, next) => {
           platform: "facebook",
           postID: response.data.post_id,
           userID: req.userId,
+          promotionID: promotionId,
         });
 
         await post.save();
@@ -25,7 +27,7 @@ exports.uploadToFacebook = async (req, res, next) => {
         res.send(response.data);
       })
       .catch((error) => {
-        next(error.response.data);
+        next(error?.response?.data);
       });
   } catch (err) {
     next(err);
@@ -34,8 +36,13 @@ exports.uploadToFacebook = async (req, res, next) => {
 
 exports.uploadToInsta = async (req, res, next) => {
   try {
-    const { facebookAccessToken, instagramAccountId, imageUrl, caption } =
-      req.body;
+    const {
+      facebookAccessToken,
+      instagramAccountId,
+      imageUrl,
+      caption,
+      promotionId,
+    } = req.body;
     axios
       .post(
         `https://graph.facebook.com/v18.0/${instagramAccountId}/media?&caption=${caption}&access_token=${facebookAccessToken}&is_carousel_item=${false}`,
@@ -52,6 +59,7 @@ exports.uploadToInsta = async (req, res, next) => {
               platform: "instagram",
               postID: response.data.id,
               userID: req.userId,
+              promotionID: promotionId,
             });
 
             await post.save();
@@ -106,42 +114,10 @@ exports.getPostDetails = async (req, res, next) => {
 exports.uploadToYoutube = async (req, res, next) => {
   // upload post to youtube
   try {
-    // const { accessToken } = req.body;
+    const { accessToken, title, description, file, promotionId } = req.body;
 
-    // const response = await axios.post(
-    //   `https://www.googleapis.com/upload/youtube/v3/videos?part=snippet,status`,
-    //   {
-    //     snippet: {
-    //       title: "asd",
-    //       description: "sad",
-    //     },
-    //     status: {
-    //       privacyStatus: "public",
-    //     },
-    //   },
-    //   {
-    //     headers: {
-    //       Authorization: `Bearer ${accessToken}`,
-    //     },
-    //   }
-    // );
+    // const { originalname, buffer } = req.file;
 
-    // const post = new Post({
-    //   platform: "youtube",
-    //   postID: response.data.id,
-    //   userID: req.userId,
-    // });
-
-    // await post.save();
-
-    // res.send(response.data);
-
-    // Create a new YouTube Data API client
-
-    const { accessToken, title, description } = req.body;
-
-    const { originalname, buffer } = req.file;
-    console.log(accessToken);
     const oauth2Client = new google.auth.OAuth2();
     oauth2Client.setCredentials({
       access_token: accessToken,
@@ -166,7 +142,7 @@ exports.uploadToYoutube = async (req, res, next) => {
       part: "snippet,status",
       media: {
         mimeType: "video/*",
-        body: Readable.from(buffer),
+        body: req.file ? Readable.from(req.file.buffer) : req.body.url,
       },
       notifySubscribers: false,
       resource: metadata,
@@ -181,6 +157,7 @@ exports.uploadToYoutube = async (req, res, next) => {
           platform: "youtube",
           postID: data.data.id,
           userID: req.userId,
+          promotionID: promotionId,
         });
         console.log(data.data);
         await post.save();
@@ -189,6 +166,45 @@ exports.uploadToYoutube = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err);
+    next(err);
+  }
+};
+
+exports.getPostsDetailsByRequest = async (req, res, next) => {
+  try {
+    const { promotionId } = req.params;
+    const posts = await Post.find({ promotionID: promotionId });
+    const user = await User.findById(req.userId);
+
+    if (!posts) {
+      return res.status(404).send("Posts not found");
+    }
+
+    const postDetails = [];
+
+    for (let post of posts) {
+      if (post.platform === "facebook") {
+        const facebookPost = await axios.get(
+          `https://graph.facebook.com/v12.0/${post.postID}?fields=likes.limit(10).summary(true),comments.limit(10).summary(true)&access_token=${user.facebookPage.access_token}`
+        );
+        postDetails.push({ facebookPost: facebookPost.data });
+      } else if (post.platform === "instagram") {
+        const instagramPost = await axios.get(
+          `https://graph.facebook.com/v12.0/${post.postID}?fields=like_count,comments_count&access_token=${user.instagramPage.token}`
+        );
+
+        postDetails.push({ instagramPost: instagramPost.data });
+      } else {
+        const youtubePost = await axios.get(
+          `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${post.postID}&key=${process.env.YOUTUBE_API_KEY}`
+        );
+
+        postDetails.push({ youtubePost: youtubePost.data });
+      }
+    }
+
+    return res.send(postDetails);
+  } catch (err) {
     next(err);
   }
 };

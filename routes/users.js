@@ -23,11 +23,7 @@ router.post(
 );
 router.put("/update", verifyJWT, authController.updateProfile);
 router.put("/password", verifyJWT, authController.updatePassword);
-router.get(
-  "/job-request/:userId",
-  verifyJWT,
-  authController.getUserJobRequestDetails
-);
+
 router.get("/recommended", verifyJWT, authController.recommendedInfluencers);
 router.get(
   "/influencer/request/:id",
@@ -37,5 +33,11 @@ router.get(
 router.get("/influencer/search", verifyJWT, authController.searchInfluencers);
 
 router.get("/check-login", verifyJWT, authController.checkLogin);
+
+router.get(
+  "/influencer-dashboard",
+  verifyJWT,
+  authController.influencerDashboard
+);
 
 module.exports = router;

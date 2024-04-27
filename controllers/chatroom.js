@@ -1,6 +1,7 @@
 const Chatroom = require("../models/chatroom");
 const Job = require("../models/job");
 const Workplace = require("../models/workplace");
+const Review = require("../models/review");
 
 exports.getChatrooms = async (req, res, next) => {
   try {
@@ -25,7 +26,7 @@ exports.getChatroomById = async (req, res, next) => {
       return res.status(404).send({ message: "Chatroom not found" });
     }
 
-    const job = await Job.findOne({
+    let job = await Job.findOne({
       workplaceID: req.params.id,
       employee: { $exists: true },
     });
@@ -43,11 +44,15 @@ exports.getChatroomById = async (req, res, next) => {
         "employee.userID": member._id,
       });
 
-      // Update the job property for the member
-      chatroom.membersID[i] = {
-        ...member._doc,
-        job: job,
-      };
+      if (job) {
+        const review = await Review.findOne({ jobID: job._id });
+
+        // Update the job property for the member
+        chatroom.membersID[i] = {
+          ...member._doc,
+          job: { ...job._doc, review },
+        };
+      }
     }
 
     res.send({ ...chatroom._doc, canDelete });
@@ -120,7 +125,8 @@ exports.getUserChat = async (req, res, next) => {
 
     const chatroom = await Chatroom.findOne({
       workplaceID: { $exists: false },
-      membersID: [req.userId, id],
+      _id: id,
+      // membersID: [req.userId, id],
     })
       .populate("membersID chats.sentBy")
       .select("-membersID.password");
@@ -158,6 +164,7 @@ exports.getUserChats = async (req, res, next) => {
       .populate("membersID chats.sentBy")
       .select("-membersID.password")
       .sort({ "lastMsg.date": -1 });
+
     res.send(
       chatrooms
         .filter((chat) => chat.membersID.length > 1)
@@ -197,6 +204,41 @@ exports.deleteChatroom = async (req, res, next) => {
     await chatroom.remove();
 
     res.send({ message: "Chatroom deleted successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getRecentChats = async (req, res, next) => {
+  try {
+    console.log(req.userId);
+    const chatrooms = await Chatroom.find({
+      workplaceID: { $exists: false },
+      membersID: req.userId,
+    })
+      .populate("membersID chats.sentBy")
+      .select("-membersID.password")
+      .sort({ "lastMsg.date": -1 })
+      .limit(3);
+
+    res.send(
+      chatrooms
+        .filter((chat) => chat.membersID.length > 1)
+        .map((chatroom) => {
+          return {
+            ...chatroom._doc,
+            name: chatroom.membersID.find(
+              (member) => member._id.toString() !== req.userId
+            ).username,
+            unreadMessages: chatroom.chats.filter(
+              (chat) =>
+                chat.sentBy !== req.userId &&
+                !chat.readBy.includes(req.userId) &&
+                chat.deliveredTo.includes(req.userId)
+            ).length,
+          };
+        })
+    );
   } catch (error) {
     next(error);
   }

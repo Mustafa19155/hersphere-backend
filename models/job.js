@@ -19,10 +19,6 @@ const JobSchema = new Schema(
     description: { type: String },
     skillset: [{ type: String }],
     price: { type: Number },
-    reviewID: {
-      type: mongoose.Types.ObjectId,
-      ref: "Review",
-    },
   },
   { timestamps: true }
 );

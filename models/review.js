@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
-const reviewSchema = new mongoose.Schema({
+const ReviewSchema = new Schema({
   givenBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -25,7 +26,7 @@ const reviewSchema = new mongoose.Schema({
   },
   requestID: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Request",
+    ref: "Promotion",
   },
   date: {
     type: Date,
@@ -33,4 +34,4 @@ const reviewSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Review", reviewSchema);
+module.exports = mongoose.model("Review", ReviewSchema);

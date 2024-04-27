@@ -37,7 +37,10 @@ exports.getUserWorkplaces = async (req, res, next) => {
   try {
     const { userId } = req;
 
-    const workplaces = await Workplace.find({ createdBy: userId });
+    const workplaces = await Workplace.find({
+      createdBy: userId,
+      status: "active",
+    });
     res.status(200).json(workplaces);
   } catch (error) {
     next(error);

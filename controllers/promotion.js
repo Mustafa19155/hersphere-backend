@@ -102,16 +102,28 @@ exports.getPromotion = async (req, res, next) => {
 
 exports.getPromotions = async (req, res, next) => {
   try {
+    console.log(req.userId);
     const promotions = await Promotion.find({
       $or: [{ userID: req.userId }, { influencerID: req.userId }],
     }).populate("userID influencerID transactionID");
-
     res.send(
       promotions.filter(
         (promotion) =>
-          promotion.status !== "rejected" && promotion.influencerID != null
+          promotion.status != "rejected" && promotion.influencerID != null
       )
     );
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getPendingRequests = async (req, res, next) => {
+  try {
+    const promotions = await Promotion.find({
+      status: "pending",
+      influencerID: req.userId,
+    }).populate("userID influencerID transactionID");
+    res.send(promotions);
   } catch (err) {
     next(err);
   }
