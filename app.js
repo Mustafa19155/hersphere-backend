@@ -105,6 +105,9 @@ app.use("/api/chatroom", verifyJWT, chatroomRouter);
 app.use("/api/promotion", verifyJWT, require("./routes/promotion"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/review", verifyJWT, require("./routes/review"));
+app.use("/api/wallet", verifyJWT, require("./routes/wallet"));
+app.use("/api/payment", verifyJWT, require("./routes/payment"));
+app.use("/api/transaction", verifyJWT, require("./routes/transaction"));
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public", "index.html"));

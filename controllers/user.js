@@ -10,6 +10,7 @@ const Job = require("../models/job");
 const mongoose = require("mongoose");
 const Promotion = require("../models/promotion");
 const Review = require("../models/review");
+const Wallet = require("../models/wallet");
 
 exports.getFacebookPages = async (req, res, next) => {
   try {
@@ -239,6 +240,10 @@ exports.register = async (req, res, next) => {
 
     await user.save();
 
+    const wallet = new Wallet({ userID: user._id });
+
+    await wallet.save();
+
     let token;
     token = jwt.sign(
       { userId: user._id, email: user.email },
@@ -344,6 +349,10 @@ exports.loginWithGoogle = async (req, res, next) => {
       const user = new User(data);
 
       await user.save();
+
+      const wallet = new Wallet({ userID: user._id });
+
+      await wallet.save();
 
       token = jwt.sign(
         { userId: user._id, email: user.email },

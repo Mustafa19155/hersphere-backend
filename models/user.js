@@ -27,6 +27,10 @@ const ProductSchema = new Schema(
     },
     skills: [],
     businessDetails: {},
+    balance: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
