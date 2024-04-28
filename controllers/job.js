@@ -4,11 +4,27 @@ const Workplace = require("../models/workplace");
 const JobRequest = require("../models/jobRequest");
 const Chatroom = require("../models/chatroom");
 const Review = require("../models/review");
+const User = require("../models/user");
+const Transaction = require("../models/transaction");
 
 // Create a new job
 exports.createJob = async (req, res, next) => {
   try {
     const job = await Job.create(req.body);
+
+    console.log(req.body.paymentMethod == "wallet");
+    if (req.body.paymentMethod == "wallet") {
+      const user = await User.findById(req.userId);
+      user.balance -= req.body.price;
+      await user.save();
+    }
+    await Transaction.create({
+      userID: req.userId,
+      amount: req.body.price,
+      type: req.body.paymentMethod,
+      reason: "Job Payment",
+    });
+
     res.status(201).json(job);
   } catch (error) {
     next(error);
@@ -167,6 +183,20 @@ exports.deleteJobById = async (req, res, next) => {
     if (!job || !workplace) {
       return res.status(404).json({ message: "Job not found" });
     }
+
+    // refund to user wallet
+    const user = await User.findById(req.userId);
+    user.balance += job.price;
+    await user.save();
+
+    await Transaction.create({
+      userID: req.userId,
+      amount: job.price,
+      type: "wallet",
+      reason: "Job Refund",
+      direction: "out",
+    });
+
     res.status(204).json();
   } catch (error) {
     next(error);

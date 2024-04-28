@@ -15,6 +15,12 @@ exports.createPromotion = async (req, res, next) => {
 
     await transaction.save();
 
+    if (req.body.paymentMethod === "wallet") {
+      const user = await User.findById(req.userId);
+      user.balance -= req.body.amount;
+      await user.save();
+    }
+
     const promotion = new Promotion({
       ...req.body,
       transactionID: transaction._id,
@@ -51,7 +57,22 @@ exports.rejectPromotion = async (req, res, next) => {
       req.params.id,
       { status: "rejected" },
       { new: true }
-    );
+    ).populate("transactionID");
+
+    const transaction = new Transaction({
+      userID: promotion.userID,
+      amount: promotion.transactionID.amount,
+      type: "wallet",
+      direction: "out",
+      reason: "Promotion Rejected",
+    });
+
+    const user = await User.findById(promotion.userID);
+    user.balance += promotion.transactionID.amount;
+    await user.save();
+
+    await transaction.save();
+
     res.send(promotion);
   } catch (err) {
     next(err);
