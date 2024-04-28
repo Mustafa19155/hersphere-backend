@@ -465,7 +465,6 @@ exports.getInfluencerProfileForRequest = async (req, res, next) => {
     const { id } = req.params;
 
     const influencer = await User.findById(id);
-
     const platforms = [];
 
     if (influencer._doc.facebookPage) {
@@ -631,9 +630,30 @@ exports.influencerDashboard = async (req, res, next) => {
           averageRating: { $avg: "$rating" }, // Calculate the average rating for each user
         },
       },
+      // populate user details
+      {
+        $lookup: {
+          from: "users", // Name of the collection to perform the lookup
+          localField: "_id", // Field from the current collection (reviews) to match with foreignField
+          foreignField: "_id", // Field from the foreign collection (users) to match with localField
+          as: "user", // Name of the field to store the result of the lookup
+        },
+      },
+      {
+        $unwind: { path: "$user" },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id field from the output
+          averageRating: 1, // Include average rating in the output
+          user: 1, // Include user details in the output
+        },
+      },
+
       {
         $sort: { averageRating: -1 }, // Sort by average rating in descending order
       },
+
       {
         $limit: 5, // Limit the results to the top 5 users
       },

@@ -12,5 +12,6 @@ router.get("/", promotionController.getPromotionRequests);
 router.get("/all", promotionController.getPromotions);
 router.get("/single/:id", promotionController.getPromotion);
 router.get("/pending", promotionController.getPendingRequests);
+router.put("/:id/complete", promotionController.completePromotion);
 
 module.exports = router;
