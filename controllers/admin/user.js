@@ -82,6 +82,14 @@ exports.getUsersWithHighestSuccessScore = async (req, res, next) => {
     // get all promotions and group by influencerID
     const promotions = await Promotion.aggregate([
       {
+        $match: {
+          status: {
+            $nin: ["not-started", "started", "pending", "rejected"], // Exclude promotions with these statuses
+          },
+        },
+      },
+
+      {
         $group: {
           _id: "$influencerID", // Group by influencerID
           all: { $sum: 1 }, // Count all promotions for each influencer

@@ -31,6 +31,12 @@ io = new Server(server);
 module.exports = io;
 
 const chatroomRouter = require("./routes/chatroom");
+const {
+  checkExpiredPromotions,
+  checkActivePromotions,
+  updateWorkplaceStatus,
+  jobPayment,
+} = require("./utils/cron");
 
 // exxport io to be used in other files
 
@@ -108,6 +114,7 @@ app.use("/api/review", verifyJWT, require("./routes/review"));
 app.use("/api/wallet", verifyJWT, require("./routes/wallet"));
 app.use("/api/payment", verifyJWT, require("./routes/payment"));
 app.use("/api/transaction", verifyJWT, require("./routes/transaction"));
+app.use("/api/category", require("./routes/category"));
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public", "index.html"));
@@ -128,6 +135,33 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.send(err);
 });
+
+checkExpiredPromotions();
+checkActivePromotions();
+updateWorkplaceStatus();
+jobPayment();
+
+// const ids = [
+//   "662e81e4c485e21e2046e7ea",
+//   "662e84f9052fd9509868c0ba",
+//   "662e8222052fd9509868c0b8",
+// ];
+// const Promotion = require("./models/promotion");
+// // get all promotiosn and update category according to the ids
+// const a = async () => {
+//   const promotions = await Promotion.find();
+
+//   promotions.forEach(async (promotion) => {
+//     // if (ids.includes(promotion._id.toString())) {
+//     // random id from ids
+//     const randomId = ids[Math.floor(Math.random() * ids.length)];
+//     promotion.category = randomId;
+//     await promotion.save();
+//     // }
+//   });
+// };
+
+// a();
 
 const db = process.env.MONGO_CONNECTION;
 mongoose.connect(db, (err) => {

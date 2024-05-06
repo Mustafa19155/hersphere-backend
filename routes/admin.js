@@ -24,4 +24,11 @@ router.get("/jobs/:id", mainController.getJob);
 // dashboard
 router.get("/dashboard", mainController.getDashboardData);
 
+// categories
+router.get("/category", mainController.getCategories);
+router.get("/category/:id", mainController.getCategory);
+router.post("/category", mainController.createCategory);
+router.put("/category/:id", mainController.updateCategory);
+router.delete("/category/:id", mainController.deleteCategory);
+
 module.exports = router;

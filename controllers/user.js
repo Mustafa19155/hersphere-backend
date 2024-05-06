@@ -530,36 +530,49 @@ exports.searchInfluencers = async (req, res, next) => {
           ? { instagramPage: { $exists: true } }
           : { youtubeChannel: { $exists: true } };
       });
-
-      // query["$or"] = [
-      //   { facebookPage: platforms.includes("facebook") && { $exists: true } },
-      //   { instagramPage: platforms.includes("instagram") && { $exists: true } },
-      //   { youtubeChannel: platforms.includes("youtube") && { $exists: true } },
-      // ];
-      // query["$or"] = [
-      //   platforms.includes("facebook") && { facebookPage: { $exists: true } },
-      //   platforms.includes("instagram") && { instagramPage: { $exists: true } },
-      //   platforms.includes("youtube") && { youtubeChannel: { $exists: true } },
-      // ];
     }
     if (categories) {
       query["businessDetails.targetAudience"] = { $in: categories };
     }
-    const users = await User.find(query);
+    const users = await User.aggregate([
+      {
+        $match: query,
+      },
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "givenTo",
+          as: "reviews",
+        },
+      },
+      {
+        $addFields: {
+          averageRating: {
+            $cond: [
+              { $gt: [{ $size: "$reviews" }, 0] }, // Check if the user has reviews
+              { $avg: "$reviews.rating" }, // Calculate average rating
+              0, // If no reviews, set average rating to 0
+            ],
+          },
+        },
+      },
+    ]);
+
     res.json(
       users.map((user) => {
         const platforms = [];
-        if (user._doc.facebookPage) {
+        if (user.facebookPage) {
           platforms.push("facebook");
         }
-        if (user._doc.instagramPage) {
+        if (user.instagramPage) {
           platforms.push("instagram");
         }
-        if (user._doc.youtubeChannel) {
+        if (user.youtubeChannel) {
           platforms.push("youtube");
         }
 
-        return { ...user._doc, rating: 5, platforms };
+        return { ...user, rating: Math.ceil(user.averageRating), platforms };
       })
     );
   } catch (err) {
@@ -584,6 +597,13 @@ exports.checkLogin = async (req, res, next) => {
 exports.influencerDashboard = async (req, res, next) => {
   try {
     const highestSuccess = await Promotion.aggregate([
+      {
+        $match: {
+          status: {
+            $nin: ["not-started", "started", "pending", "rejected"], // Exclude promotions with these statuses
+          },
+        },
+      },
       {
         $group: {
           _id: "$influencerID", // Group by influencerID

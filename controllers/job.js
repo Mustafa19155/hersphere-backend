@@ -39,15 +39,32 @@ exports.getAllJobs = async (req, res, next) => {
     const { userId } = req;
 
     // Step 2: Use aggregate to add application status for each job
+    const userWorkplaces = await Job.aggregate([
+      {
+        $match: {
+          "employee.userID": mongoose.Types.ObjectId(userId), // User is already employed
+        },
+      },
+      {
+        $group: {
+          _id: "$workplaceID", // Group by workplaceID
+        },
+      },
+    ]);
+
+    // Extract workplaceIDs from the user's workplaces
+    const userWorkplaceIDs = userWorkplaces.map((workplace) => workplace._id);
+
+    // Use $nin (not in) operator to exclude jobs from workplaces where the user is already employed
     const jobsWithStatus = await Job.aggregate([
       {
         $match: {
-          // employee.userID is null, meaning the job is not taken
-          "employee.userID": null,
-          skillset: { $in: req.query.skills.split(",") },
+          "employee.userID": null, // Job is not taken
+          skillset: { $in: req.query.skills.split(",") }, // Job matches required skills
+          workplaceID: { $nin: userWorkplaceIDs }, // Exclude jobs from workplaces where the user is already employed
         },
       },
-      // populate workplace
+      // Populate workplace
       {
         $lookup: {
           from: "workplaces", // The name of the Workplace collection
@@ -56,10 +73,9 @@ exports.getAllJobs = async (req, res, next) => {
           as: "workplaceID",
         },
       },
-      // find review from review collection based on jobID
-      {
-        $unwind: "$workplaceID", // Deconstruct the array from the previous lookup stage
-      },
+      // Deconstruct the array from the previous lookup stage
+      { $unwind: "$workplaceID" },
+      // Find review from review collection based on jobID
       {
         $lookup: {
           from: "job-requests", // The name of the JobRequest collection
@@ -70,7 +86,7 @@ exports.getAllJobs = async (req, res, next) => {
                 $expr: {
                   $and: [
                     { $eq: ["$jobID", "$$jobId"] },
-                    { $eq: ["$userID", mongoose.Types.ObjectId(userId)] },
+                    { $eq: ["$userID", userId] }, // Use the converted ObjectId directly
                   ],
                 },
               },
@@ -79,16 +95,13 @@ exports.getAllJobs = async (req, res, next) => {
           as: "applications",
         },
       },
+      // Add field to check if the user has applied for the job
       {
         $addFields: {
-          hasApplied: {
-            $gt: [{ $size: "$applications" }, 0], // Check if the array is not empty
-          },
+          hasApplied: { $gt: [{ $size: "$applications" }, 0] }, // Check if the array is not empty
         },
       },
     ]);
-
-    // Now, jobsWithStatus contains the original jobs array with an additional field 'hasApplied'
 
     res.send(jobsWithStatus);
   } catch (error) {

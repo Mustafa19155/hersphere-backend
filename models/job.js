@@ -19,6 +19,11 @@ const JobSchema = new Schema(
     description: { type: String },
     skillset: [{ type: String }],
     price: { type: Number },
+    paymentStatus: {
+      type: String,
+      default: "pending",
+      enum: ["pending", "half", "full"],
+    },
   },
   { timestamps: true }
 );

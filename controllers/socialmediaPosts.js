@@ -67,13 +67,16 @@ exports.uploadToInsta = async (req, res, next) => {
             res.send(response.data);
           })
           .catch((err) => {
+            console.log(err.response.data);
             next(err);
           });
       })
       .catch((err) => {
+        console.log(err.response.data);
         next(err);
       });
   } catch (err) {
+    console.log(err.response.data);
     next(err);
   }
 };
@@ -116,7 +119,7 @@ exports.uploadToYoutube = async (req, res, next) => {
   // upload post to youtube
   try {
     const { accessToken, title, description, file, promotionId } = req.body;
-
+    console.log(accessToken);
     // const { originalname, buffer } = req.file;
 
     const oauth2Client = new google.auth.OAuth2();
@@ -152,7 +155,7 @@ exports.uploadToYoutube = async (req, res, next) => {
     youtube.videos.insert(params, async (err, data) => {
       if (err) {
         console.error(`Error uploading video: ${err}`);
-        res.status(500).send(`Error uploading video: ${err}`);
+        return res.status(500).send(`Error uploading video: ${err}`);
       } else {
         const post = new Post({
           platform: "youtube",
@@ -162,7 +165,7 @@ exports.uploadToYoutube = async (req, res, next) => {
         });
         console.log(data.data);
         await post.save();
-        res.send("Video uploaded successfully!");
+        return res.send("Video uploaded successfully!");
       }
     });
   } catch (err) {

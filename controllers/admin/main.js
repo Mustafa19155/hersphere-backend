@@ -4,6 +4,7 @@ const User = require("../../models/user");
 const Post = require("../../models/post");
 const Transaction = require("../../models/transaction");
 const Workplace = require("../../models/workplace");
+const Category = require("../../models/category");
 
 const mongoose = require("mongoose");
 
@@ -156,11 +157,62 @@ exports.getDashboardData = async (req, res, next) => {
         (user) => user._doc.userType == "influencer"
       ).length,
       workplacesCount: workplaces.length,
-      revenue: transactions.reduce((acc, curr) => acc + curr.amount, 0),
+      revenue: transactions.reduce(
+        (acc, curr) => (acc + curr.amount ? curr.amount : 0),
+        0
+      ),
       last7DaysUsers: usersJoined,
       posts: posts,
     });
   } catch (err) {
     next(err);
+  }
+};
+
+exports.getCategories = async (req, res, next) => {
+  try {
+    const categories = await Category.find();
+    res.status(200).json(categories);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getCategory = async (req, res, next) => {
+  try {
+    const category = await Category.findById(req.params.id);
+    res.status(200).json(category);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.createCategory = async (req, res, next) => {
+  try {
+    const category = await Category.create(req.body);
+    res.status(201).json(category);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateCategory = async (req, res, next) => {
+  try {
+    const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json(category);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteCategory = async (req, res, next) => {
+  try {
+    await Category.findByIdAndDelete(req.params.id);
+    res.status(204).json();
+  } catch (error) {
+    next(error);
   }
 };

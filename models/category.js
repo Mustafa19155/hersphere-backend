@@ -6,10 +6,11 @@ const categorySchema = new Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
   },
   status: {
     type: String,
-    enum: ["accepted", "rejected", "pending"],
+    enum: ["accepted", "rejected", "pending", "active"],
     default: "active",
   },
 });
