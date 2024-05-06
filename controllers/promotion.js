@@ -158,7 +158,7 @@ exports.completePromotion = async (req, res, next) => {
     // check if post likes and counts are equal or greater than the requirements
     const promotion = await Promotion.findById(req.params.id);
     const posts = await Post.find({ promotionID: req.params.id });
-    const user = await User.findById(req.userId);
+    const user = await User.findById(promotion.influencerID);
 
     let isCompleted = false;
 

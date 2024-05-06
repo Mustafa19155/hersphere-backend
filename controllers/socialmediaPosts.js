@@ -181,7 +181,7 @@ exports.getPostsDetailsByRequest = async (req, res, next) => {
       "userID influencerID transactionID"
     );
     const posts = await Post.find({ promotionID: promotionId });
-    const user = await User.findById(req.userId);
+    const user = await User.findById(promotion.influencerID._id);
 
     if (!posts) {
       return res.status(404).send("Posts not found");
@@ -194,7 +194,7 @@ exports.getPostsDetailsByRequest = async (req, res, next) => {
         const facebookPost = await axios.get(
           `https://graph.facebook.com/v12.0/${post.postID}?fields=likes.limit(10).summary(true),comments.limit(10).summary(true)&access_token=${user.facebookPage.access_token}`
         );
-        console.log(facebookPost.data);
+
         postDetails.push({
           facebook: {
             likes: facebookPost.data.likes.summary.total_count,

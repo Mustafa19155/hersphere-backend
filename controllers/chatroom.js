@@ -125,11 +125,18 @@ exports.getUserChat = async (req, res, next) => {
 
     const chatroom = await Chatroom.findOne({
       workplaceID: { $exists: false },
-      _id: id,
-      // membersID: [req.userId, id],
+      // _id: id,
+      membersID: { $all: [req.userId, id] },
     })
       .populate("membersID chats.sentBy")
       .select("-membersID.password");
+    // const chatroom = await Chatroom.findOne({
+    //   workplaceID: { $exists: false },
+    //   _id: id,
+    //   // membersID: [req.userId, id],
+    // })
+    //   .populate("membersID chats.sentBy")
+    //   .select("-membersID.password");
     if (!chatroom) {
       // create a new chatroom
       let newChatroom = new Chatroom({
@@ -159,6 +166,7 @@ exports.getUserChats = async (req, res, next) => {
   try {
     const chatrooms = await Chatroom.find({
       workplaceID: { $exists: false },
+      "lastMsg.messageType": { $exists: true },
       membersID: req.userId,
     })
       .populate("membersID chats.sentBy")
@@ -214,6 +222,7 @@ exports.getRecentChats = async (req, res, next) => {
     console.log(req.userId);
     const chatrooms = await Chatroom.find({
       workplaceID: { $exists: false },
+      "lastMsg.messageType": { $exists: true },
       membersID: req.userId,
     })
       .populate("membersID chats.sentBy")
