@@ -1,5 +1,8 @@
 const Promotion = require("../models/promotion");
 const Job = require("../models/job");
+const natural = require("natural");
+const tokenizer = new natural.WordTokenizer();
+const Workplace = require("../models/workplace");
 
 exports.influencerAnalysis = async (req, res, next) => {
   try {
@@ -29,8 +32,15 @@ exports.influencerAnalysis = async (req, res, next) => {
     ).length;
 
     // calculate success rate
-    const successRate =
-      (successfulPromotions / (successfulPromotions + failedPromotions)) * 100;
+    let successRate;
+
+    if (successfulPromotions === 0 && failedPromotions === 0) {
+      successRate = 0;
+    } else {
+      successRate =
+        (successfulPromotions / (successfulPromotions + failedPromotions)) *
+        100;
+    }
 
     // divide promotions in 12 months
     const monthlyPromotions = [];
@@ -83,9 +93,34 @@ exports.influencerAnalysis = async (req, res, next) => {
   }
 };
 
-const natural = require("natural");
-const tokenizer = new natural.WordTokenizer();
+exports.startupAnalysis = async (req, res, next) => {
+  try {
+    const workplaces = await Workplace.find();
+    const jobs = await Job.find();
+    const promotions = await Promotion.find().populate("transactionID");
 
+    // calculate job acceptance rate
+    const jobAcceptanceRate =
+      (jobs.filter((job) => job.employee.userID).length / jobs.length) * 100;
+
+    // calculate total spent
+    const totalSpent =
+      promotions
+        .filter((pro) => pro.status != "failed" && pro.transactionID)
+        .reduce((acc, promotion) => acc + promotion.transactionID.amount, 0) +
+      jobs.reduce((acc, job) => acc + job.price, 0);
+
+    res.json({
+      totalWorkplaces: workplaces.length,
+      totalJobs: jobs.length,
+      totalPromotions: promotions.length,
+      jobAcceptanceRate,
+      totalSpent,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 // Function to calculate Jaccard similarity
 const calculateJaccardSimilarity = (skillTokens, groupKeyTokens) => {
   const intersectionSize = skillTokens.filter((token) =>
@@ -97,7 +132,7 @@ const calculateJaccardSimilarity = (skillTokens, groupKeyTokens) => {
 };
 
 // Function to group similar skills together
-const groupSimilarSkills = (skillsMap) => {
+function groupSimilarSkills(skillsMap) {
   const groupedSkills = new Map();
   const threshold = 0.5; // Adjust as needed
 
@@ -125,7 +160,7 @@ const groupSimilarSkills = (skillsMap) => {
   });
 
   return groupedSkills;
-};
+}
 
 exports.skillRecommendation = async (req, res, next) => {
   try {
