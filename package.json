@@ -24,6 +24,7 @@
     "mongoose": "^5.12.5",
     "morgan": "~1.9.1",
     "multer": "*",
+    "natural": "^7.0.5",
     "node-cron": "^3.0.3",
     "nodemon": "^2.0.22",
     "passport": "^0.6.0",

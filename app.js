@@ -116,6 +116,7 @@ app.use("/api/payment", verifyJWT, require("./routes/payment"));
 app.use("/api/transaction", verifyJWT, require("./routes/transaction"));
 app.use("/api/category", require("./routes/category"));
 app.use("/api/report", require("./routes/report"));
+app.use("/api/analysis", verifyJWT, require("./routes/analysis"));
 
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public", "index.html"));

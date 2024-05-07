@@ -5,6 +5,7 @@ const Transaction = require("../models/transaction");
 const User = require("../models/user");
 const Job = require("../models/job");
 const cron = require("node-cron");
+const axios = require("axios");
 
 exports.checkExpiredPromotions = async () => {
   cron.schedule(
