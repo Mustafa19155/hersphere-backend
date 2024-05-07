@@ -31,4 +31,10 @@ router.post("/category", mainController.createCategory);
 router.put("/category/:id", mainController.updateCategory);
 router.delete("/category/:id", mainController.deleteCategory);
 
+// reports
+router.get("/report", mainController.getReports);
+router.get("/report/:id", mainController.getReport);
+router.put("/report/:id", mainController.updateReport);
+router.delete("/report/:id", mainController.deleteReport);
+
 module.exports = router;

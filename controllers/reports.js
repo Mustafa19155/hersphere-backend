@@ -2,7 +2,7 @@ const Report = require("../models/report");
 
 exports.getReports = async (req, res, next) => {
   try {
-    const reports = await Report.find();
+    const reports = await Report.find().populate("userID reportedUserID");
     res.status(200).json({ reports });
   } catch (error) {
     next(error);
@@ -20,7 +20,10 @@ exports.getReport = async (req, res, next) => {
 
 exports.createReport = async (req, res, next) => {
   try {
-    const report = await Report.create(req.body);
+    const report = await Report.create({
+      ...req.body,
+      userID: req.userId,
+    });
     res.status(201).json({ report });
   } catch (error) {
     next(error);

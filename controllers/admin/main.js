@@ -5,6 +5,7 @@ const Post = require("../../models/post");
 const Transaction = require("../../models/transaction");
 const Workplace = require("../../models/workplace");
 const Category = require("../../models/category");
+const Report = require("../../models/report");
 
 const mongoose = require("mongoose");
 
@@ -214,5 +215,41 @@ exports.deleteCategory = async (req, res, next) => {
     res.status(204).json();
   } catch (error) {
     next(error);
+  }
+};
+
+exports.getReports = async (req, res, next) => {
+  try {
+    const reports = await Report.find().populate("userID reportedUserID");
+    return res.status(200).json(reports);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getReport = async (req, res, next) => {
+  try {
+    const report = await Report.findById(req.params.id);
+    return res.status(200).json(report);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.updateReport = async (req, res, next) => {
+  try {
+    const report = await Report.findByIdAndUpdate(req.params.id, req.body);
+    return res.status(200).json({ message: "Report updated successfully" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deleteReport = async (req, res, next) => {
+  try {
+    await Report.findByIdAndDelete(req.params.id);
+    return res.status(204).json();
+  } catch (err) {
+    next(err);
   }
 };

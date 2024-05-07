@@ -5,6 +5,7 @@ const Job = require("../models/job");
 const Workplace = require("../models/workplace");
 const Promotion = require("../models/promotion");
 const Review = require("../models/review");
+const Report = require("../models/report");
 const Category = require("../models/category");
 
 exports.login = async (req, res, next) => {
