@@ -33,9 +33,6 @@ exports.createJob = async (req, res, next) => {
 
 exports.getAllJobs = async (req, res, next) => {
   try {
-    // const jobs = await Job.find();
-    // res.status(200).json(jobs);
-
     const { userId } = req;
 
     // Step 2: Use aggregate to add application status for each job
@@ -55,12 +52,16 @@ exports.getAllJobs = async (req, res, next) => {
     // Extract workplaceIDs from the user's workplaces
     const userWorkplaceIDs = userWorkplaces.map((workplace) => workplace._id);
 
+    const skillPatterns = req.query.skills
+      .split(",")
+      .map((skill) => new RegExp(skill, "i"));
+
     // Use $nin (not in) operator to exclude jobs from workplaces where the user is already employed
     const jobsWithStatus = await Job.aggregate([
       {
         $match: {
           "employee.userID": null, // Job is not taken
-          skillset: { $in: req.query.skills.split(",") }, // Job matches required skills
+          skillset: { $in: skillPatterns }, // Job matches required skills
           workplaceID: { $nin: userWorkplaceIDs }, // Exclude jobs from workplaces where the user is already employed
         },
       },
@@ -102,7 +103,6 @@ exports.getAllJobs = async (req, res, next) => {
         },
       },
     ]);
-
     res.send(jobsWithStatus);
   } catch (error) {
     next(error);

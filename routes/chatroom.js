@@ -67,6 +67,7 @@ chatroomRouter.get(
 
 // read messages
 chatroomRouter.put("/:id/read", chatroomCOntroller.readMessages);
+chatroomRouter.put("/:id/read-single", chatroomCOntroller.readMessages);
 
 // get user chat
 chatroomRouter.get("/user/single/:id", chatroomCOntroller.getUserChat);

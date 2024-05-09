@@ -4,6 +4,10 @@ const Promotion = require("../models/promotion");
 const User = require("../models/user");
 const { google } = require("googleapis");
 const { Readable } = require("stream");
+const fs = require("fs");
+const https = require("https");
+const path = require("path");
+const { v4: uuidv4 } = require("uuid");
 
 exports.uploadToFacebook = async (req, res, next) => {
   try {
@@ -115,11 +119,46 @@ exports.getPostDetails = async (req, res, next) => {
   }
 };
 
+const createDirectoryIfNotExists = (directory) => {
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, { recursive: true }); // recursive: true ensures creation of nested directories
+  }
+};
+
+// Function to download file from URL
+const downloadFile = (url, destinationDirectory) => {
+  return new Promise((resolve, reject) => {
+    createDirectoryIfNotExists(destinationDirectory); // Create destination directory if it doesn't exist
+
+    const randomFileName = uuidv4(); // Generate a random filename
+    const destinationPath = path.join(destinationDirectory, randomFileName);
+
+    const file = fs.createWriteStream(destinationPath);
+
+    https
+      .get(url, (response) => {
+        response.pipe(file);
+
+        file.on("finish", () => {
+          file.close(resolve(destinationPath));
+        });
+      })
+      .on("error", (error) => {
+        fs.unlink(destinationPath, () => {
+          reject(error.message);
+        });
+      });
+  });
+};
 exports.uploadToYoutube = async (req, res, next) => {
   // upload post to youtube
   try {
-    const { accessToken, title, description, file, promotionId } = req.body;
-    console.log(accessToken);
+    const { accessToken, title, description, promotionId, url } = req.body;
+
+    const destinationPath = "./tempfile"; // Choose a destination path for the downloaded file
+    const filePath = await downloadFile(url, destinationPath);
+
+    // return res.send("A");
     // const { originalname, buffer } = req.file;
 
     const oauth2Client = new google.auth.OAuth2();
@@ -146,7 +185,8 @@ exports.uploadToYoutube = async (req, res, next) => {
       part: "snippet,status",
       media: {
         mimeType: "video/*",
-        body: req.file ? Readable.from(req.file.buffer) : req.body.url,
+        // body: req.file ? Readable.from(req.file.buffer) : req.body.url,
+        body: fs.createReadStream(filePath),
       },
       notifySubscribers: false,
       resource: metadata,
@@ -163,7 +203,6 @@ exports.uploadToYoutube = async (req, res, next) => {
           userID: req.userId,
           promotionID: promotionId,
         });
-        console.log(data.data);
         await post.save();
         return res.send("Video uploaded successfully!");
       }
@@ -212,12 +251,51 @@ exports.getPostsDetailsByRequest = async (req, res, next) => {
             comments: instagramPost.data.comments_count,
           },
         });
-      } else {
-        const youtubePost = await axios.get(
-          `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${post.postID}&key=${process.env.YOUTUBE_API_KEY}`
-        );
+      } else if (post.platform === "youtube") {
+        console.log(post);
+        const oauth2Client = new google.auth.OAuth2();
+        oauth2Client.setCredentials({
+          access_token: user.youtubeChannel.token,
+        });
 
-        postDetails.push({ youtube: youtubePost.data });
+        const youtube = google.youtube({
+          version: "v3",
+          auth: oauth2Client,
+        });
+
+        // retrieve the user's channel ID
+        const {
+          data: { items: channels },
+        } = await youtube.channels.list({
+          part: "id",
+          mine: true,
+        });
+
+        const channelId = channels[0].id;
+
+        // retrieve a list of the user's uploaded videos
+        const {
+          data: { items: videos },
+        } = await youtube.videos.list({
+          part: "snippet,statistics",
+          id: post.postID,
+          channelId: channelId,
+          maxResults: 50, // retrieve up to 50 videos
+        });
+        if (videos.length > 0) {
+          postDetails.push({
+            youtube: {
+              likes: videos[0].statistics.likeCount,
+              comments: videos[0].statistics.commentCount,
+            },
+          });
+        }
+
+        // const youtubePost = await axios.get(
+        //   `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${post.postID}&key=${process.env.YOUTUBE_API_KEY}`
+        // );
+
+        // postDetails.push({ youtube: youtubePost.data });
       }
     }
     return res.send({ promotion, postDetails });

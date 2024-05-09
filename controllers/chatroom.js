@@ -119,6 +119,33 @@ exports.readMessages = async (req, res, next) => {
   }
 };
 
+exports.readMessages = async (req, res, next) => {
+  try {
+    const { userId } = req;
+    const chatroom = await Chatroom.findById(req.params.id);
+
+    if (!chatroom) {
+      return res.status(404).send({ message: "Chatroom not found" });
+    }
+
+    chatroom.chats.forEach((chat) => {
+      if (
+        chat.sentBy !== userId &&
+        !chat.readBy.includes(userId) &&
+        chat.deliveredTo.includes(userId)
+      ) {
+        chat.readBy.push(userId);
+      }
+    });
+
+    await chatroom.save();
+
+    res.send(chatroom);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getUserChat = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -182,7 +209,7 @@ exports.getUserChats = async (req, res, next) => {
             name: chatroom.membersID.find(
               (member) => member._id.toString() !== req.userId
             ).username,
-            unreadMessages: chatroom.chats.filter(
+            unread: chatroom.chats.filter(
               (chat) =>
                 chat.sentBy !== req.userId &&
                 !chat.readBy.includes(req.userId) &&
