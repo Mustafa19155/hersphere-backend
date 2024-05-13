@@ -1,7 +1,13 @@
 const userController = require("../controllers/admin/user");
 const mainController = require("../controllers/admin/main");
+const adminController = require("../controllers/admin");
 
 const router = require("express").Router();
+
+// auth
+router.post("/login", adminController.login);
+router.post("/logout", adminController.logout);
+router.get("/check-login", adminController.checkLogin);
 
 // users
 router.get("/users", userController.getUsers);

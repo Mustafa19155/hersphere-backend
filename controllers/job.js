@@ -51,17 +51,16 @@ exports.getAllJobs = async (req, res, next) => {
 
     // Extract workplaceIDs from the user's workplaces
     const userWorkplaceIDs = userWorkplaces.map((workplace) => workplace._id);
-
-    const skillPatterns = req.query.skills
-      .split(",")
-      .map((skill) => new RegExp(skill, "i"));
+    // const skillPatterns = req.query.skills
+    //   .split(",")
+    //   .map((skill) => new RegExp(skill, "i"));
 
     // Use $nin (not in) operator to exclude jobs from workplaces where the user is already employed
     const jobsWithStatus = await Job.aggregate([
       {
         $match: {
           "employee.userID": null, // Job is not taken
-          skillset: { $in: skillPatterns }, // Job matches required skills
+          // skillset: { $in: skillPatterns }, // Job matches required skills
           workplaceID: { $nin: userWorkplaceIDs }, // Exclude jobs from workplaces where the user is already employed
         },
       },
@@ -103,6 +102,19 @@ exports.getAllJobs = async (req, res, next) => {
         },
       },
     ]);
+
+    // filter jobs based on the user's skills
+    // return job even if only 3 letters of the skill match
+
+    // const jobs = jobsWithStatus.filter((job) => {
+    //   const skillPatterns = req.query.skills
+    //     .split(",")
+    //     .map((skill) => new RegExp(`\\b[a-zA-Z]{3,}\\b`, "i")); // Adjusted regex pattern to match words with at least 3 letters
+    //   return skillPatterns.some((pattern) =>
+    //     job.skillset.some((skill) => pattern.test(skill))
+    //   );
+    // });
+
     res.send(jobsWithStatus);
   } catch (error) {
     next(error);

@@ -15,7 +15,16 @@ exports.initializingPassport = (passport) => {
       async (email, password, done) => {
         try {
           const foundUser = await Admin.findOne({ email: email });
+
           if (!foundUser) {
+            // const encryptedPassword = await bcrypt.hash(password, 10);
+            // const user = new Admin({
+            //   email: email,
+            //   password: encryptedPassword,
+            // });
+
+            // await user.save();
+
             return done(null, false, { message: "User does not exist" });
           } else {
             const validPass = await bcrypt.compare(

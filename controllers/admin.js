@@ -2,15 +2,11 @@ const passport = require("passport");
 const Admin = require("../models/admin");
 const User = require("../models/user");
 const Job = require("../models/job");
-const Workplace = require("../models/workplace");
-const Promotion = require("../models/promotion");
-const Review = require("../models/review");
-const Report = require("../models/report");
 const Category = require("../models/category");
 
 exports.login = async (req, res, next) => {
   try {
-    passport.Authenticator("local", (err, user, info) => {
+    passport.authenticate("local", (err, user, info) => {
       if (err) {
         next(err);
       }
@@ -31,8 +27,23 @@ exports.login = async (req, res, next) => {
 
 exports.logout = async (req, res, next) => {
   try {
-    req.logout();
+    req.logout((err) => {
+      if (err) {
+        next(err);
+      }
+    });
     return res.status(200).json({ message: "Logout successful" });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.checkLogin = async (req, res, next) => {
+  try {
+    if (req.isAuthenticated()) {
+      return res.status(200).json({ message: "User is logged in" });
+    }
+    return res.status(400).json({ message: "User is not logged in" });
   } catch (err) {
     next(err);
   }

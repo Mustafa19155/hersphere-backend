@@ -138,10 +138,10 @@ app.use(function (err, req, res, next) {
   res.send(err);
 });
 
-checkExpiredPromotions();
-checkActivePromotions();
-updateWorkplaceStatus();
-jobPayment();
+// checkExpiredPromotions();
+// checkActivePromotions();
+// updateWorkplaceStatus();
+// jobPayment();
 
 // const ids = [
 //   "662e81e4c485e21e2046e7ea",

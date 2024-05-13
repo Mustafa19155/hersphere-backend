@@ -123,7 +123,6 @@ exports.readMessages = async (req, res, next) => {
   try {
     const { userId } = req;
     const chatroom = await Chatroom.findById(req.params.id);
-
     if (!chatroom) {
       return res.status(404).send({ message: "Chatroom not found" });
     }

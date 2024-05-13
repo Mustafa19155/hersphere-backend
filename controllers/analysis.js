@@ -110,7 +110,16 @@ exports.startupAnalysis = async (req, res, next) => {
         .reduce((acc, promotion) => acc + promotion.transactionID.amount, 0) +
       jobs.reduce((acc, job) => acc + job.price, 0);
 
+    const monthlyPromotions = [];
+    for (let i = 0; i < 12; i++) {
+      const monthPromotions = promotions.filter(
+        (promotion) => promotion.createdAt.getMonth() === i
+      );
+      monthlyPromotions.push(monthPromotions.length);
+    }
+
     res.json({
+      monthlyPromotions,
       totalWorkplaces: workplaces.length,
       totalJobs: jobs.length,
       totalPromotions: promotions.length,

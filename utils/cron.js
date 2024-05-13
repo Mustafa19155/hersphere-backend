@@ -9,7 +9,7 @@ const axios = require("axios");
 
 exports.checkExpiredPromotions = async () => {
   cron.schedule(
-    "0 0 * * *",
+    "* * * * *",
     async () => {
       try {
         // check for pending promotions and set them to expired
@@ -17,25 +17,30 @@ exports.checkExpiredPromotions = async () => {
           status: "pending",
           deadline: { $lt: new Date() },
         });
+
         promotions.forEach(async (promotion) => {
-          const transaction = new Transaction({
-            userID: promotion.userID,
-            amount: promotion.transactionID.amount,
-            type: "wallet",
-            direction: "out",
-            reason: "Promotion Expired",
-          });
+          if (promotion.transactionID && promotion.transactionID.amount) {
+            const transaction = new Transaction({
+              userID: promotion.userID,
+              amount: promotion.transactionID.amount,
+              type: "wallet",
+              direction: "out",
+              reason: "Promotion Expired",
+            });
+            await transaction.save();
 
-          await transaction.save();
+            const user = await User.findById(promotion.userID);
+            if (user) {
+              user.balance += promotion.transactionID.amount;
+              await user.save();
+            }
 
-          const user = await User.findById(promotion.userID);
-          if (user) {
-            user.balance += promotion.transactionID.amount;
-            await user.save();
+            promotion.status = "rejected";
+            await promotion.save();
+          } else {
+            // delete promotion
+            await promotion.delete();
           }
-
-          promotion.status = "rejected";
-          await promotion.save();
         });
       } catch (error) {
         console.error("Error occurred:", error);
@@ -49,92 +54,116 @@ exports.checkExpiredPromotions = async () => {
 
 exports.checkActivePromotions = async () => {
   cron.schedule(
-    "*/5 * * * *",
+    "* * * * *",
     async () => {
       try {
+        console.log("A");
         const promotions = await Promotion.find({
-          status: "started",
+          $or: [{ status: "started" }, { status: "not-started" }],
           deadline: { $lt: new Date() },
         }).populate("userID influencerID transactionID");
 
         promotions.forEach(async (promotion) => {
-          const posts = await Post.find({ promotionID: promotion._id });
-          let isCompleted = false;
+          if (promotion.status === "not-started") {
+            if (promotion.transactionID && promotion.transactionID.amount) {
+              const transaction = new Transaction({
+                userID: promotion.userID,
+                amount: promotion.transactionID.amount,
+                type: "wallet",
+                direction: "out",
+                reason: "Promotion Failed",
+              });
+              await transaction.save();
 
-          for (let post of posts) {
-            if (post.platform === "facebook") {
-              const facebookPost = await axios.get(
-                `https://graph.facebook.com/v12.0/${post.postID}?fields=likes.limit(10).summary(true),comments.limit(10).summary(true)&access_token=${promotion.influencerID.facebookPage.access_token}`
-              );
-              facebookPost.data.likes.summary.total_count >=
-                promotion.requirements.likes &&
-              facebookPost.data.comments.summary.total_count >=
-                promotion.requirements.comments
-                ? (isCompleted = true)
-                : (isCompleted = false);
-            } else if (post.platform === "instagram") {
-              const instagramPost = await axios.get(
-                `https://graph.facebook.com/v12.0/${post.postID}?fields=like_count,comments_count&access_token=${promotion.influencerID.instagramPage.token}`
-              );
+              const user = await User.findById(promotion.userID);
+              if (user) {
+                user.balance += promotion.transactionID.amount;
+                await user.save();
+              }
 
-              instagramPost.data.like_count >= promotion.requirements.likes &&
-              instagramPost.data.comments_count >=
-                promotion.requirements.comments
-                ? (isCompleted = true)
-                : (isCompleted = false);
-            } else if (post.platform === "youtube") {
-              const youtubePost = await axios.get(
-                `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${post.postID}&key=${process.env.YOUTUBE_API_KEY}`
-              );
+              promotion.status = "failed";
 
-              youtubePost.data.items[0].statistics.likeCount >=
-                promotion.requirements.likes &&
-              youtubePost.data.items[0].statistics.commentCount >=
-                promotion.requirements.comments
-                ? (isCompleted = true)
-                : (isCompleted = false);
+              await promotion.save();
             }
-          }
-          if (isCompleted) {
-            promotion.completedOn = Date.now();
-            promotion.status = "completed";
-
-            const transaction = new Transaction({
-              userID: promotion.influencerID._id,
-              amount: promotion.transactionID.amount,
-              type: "wallet",
-              direction: "out",
-              reason: "Promotion Completed",
-            });
-            await transaction.save();
-
-            // update user balance
-            const user = await User.findById(promotion.influencerID._id);
-            if (user) {
-              user.balance += promotion.transactionID.amount;
-              await user.save();
-            }
-
-            await promotion.save();
           } else {
-            const transaction = new Transaction({
-              userID: promotion.userID._id,
-              amount: promotion.transactionID.amount,
-              type: "wallet",
-              direction: "out",
-              reason: "Promotion Failed",
-            });
-            await transaction.save();
+            const posts = await Post.find({ promotionID: promotion._id });
+            let isCompleted = false;
 
-            // update user balance
-            const user = await User.findById(promotion.userID._id);
-            if (user) {
-              user.balance += promotion.transactionID.amount;
-              await user.save();
+            for (let post of posts) {
+              if (post.platform === "facebook") {
+                const facebookPost = await axios.get(
+                  `https://graph.facebook.com/v12.0/${post.postID}?fields=likes.limit(10).summary(true),comments.limit(10).summary(true)&access_token=${promotion.influencerID.facebookPage.access_token}`
+                );
+                facebookPost.data.likes.summary.total_count >=
+                  promotion.requirements.likes &&
+                facebookPost.data.comments.summary.total_count >=
+                  promotion.requirements.comments
+                  ? (isCompleted = true)
+                  : (isCompleted = false);
+              } else if (post.platform === "instagram") {
+                const instagramPost = await axios.get(
+                  `https://graph.facebook.com/v12.0/${post.postID}?fields=like_count,comments_count&access_token=${promotion.influencerID.instagramPage.token}`
+                );
+
+                instagramPost.data.like_count >= promotion.requirements.likes &&
+                instagramPost.data.comments_count >=
+                  promotion.requirements.comments
+                  ? (isCompleted = true)
+                  : (isCompleted = false);
+              } else if (post.platform === "youtube") {
+                const youtubePost = await axios.get(
+                  `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${post.postID}&key=${process.env.YOUTUBE_API_KEY}`
+                );
+
+                youtubePost.data.items[0].statistics.likeCount >=
+                  promotion.requirements.likes &&
+                youtubePost.data.items[0].statistics.commentCount >=
+                  promotion.requirements.comments
+                  ? (isCompleted = true)
+                  : (isCompleted = false);
+              }
             }
+            if (isCompleted) {
+              promotion.completedOn = Date.now();
+              promotion.status = "completed";
 
-            promotion.status = "failed";
-            await promotion.save();
+              const transaction = new Transaction({
+                userID: promotion.influencerID._id,
+                amount: promotion.transactionID.amount,
+                type: "wallet",
+                direction: "out",
+                reason: "Promotion Completed",
+              });
+              await transaction.save();
+
+              // update user balance
+              const user = await User.findById(promotion.influencerID._id);
+              if (user) {
+                user.balance += promotion.transactionID.amount;
+                await user.save();
+              }
+
+              await promotion.save();
+            } else {
+              const transaction = new Transaction({
+                userID: promotion.userID._id,
+                amount: promotion.transactionID.amount,
+                type: "wallet",
+                direction: "out",
+                reason: "Promotion Failed",
+              });
+              await transaction.save();
+
+              // update user balance
+              const user = await User.findById(promotion.userID._id);
+              if (user) {
+                user.balance += promotion.transactionID.amount;
+                await user.save();
+              }
+
+              promotion.status = "failed";
+              await promotion.save();
+            }
           }
         });
       } catch (error) {

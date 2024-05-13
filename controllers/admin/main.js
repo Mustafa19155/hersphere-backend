@@ -6,6 +6,7 @@ const Transaction = require("../../models/transaction");
 const Workplace = require("../../models/workplace");
 const Category = require("../../models/category");
 const Report = require("../../models/report");
+const moment = require("moment");
 
 const mongoose = require("mongoose");
 
@@ -122,7 +123,6 @@ exports.getDashboardData = async (req, res, next) => {
     const workplaces = await Workplace.find({});
     const transactions = await Transaction.find({});
 
-    // get users joined in last 7 days group by date
     const usersJoined = await User.aggregate([
       {
         $match: {
@@ -140,6 +140,43 @@ exports.getDashboardData = async (req, res, next) => {
         },
       },
     ]);
+
+    let last7DaysUsers = [];
+    // Get the start date for the last 7 days
+    const startDate = moment().subtract(6, "days").startOf("day");
+
+    // Iterate over the last 7 days
+    for (let i = 0; i < 7; i++) {
+      // Get the current date
+      const currentDate = moment(startDate).add(i, "days").format("YYYY-MM-DD");
+      // Find users joined on the current date
+      const usersJoinedOnDate = usersJoined.find(
+        (item) => item._id === currentDate
+      );
+      // If users joined on the current date, add count, else 0
+      const count = usersJoinedOnDate ? usersJoinedOnDate.count : 0;
+      // Push date and count to the result
+      last7DaysUsers.push({ date: currentDate, count });
+    }
+    console.log(last7DaysUsers);
+    // get users joined in last 7 days group by date
+    // const usersJoined = await User.aggregate([
+    //   {
+    //     $match: {
+    //       createdAt: {
+    //         $gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+    //       },
+    //     },
+    //   },
+    //   {
+    //     $group: {
+    //       _id: {
+    //         $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+    //       },
+    //       count: { $sum: 1 },
+    //     },
+    //   },
+    // ]);
 
     // get posts by grouping them by platform
     const posts = await Post.aggregate([
@@ -162,7 +199,7 @@ exports.getDashboardData = async (req, res, next) => {
         (acc, curr) => (acc + curr.amount ? curr.amount : 0),
         0
       ),
-      last7DaysUsers: usersJoined,
+      last7DaysUsers,
       posts: posts,
     });
   } catch (err) {
